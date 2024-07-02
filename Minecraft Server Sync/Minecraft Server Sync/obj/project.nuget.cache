@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "NPkQbAXWJhrUMMXq4lkYA5rBDts5ldRYkJF71jesvc109oJyxEtg71oE8imsPxmQ5TPVB5q5c6gZXeQl5QGAQw==",
+  "success": true,
+  "projectFilePath": "D:\\Coding Projects\\Minecraft Server Sync\\Minecraft Server Sync\\Minecraft Server Sync.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\tobyh\\.nuget\\packages\\dropbox.api\\6.37.0\\dropbox.api.6.37.0.nupkg.sha512",
+    "C:\\Users\\tobyh\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}

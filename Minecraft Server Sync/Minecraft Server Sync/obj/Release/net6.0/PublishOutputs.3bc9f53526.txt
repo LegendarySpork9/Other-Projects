@@ -1,0 +1,7 @@
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Release\net6.0\Minecraft Server Sync.exe
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Release\net6.0\Minecraft Server Sync.dll
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Release\net6.0\Minecraft Server Sync.deps.json
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Release\net6.0\Minecraft Server Sync.runtimeconfig.json
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Release\net6.0\Minecraft Server Sync.pdb
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Release\net6.0\Dropbox.Api.dll
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Release\net6.0\Newtonsoft.Json.dll
