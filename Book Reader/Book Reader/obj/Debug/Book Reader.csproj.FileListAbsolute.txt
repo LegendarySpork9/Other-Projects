@@ -1,0 +1,33 @@
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.csprojAssemblyReference.cache
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\obj\Debug\Book_Reader.Book_Reader.resources
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\obj\Debug\Book_Reader.Properties.Resources.resources
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.GenerateResource.cache
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\bin\Debug\Book Reader.exe.config
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\bin\Debug\Book Reader.exe
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\bin\Debug\Book Reader.pdb
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.exe
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.pdb
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\bin\Debug\Book Reader.exe.config
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\bin\Debug\Book Reader.exe
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\bin\Debug\Book Reader.pdb
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.AssemblyReference.cache
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.SuggestedBindingRedirects.cache
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\obj\Debug\Book_Reader.Book_Reader.resources
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\obj\Debug\Book_Reader.Properties.Resources.resources
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.GenerateResource.cache
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.CoreCompileInputs.cache
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\obj\Debug\Book Reader.exe
+C:\Users\TobyH\Downloads\Book Reader\Book Reader\obj\Debug\Book Reader.pdb
+C:\Users\Ginger\Documents\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.ResolveComReference.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.AssemblyReference.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.SuggestedBindingRedirects.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.ResolveComReference.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book_Reader.Book_Reader.resources
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book_Reader.Properties.Resources.resources
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.GenerateResource.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.csproj.CoreCompileInputs.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.exe
+D:\Coding Projects\Book Reader\Book Reader\obj\Debug\Book Reader.pdb
+D:\Coding Projects\Book Reader\Book Reader\bin\Debug\Book Reader.exe.config
+D:\Coding Projects\Book Reader\Book Reader\bin\Debug\Book Reader.exe
+D:\Coding Projects\Book Reader\Book Reader\bin\Debug\Book Reader.pdb
