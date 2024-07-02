@@ -1,0 +1,18 @@
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Debug\net6.0\Minecraft Server Sync.exe
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Debug\net6.0\Minecraft Server Sync.deps.json
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Debug\net6.0\Minecraft Server Sync.runtimeconfig.json
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Debug\net6.0\Minecraft Server Sync.dll
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Debug\net6.0\Minecraft Server Sync.pdb
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Debug\net6.0\Dropbox.Api.dll
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.csproj.AssemblyReference.cache
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.GeneratedMSBuildEditorConfig.editorconfig
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.AssemblyInfoInputs.cache
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.AssemblyInfo.cs
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.csproj.CoreCompileInputs.cache
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.csproj.CopyComplete
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.dll
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\refint\Minecraft Server Sync.dll
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.pdb
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\Minecraft Server Sync.genruntimeconfig.cache
+D:\Coding Projects\Minecraft Server Sync\Minecraft Server Sync\obj\Debug\net6.0\ref\Minecraft Server Sync.dll
