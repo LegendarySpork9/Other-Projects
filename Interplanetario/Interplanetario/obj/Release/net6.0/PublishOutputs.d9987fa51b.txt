@@ -1,0 +1,7 @@
+D:\Coding Projects\Interplanetario\Interplanetario\bin\Release\net6.0\Interplanetario.exe
+D:\Coding Projects\Interplanetario\Interplanetario\bin\Release\net6.0\Interplanetario.dll
+D:\Coding Projects\Interplanetario\Interplanetario\bin\Release\net6.0\Interplanetario.deps.json
+D:\Coding Projects\Interplanetario\Interplanetario\bin\Release\net6.0\Interplanetario.runtimeconfig.json
+D:\Coding Projects\Interplanetario\Interplanetario\bin\Release\net6.0\Interplanetario.pdb
+D:\Coding Projects\Interplanetario\Interplanetario\bin\Release\net6.0\Dropbox.Api.dll
+D:\Coding Projects\Interplanetario\Interplanetario\bin\Release\net6.0\Newtonsoft.Json.dll
