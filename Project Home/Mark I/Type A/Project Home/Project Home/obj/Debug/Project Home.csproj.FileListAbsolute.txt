@@ -1,0 +1,20 @@
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\bin\Debug\Project Home.exe.config
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\bin\Debug\Project Home.exe
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\bin\Debug\Project Home.pdb
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.csprojAssemblyReference.cache
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\obj\Debug\Project_Home.Form1.resources
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\obj\Debug\Project_Home.Properties.Resources.resources
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.csproj.GenerateResource.cache
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.exe
+C:\Users\Ginger\Documents\Project Home\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.pdb
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.csproj.AssemblyReference.cache
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.csproj.SuggestedBindingRedirects.cache
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\obj\Debug\Project_Home.Form1.resources
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\obj\Debug\Project_Home.Properties.Resources.resources
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.csproj.GenerateResource.cache
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.csproj.CoreCompileInputs.cache
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.exe
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\obj\Debug\Project Home.pdb
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\bin\Debug\Project Home.exe.config
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\bin\Debug\Project Home.exe
+D:\Coding Projects\Project Home (Scrapped)\Mark I\Type A\Project Home\Project Home\bin\Debug\Project Home.pdb
