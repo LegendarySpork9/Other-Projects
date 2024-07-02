@@ -1,0 +1,18 @@
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.exe
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.deps.json
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.runtimeconfig.json
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.dll
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.pdb
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\Dropbox.Api.dll
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\Newtonsoft.Json.dll
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.csproj.AssemblyReference.cache
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.GeneratedMSBuildEditorConfig.editorconfig
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.AssemblyInfoInputs.cache
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.AssemblyInfo.cs
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.csproj.CoreCompileInputs.cache
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.csproj.CopyComplete
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.dll
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\refint\PA Updater.dll
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.pdb
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\PA Updater.genruntimeconfig.cache
+D:\Coding Projects\PA Updater\PA Updater\obj\Release\net6.0\ref\PA Updater.dll
