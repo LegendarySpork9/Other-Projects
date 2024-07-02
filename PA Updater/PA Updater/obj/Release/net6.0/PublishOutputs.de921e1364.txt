@@ -1,0 +1,7 @@
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.exe
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.dll
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.deps.json
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.runtimeconfig.json
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\PA Updater.pdb
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\Dropbox.Api.dll
+D:\Coding Projects\PA Updater\PA Updater\bin\Release\net6.0\Newtonsoft.Json.dll
