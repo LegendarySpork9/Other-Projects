@@ -1,0 +1,12 @@
+D:\Coding Projects\Book Reader\Book Reader\bin\Release\Book Reader.exe.config
+D:\Coding Projects\Book Reader\Book Reader\bin\Release\Book Reader.exe
+D:\Coding Projects\Book Reader\Book Reader\bin\Release\Book Reader.pdb
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book Reader.csproj.AssemblyReference.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book Reader.csproj.SuggestedBindingRedirects.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book Reader.csproj.ResolveComReference.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book_Reader.Book_Reader.resources
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book_Reader.Properties.Resources.resources
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book Reader.csproj.GenerateResource.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book Reader.csproj.CoreCompileInputs.cache
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book Reader.exe
+D:\Coding Projects\Book Reader\Book Reader\obj\Release\Book Reader.pdb
