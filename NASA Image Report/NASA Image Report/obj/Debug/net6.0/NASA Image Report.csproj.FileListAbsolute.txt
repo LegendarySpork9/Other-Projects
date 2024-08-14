@@ -1,0 +1,23 @@
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.csproj.AssemblyReference.cache
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.GeneratedMSBuildEditorConfig.editorconfig
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.AssemblyInfoInputs.cache
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.AssemblyInfo.cs
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.csproj.CoreCompileInputs.cache
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\NASA Image Report.exe
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\NASA Image Report.deps.json
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\NASA Image Report.runtimeconfig.json
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\NASA Image Report.dll
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\NASA Image Report.pdb
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\RestSharp.dll
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.csproj.CopyComplete
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.dll
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\refint\NASA Image Report.dll
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.pdb
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.genruntimeconfig.cache
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\ref\NASA Image Report.dll
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\Interop.Microsoft.Office.Interop.Word.dll
+D:\Coding Projects\NASA Image Report\NASA Image Report\obj\Debug\net6.0\NASA Image Report.csproj.ResolveComReference.cache
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\NASA Image Report.dll.config
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\System.Configuration.ConfigurationManager.dll
+D:\Coding Projects\NASA Image Report\NASA Image Report\bin\Debug\net6.0\System.Security.Cryptography.ProtectedData.dll
