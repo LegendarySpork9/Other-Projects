@@ -2,8 +2,9 @@
 
 namespace Github_To_Codecks.Models
 {
-    internal class GitTokenModel
+    internal class CodeckModel
     {
         public string Token { get; set; }
+        public string SubDomain { get; set; }
     }
 }

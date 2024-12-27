@@ -8,12 +8,12 @@ namespace Github_To_Codecks.Services
 {
     internal class CodeckService
     {
-        CodeckTokenModel codeckToken;
+        CodeckModel codeck;
         private string accountId;
 
-        public CodeckService(CodeckTokenModel _codeckToken)
+        public CodeckService(CodeckModel _codeck)
         {
-            codeckToken = _codeckToken;
+            codeck = _codeck;
         }
 
         // Gets all the cards in my organisation.
@@ -26,8 +26,8 @@ namespace Github_To_Codecks.Services
             {
                 Method = Method.Get
             };
-            request.AddHeader("X-Auth-Token", $"{codeckToken.Token}");
-            request.AddHeader("X-Account", "hunter-industries");
+            request.AddHeader("X-Auth-Token", $"{codeck.Token}");
+            request.AddHeader("X-Account", codeck.SubDomain);
             request.AddParameter("query", "{\"_root\": [{\"account\": [{\"cards\": [\"title\",\"status\",\"tags\",\"content\"]}]}]}");
             RestResponse response = await rest.ExecuteAsync(request);
 
@@ -66,8 +66,8 @@ namespace Github_To_Codecks.Services
             {
                 Method = Method.Get
             };
-            request.AddHeader("X-Auth-Token", $"{codeckToken.Token}");
-            request.AddHeader("X-Account", "hunter-industries");
+            request.AddHeader("X-Auth-Token", $"{codeck.Token}");
+            request.AddHeader("X-Account", codeck.SubDomain);
             request.AddParameter("query", "{\"_root\": [{\"account\": [{\"projects\": [\"name\"]}]}]}");
             RestResponse response = await rest.ExecuteAsync(request);
 
@@ -102,8 +102,8 @@ namespace Github_To_Codecks.Services
             {
                 Method = Method.Get
             };
-            request.AddHeader("X-Auth-Token", $"{codeckToken.Token}");
-            request.AddHeader("X-Account", "hunter-industries");
+            request.AddHeader("X-Auth-Token", $"{codeck.Token}");
+            request.AddHeader("X-Account", codeck.SubDomain);
             request.AddParameter("query", "{\"_root\": [{\"account\": [{\"decks({\\\"title\\\":{\\\"op\\\":\\\"contains\\\",\\\"value\\\":\\\"Awaiting Triage\\\"}})\": [\"title\",\"project\"]}]}]}");
             RestResponse response = await rest.ExecuteAsync(request);
 
@@ -142,8 +142,8 @@ namespace Github_To_Codecks.Services
             {
                 Method = Method.Post
             };
-            request.AddHeader("X-Auth-Token", $"{codeckToken.Token}");
-            request.AddHeader("X-Account", "hunter-industries");
+            request.AddHeader("X-Auth-Token", $"{codeck.Token}");
+            request.AddHeader("X-Account", codeck.SubDomain);
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json", json.ToString(), ParameterType.RequestBody);
             RestResponse response = await rest.ExecuteAsync(request);

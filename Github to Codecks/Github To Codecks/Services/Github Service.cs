@@ -8,11 +8,11 @@ namespace Github_To_Codecks.Services
 {
     internal class GithubService
     {
-        GitTokenModel gitToken;
+        GitModel git;
 
-        public GithubService(GitTokenModel _gitToken)
+        public GithubService(GitModel _git)
         {
-            gitToken = _gitToken;
+            git = _git;
         }
 
         // Gets all the repos I own.
@@ -25,7 +25,7 @@ namespace Github_To_Codecks.Services
             {
                 Method = Method.Get
             };
-            request.AddHeader("Authorization", $"Bearer {gitToken.Token}");
+            request.AddHeader("Authorization", $"Bearer {git.Token}");
             request.AddHeader("Accept", "application/vnd.github+json");
             request.AddHeader("X-GitHub-Api-Version", "2022-11-28");
             request.AddParameter("affiliation", "owner");
@@ -54,14 +54,14 @@ namespace Github_To_Codecks.Services
         public async Task<List<IssueModel>> GetIssues(string repoName)
         {
             List<IssueModel> issues = new List<IssueModel>();
-            string url = $"https://api.github.com/repos/LegendarySpork9/{repoName}/issues";
+            string url = $"https://api.github.com/repos/{git.User}/{repoName}/issues";
 
             RestClient rest = new RestClient(url);
             RestRequest request = new RestRequest
             {
                 Method = Method.Get
             };
-            request.AddHeader("Authorization", $"Bearer {gitToken.Token}");
+            request.AddHeader("Authorization", $"Bearer {git.Token}");
             request.AddHeader("Accept", "application/vnd.github+json");
             request.AddHeader("X-GitHub-Api-Version", "2022-11-28");
             request.AddParameter("per_page", "100");
