@@ -49,7 +49,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>C/IUPJF46RYPlKiJiQjsuXd8mpsJ1yNO0y5oQyYEBow=</dsig:DigestValue>
+        <dsig:DigestValue>XN3Po99SPs+HlSnpz7niv4Zqmwxz+31G+CJUBrtdTVA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -221,13 +221,13 @@
       <dsig:DigestValue>WVuY/DZuCIGvw4TDv9TrnPPOsX8ZVagR49rKy6eP8X0=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Github To Codecks.exe.config" size="809">
+  <file name="Github To Codecks.exe.config" size="784">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>6A8vF42CXa9v40DAJu9gCid3woBIe0ixF/f3ImiRD7g=</dsig:DigestValue>
+      <dsig:DigestValue>MGJFaXyAx+/b1uhkTH1sumEmk0ZElzvhnxy+V/AP94c=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>

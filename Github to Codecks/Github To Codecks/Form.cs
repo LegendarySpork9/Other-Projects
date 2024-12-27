@@ -9,8 +9,8 @@ namespace Github_To_Codecks
 {
     public partial class Form : System.Windows.Forms.Form
     {
-        readonly GitTokenModel gitToken = new GitTokenModel();
-        readonly CodeckTokenModel codeckToken = new CodeckTokenModel();
+        readonly GitModel git = new GitModel();
+        readonly CodeckModel codeck = new CodeckModel();
         readonly GithubService _github;
         readonly CodeckService _codeck;
 
@@ -22,11 +22,13 @@ namespace Github_To_Codecks
         {
             InitializeComponent();
 
-            gitToken.Token = ConfigurationManager.AppSettings["GithubToken"];
-            codeckToken.Token = ConfigurationManager.AppSettings["CodeckToken"];
+            git.Token = ConfigurationManager.AppSettings["GithubToken"];
+            git.User = ConfigurationManager.AppSettings["GithubLogin"];
+            codeck.Token = ConfigurationManager.AppSettings["CodeckToken"];
+            codeck.SubDomain = ConfigurationManager.AppSettings["CodeckSubDomain"];
 
-            _github = new GithubService(gitToken);
-            _codeck = new CodeckService(codeckToken);
+            _github = new GithubService(git);
+            _codeck = new CodeckService(codeck);
         }
 
         private async void LoadRepos(object sender, EventArgs e)
@@ -65,6 +67,8 @@ namespace Github_To_Codecks
 
             if (issues.Count == 0 || cards.Count == 0)
             {
+                cmbIssue.Items.Add("--Back--");
+                cmbIssue.Enabled = true;
                 ptbIssue.Image = Properties.Resources.Cross;
             }
 
@@ -103,6 +107,8 @@ namespace Github_To_Codecks
 
                 if (projects.Count == 0)
                 {
+                    cmbProject.Items.Add("--Back--");
+                    cmbProject.Enabled = true;
                     ptbProject.Image = Properties.Resources.Cross;
                 }
 

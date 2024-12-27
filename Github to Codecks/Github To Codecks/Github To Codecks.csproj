@@ -121,8 +121,8 @@
       <DependentUpon>Form.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Card Model.cs" />
-    <Compile Include="Models\Codeck Token Model.cs" />
-    <Compile Include="Models\Git Token Model.cs" />
+    <Compile Include="Models\Codeck Model.cs" />
+    <Compile Include="Models\Git Model.cs" />
     <Compile Include="Models\Project Model.cs" />
     <Compile Include="Models\Repo Model.cs" />
     <Compile Include="Models\Issue Model.cs" />

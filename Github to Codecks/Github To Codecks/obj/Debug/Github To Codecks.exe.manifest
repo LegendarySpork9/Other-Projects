@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Github To Codecks.exe" size="274880">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Github To Codecks.exe" size="275392">
       <assemblyIdentity name="Github To Codecks" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>+Y5qsZy9KpW8PKmigdP/Mk+oozoxVFDgxD5c9lHPy7c=</dsig:DigestValue>
+        <dsig:DigestValue>9XHi8DB8weyPlixBUqiGiVOFsJ+nDWXW+fcJO7ceffI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -221,13 +221,13 @@
       <dsig:DigestValue>WVuY/DZuCIGvw4TDv9TrnPPOsX8ZVagR49rKy6eP8X0=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Github To Codecks.exe.config" size="809">
+  <file name="Github To Codecks.exe.config" size="909">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>6A8vF42CXa9v40DAJu9gCid3woBIe0ixF/f3ImiRD7g=</dsig:DigestValue>
+      <dsig:DigestValue>M70Ap9hnL52ps30HJbtMIYyuTD6aUUOpCGxVEpDhQ0M=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>
