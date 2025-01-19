@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\obj\\Release\\net8.0\\scopedcss\\projectbundle\\ServerStatusSite.bundle.scp.css",
+      "PackagePath": "staticwebassets\\ServerStatusSite.dzb27ykdnp.bundle.scp.css"
+    },
+    {
+      "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.ServerStatusSite.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.ServerStatusSite.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.build.ServerStatusSite.props",
+      "PackagePath": "build\\ServerStatusSite.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.ServerStatusSite.props",
+      "PackagePath": "buildMultiTargeting\\ServerStatusSite.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.buildTransitive.ServerStatusSite.props",
+      "PackagePath": "buildTransitive\\ServerStatusSite.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
