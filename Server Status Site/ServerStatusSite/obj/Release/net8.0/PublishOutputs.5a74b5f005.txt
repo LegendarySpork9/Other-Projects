@@ -1,4 +1,5 @@
 D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\obj\Release\net8.0\PubTmp\Out\ServerStatusSite.exe
+D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\obj\Release\net8.0\PubTmp\Out\web.config
 D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\obj\Release\net8.0\PubTmp\Out\appsettings.Development.json
 D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\obj\Release\net8.0\PubTmp\Out\appsettings.json
 D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\obj\Release\net8.0\PubTmp\Out\ServerStatusSite.dll

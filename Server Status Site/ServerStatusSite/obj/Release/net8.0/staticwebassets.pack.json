@@ -5,6 +5,14 @@
       "PackagePath": "staticwebassets\\ServerStatusSite.dzb27ykdnp.bundle.scp.css"
     },
     {
+      "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Login Background.gif",
+      "PackagePath": "staticwebassets\\Login Background.gif"
+    },
+    {
+      "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Login Background.png",
+      "PackagePath": "staticwebassets\\Login Background.png"
+    },
+    {
       "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\app.css",
       "PackagePath": "staticwebassets\\app.css"
     },

@@ -32,3 +32,4 @@ D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatu
 D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\obj\Release\net8.0\ServerStatusSite.pdb
 D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\obj\Release\net8.0\ServerStatusSite.genruntimeconfig.cache
 D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\obj\Release\net8.0\ref\ServerStatusSite.dll
+D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\bin\Release\net8.0\web.config

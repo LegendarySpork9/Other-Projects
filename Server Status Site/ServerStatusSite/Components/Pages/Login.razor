@@ -1,0 +1,56 @@
+﻿@page "/login"
+@layout Layout.BlankLayout
+@rendermode InteractiveServer
+
+<PageTitle>Login</PageTitle>
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-image: url('/Login Background.gif');
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .login-form {
+        border: 2px solid black;
+        border-radius: 5px;
+        padding: 10px;
+        margin: auto;
+        background-color: white;
+    }
+
+    .login-fail {
+        display: block;
+        width: 200px;
+        border: 2px solid red;
+        margin: auto;
+        color: white;
+        background-color: red;
+        text-align: left;
+    }
+</style>
+
+<center class="login-form">
+    <img src="/favicon.png" height="75" width="75" />
+    <br />
+    <h1>Login</h1>
+    @if (ShowError)
+    {
+        <label class="login-fail">Your username or password was incorrect.</label>
+    }
+    <label>Username:</label>
+    <br />
+    <input type="text" @bind="Username" />
+    <br />
+    <label>Password:</label>
+    <br />
+    <input type="password" @bind="Password" />
+    <br />
+    <br />
+    <button class="btn btn-primary" @onclick="LoginClick">Login</button>
+</center>
