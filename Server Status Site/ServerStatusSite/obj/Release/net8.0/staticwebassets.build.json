@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "YGldqJmD2OaTc4ufwg3OJfi+p2O1BLCEbbVXYG0oCgw=",
+  "Hash": "YozqklEoR8SpVhRrqIUN7Y6OpFgrUngWZu1Ia7y8kos=",
   "Source": "ServerStatusSite",
   "BasePath": "_content/ServerStatusSite",
   "Mode": "Default",
@@ -122,12 +122,12 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\favicon.png",
+      "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\favicon.png",
       "SourceId": "ServerStatusSite",
       "SourceType": "Discovered",
       "ContentRoot": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\",
       "BasePath": "_content/ServerStatusSite",
-      "RelativePath": "favicon#[.{fingerprint}]?.png",
+      "RelativePath": "Images/favicon#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -140,7 +140,70 @@
       "Integrity": "FJjuDeSS1emUv+L8Wxugs0kSpC3aj0v0xqC+6Dppffw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\favicon.png"
+      "OriginalItemSpec": "wwwroot\\Images\\favicon.png"
+    },
+    {
+      "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Game Icon.png",
+      "SourceId": "ServerStatusSite",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\",
+      "BasePath": "_content/ServerStatusSite",
+      "RelativePath": "Images/Game Icon#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "3xi2mh00qx",
+      "Integrity": "R4ZY6L8jzIJDiEvrCft52Uf4O+o709HfOoxFk5EIEnc=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\Game Icon.png"
+    },
+    {
+      "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Hamachi Icon.png",
+      "SourceId": "ServerStatusSite",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\",
+      "BasePath": "_content/ServerStatusSite",
+      "RelativePath": "Images/Hamachi Icon#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "fat7ozmhrs",
+      "Integrity": "+UsmCHrFibj+8rr+bwQtvceNDuxrePuBEOOo9GmtC+A=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\Hamachi Icon.png"
+    },
+    {
+      "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Login Background.png",
+      "SourceId": "ServerStatusSite",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\",
+      "BasePath": "_content/ServerStatusSite",
+      "RelativePath": "Images/Login Background#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "yl9pzrmgvi",
+      "Integrity": "5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\Login Background.png"
     },
     {
       "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Login Background.gif",
@@ -162,27 +225,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\Login Background.gif"
-    },
-    {
-      "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Login Background.png",
-      "SourceId": "ServerStatusSite",
-      "SourceType": "Discovered",
-      "ContentRoot": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\",
-      "BasePath": "_content/ServerStatusSite",
-      "RelativePath": "Login Background#[.{fingerprint}]?.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "yl9pzrmgvi",
-      "Integrity": "5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Login Background.png"
     }
   ],
   "Endpoints": [
@@ -433,8 +475,8 @@
       ]
     },
     {
-      "Route": "favicon.png",
-      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\favicon.png",
+      "Route": "Images/favicon.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\favicon.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -470,8 +512,8 @@
       ]
     },
     {
-      "Route": "favicon.wz6qu9ehtj.png",
-      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\favicon.png",
+      "Route": "Images/favicon.wz6qu9ehtj.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\favicon.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -506,11 +548,257 @@
         },
         {
           "Name": "label",
-          "Value": "favicon.png"
+          "Value": "Images/favicon.png"
         },
         {
           "Name": "integrity",
           "Value": "sha256-FJjuDeSS1emUv+L8Wxugs0kSpC3aj0v0xqC+6Dppffw="
+        }
+      ]
+    },
+    {
+      "Route": "Images/Game Icon.3xi2mh00qx.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Game Icon.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "20353"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"R4ZY6L8jzIJDiEvrCft52Uf4O+o709HfOoxFk5EIEnc=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 25 Jan 2025 15:29:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "3xi2mh00qx"
+        },
+        {
+          "Name": "label",
+          "Value": "Images/Game Icon.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-R4ZY6L8jzIJDiEvrCft52Uf4O+o709HfOoxFk5EIEnc="
+        }
+      ]
+    },
+    {
+      "Route": "Images/Game Icon.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Game Icon.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "20353"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"R4ZY6L8jzIJDiEvrCft52Uf4O+o709HfOoxFk5EIEnc=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 25 Jan 2025 15:29:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-R4ZY6L8jzIJDiEvrCft52Uf4O+o709HfOoxFk5EIEnc="
+        }
+      ]
+    },
+    {
+      "Route": "Images/Hamachi Icon.fat7ozmhrs.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Hamachi Icon.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "22250"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"+UsmCHrFibj+8rr+bwQtvceNDuxrePuBEOOo9GmtC+A=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 25 Jan 2025 15:27:03 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "fat7ozmhrs"
+        },
+        {
+          "Name": "label",
+          "Value": "Images/Hamachi Icon.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-+UsmCHrFibj+8rr+bwQtvceNDuxrePuBEOOo9GmtC+A="
+        }
+      ]
+    },
+    {
+      "Route": "Images/Hamachi Icon.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Hamachi Icon.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "22250"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"+UsmCHrFibj+8rr+bwQtvceNDuxrePuBEOOo9GmtC+A=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 25 Jan 2025 15:27:03 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-+UsmCHrFibj+8rr+bwQtvceNDuxrePuBEOOo9GmtC+A="
+        }
+      ]
+    },
+    {
+      "Route": "Images/Login Background.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Login Background.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "49403"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 20 Jan 2025 20:18:31 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw="
+        }
+      ]
+    },
+    {
+      "Route": "Images/Login Background.yl9pzrmgvi.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Login Background.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "49403"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 20 Jan 2025 20:18:31 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "yl9pzrmgvi"
+        },
+        {
+          "Name": "label",
+          "Value": "Images/Login Background.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw="
         }
       ]
     },
@@ -593,88 +881,6 @@
         {
           "Name": "integrity",
           "Value": "sha256-LQjx6iKxihERVQvaYENxMQ4zKOPc22Yqf4FOwRk6C+w="
-        }
-      ]
-    },
-    {
-      "Route": "Login Background.png",
-      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Login Background.png",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "49403"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/png"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Mon, 20 Jan 2025 20:18:31 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=3600, must-revalidate"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw="
-        }
-      ]
-    },
-    {
-      "Route": "Login Background.yl9pzrmgvi.png",
-      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Login Background.png",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "49403"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/png"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Mon, 20 Jan 2025 20:18:31 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "yl9pzrmgvi"
-        },
-        {
-          "Name": "label",
-          "Value": "Login Background.png"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-5quYEJj0exBwiYuetQ3cf2ltFJLYVnYBosvLtHlR+pw="
         }
       ]
     },

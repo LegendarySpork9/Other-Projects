@@ -2,6 +2,70 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<style>
+    .online {
+        color: green;
+    }
 
-Welcome to your new app.
+    .offline {
+        color: red;
+    }
+
+    .unknown {
+        color: orange;
+    }
+</style>
+
+<table class="table">
+    <tbody>
+        @foreach (var server in Servers)
+        {
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <center>
+                        <h1>@server.HostName</h1>
+                        <p>@server.Game @server.GameVersion</p>
+                    </center>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <center>
+                        <img src="/Images/Login Background.png" height="200" width="200" />
+                    </center>
+                </td>
+                <td>
+                    <center>
+                        <img src="/Images/Hamachi Icon.png" height="200" width="200" />
+                    </center>
+                </td>
+                <td>
+                    <center>
+                        <img src="/Images/Game Icon.png" height="200" width="200" />
+                    </center>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <center>
+                        <label>PC Status: <span class="@server.Statuses[0].StatusClass">@server.Statuses[0].Status</span></label>
+                    </center>
+                </td>
+                <td>
+                    <center>
+                        <label>Hamachi Status: <span class="@server.Statuses[1].StatusClass">@server.Statuses[1].Status</span></label>
+                    </center>
+                </td>
+                <td>
+                    <center>
+                        <label>Server Status: <span class="@server.Statuses[2].StatusClass">@server.Statuses[2].Status</span></label>
+                    </center>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
