@@ -5,6 +5,10 @@
       "PackagePath": "staticwebassets\\ServerStatusSite.dzb27ykdnp.bundle.scp.css"
     },
     {
+      "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Account Icon.png",
+      "PackagePath": "staticwebassets\\Images\\Account Icon.png"
+    },
+    {
       "Id": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Game Icon.png",
       "PackagePath": "staticwebassets\\Images\\Game Icon.png"
     },

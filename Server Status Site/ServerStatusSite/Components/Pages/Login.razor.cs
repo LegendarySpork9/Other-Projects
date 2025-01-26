@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using ServerStatusSite.Models;
 
 namespace ServerStatusSite.Components.Pages
 {
@@ -6,9 +7,9 @@ namespace ServerStatusSite.Components.Pages
     {
         [Inject]
         private NavigationManager Navigation { get; set; }
+        [Inject]
+        private UserModel User { get; set; }
         private string ReturnUrl { get; set; } = "/";
-        private string Username { get; set; }
-        private string Password { get; set; }
         private bool ShowError { get; set; } = false;
 
         protected override void OnInitialized()
@@ -24,7 +25,7 @@ namespace ServerStatusSite.Components.Pages
 
         private void LoginClick()
         {
-            if (Username == "Hello" && Password == "Matey")
+            if (User.Username == "Hello" && User.Password == "Matey")
             {
                 Navigation.NavigateTo(ReturnUrl);
             }

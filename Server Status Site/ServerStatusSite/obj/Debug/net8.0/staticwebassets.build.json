@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "oGFdidoVFc0Ot1cqF/7rgU1wT5tPNO27RNLtuMC/e/k=",
+  "Hash": "gbWUfLy4mBdR1EBXf30Aps75RQACLir4lVQhBhFHSTk=",
   "Source": "ServerStatusSite",
   "BasePath": "_content/ServerStatusSite",
   "Mode": "Default",
@@ -73,8 +73,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "da95v2qkru",
-      "Integrity": "u9qEka1auR7E3rd3/8/j8hkQdSOYj9bRJ4nYiFDR1sE=",
+      "Fingerprint": "90gv3ak49v",
+      "Integrity": "ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\app.css"
@@ -120,6 +120,27 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Account Icon.png",
+      "SourceId": "ServerStatusSite",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\",
+      "BasePath": "_content/ServerStatusSite",
+      "RelativePath": "Images/Account Icon#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "oobfaqpl1q",
+      "Integrity": "6KosZdgijQUvYlNvWlKcJOb+rEuzCYrT5qa+cNFqo1g=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\Account Icon.png"
     },
     {
       "Identity": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\favicon.png",
@@ -229,6 +250,51 @@
   ],
   "Endpoints": [
     {
+      "Route": "app.90gv3ak49v.css",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\app.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2725"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 26 Jan 2025 14:00:58 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "90gv3ak49v"
+        },
+        {
+          "Name": "label",
+          "Value": "app.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA="
+        }
+      ]
+    },
+    {
       "Route": "app.css",
       "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\app.css",
       "Selectors": [],
@@ -239,7 +305,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2591"
+          "Value": "2725"
         },
         {
           "Name": "Content-Type",
@@ -247,11 +313,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"u9qEka1auR7E3rd3/8/j8hkQdSOYj9bRJ4nYiFDR1sE=\""
+          "Value": "\"ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 19 Jan 2025 16:44:53 GMT"
+          "Value": "Sun, 26 Jan 2025 14:00:58 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -261,52 +327,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-u9qEka1auR7E3rd3/8/j8hkQdSOYj9bRJ4nYiFDR1sE="
-        }
-      ]
-    },
-    {
-      "Route": "app.da95v2qkru.css",
-      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\app.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "2591"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"u9qEka1auR7E3rd3/8/j8hkQdSOYj9bRJ4nYiFDR1sE=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 19 Jan 2025 16:44:53 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "da95v2qkru"
-        },
-        {
-          "Name": "label",
-          "Value": "app.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-u9qEka1auR7E3rd3/8/j8hkQdSOYj9bRJ4nYiFDR1sE="
+          "Value": "sha256-ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA="
         }
       ]
     },
@@ -471,6 +492,88 @@
         {
           "Name": "integrity",
           "Value": "sha256-gBwg2tmA0Ci2u54gMF1jNCVku6vznarkLS6D76htNNQ="
+        }
+      ]
+    },
+    {
+      "Route": "Images/Account Icon.oobfaqpl1q.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Account Icon.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "21000"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"6KosZdgijQUvYlNvWlKcJOb+rEuzCYrT5qa+cNFqo1g=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 26 Jan 2025 12:09:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "oobfaqpl1q"
+        },
+        {
+          "Name": "label",
+          "Value": "Images/Account Icon.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-6KosZdgijQUvYlNvWlKcJOb+rEuzCYrT5qa+cNFqo1g="
+        }
+      ]
+    },
+    {
+      "Route": "Images/Account Icon.png",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\Images\\Account Icon.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "21000"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"6KosZdgijQUvYlNvWlKcJOb+rEuzCYrT5qa+cNFqo1g=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 26 Jan 2025 12:09:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-6KosZdgijQUvYlNvWlKcJOb+rEuzCYrT5qa+cNFqo1g="
         }
       ]
     },

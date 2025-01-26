@@ -17,6 +17,8 @@ namespace ServerStatusSite
             builder.Configuration.Bind("AppSettings", appSettings);
             builder.Services.AddSingleton(appSettings);
 
+            builder.Services.AddScoped<UserModel>();
+
             var app = builder.Build();
 
             if (!app.Environment.IsDevelopment())
