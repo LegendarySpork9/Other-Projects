@@ -1,13 +1,15 @@
 ﻿@inherits LayoutComponentBase
 
+<HeadOutlet />
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <NavLink class="nav-link" href="account">
+    <main style="@GetStyle("Body")">
+        <div style="@GetStyle("Bar")" class="top-row px-4">
+            <NavLink style="@GetStyle("Link")" class="nav-link" href="account">
                 Account
             </NavLink>
         </div>

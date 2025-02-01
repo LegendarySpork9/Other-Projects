@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "gbWUfLy4mBdR1EBXf30Aps75RQACLir4lVQhBhFHSTk=",
+  "Hash": "5in1rWcfy13dw+2BqhnjwXloQWQwrMRkHbZOj6wDeGU=",
   "Source": "ServerStatusSite",
   "BasePath": "_content/ServerStatusSite",
   "Mode": "Default",
@@ -73,8 +73,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "90gv3ak49v",
-      "Integrity": "ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA=",
+      "Fingerprint": "xbmd6radfu",
+      "Integrity": "s1sGs5ir64W1D2sLXTr6NPISK+DYaoZpbpRTu5zBk78=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\app.css"
@@ -250,51 +250,6 @@
   ],
   "Endpoints": [
     {
-      "Route": "app.90gv3ak49v.css",
-      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\app.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "2725"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 26 Jan 2025 14:00:58 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "90gv3ak49v"
-        },
-        {
-          "Name": "label",
-          "Value": "app.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA="
-        }
-      ]
-    },
-    {
       "Route": "app.css",
       "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\app.css",
       "Selectors": [],
@@ -305,7 +260,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2725"
+          "Value": "2577"
         },
         {
           "Name": "Content-Type",
@@ -313,11 +268,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA=\""
+          "Value": "\"s1sGs5ir64W1D2sLXTr6NPISK+DYaoZpbpRTu5zBk78=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 26 Jan 2025 14:00:58 GMT"
+          "Value": "Sun, 26 Jan 2025 14:06:13 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -327,7 +282,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-ye0o9cysKPY3RvwxKLOYwkBz6O8ytxVCQI6flRMSPWA="
+          "Value": "sha256-s1sGs5ir64W1D2sLXTr6NPISK+DYaoZpbpRTu5zBk78="
+        }
+      ]
+    },
+    {
+      "Route": "app.xbmd6radfu.css",
+      "AssetFile": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\wwwroot\\app.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2577"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"s1sGs5ir64W1D2sLXTr6NPISK+DYaoZpbpRTu5zBk78=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 26 Jan 2025 14:06:13 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "xbmd6radfu"
+        },
+        {
+          "Name": "label",
+          "Value": "app.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-s1sGs5ir64W1D2sLXTr6NPISK+DYaoZpbpRTu5zBk78="
         }
       ]
     },
@@ -1010,7 +1010,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 21 Jan 2025 20:39:01 GMT"
+          "Value": "Sat, 01 Feb 2025 14:50:19 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1047,7 +1047,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 21 Jan 2025 20:39:01 GMT"
+          "Value": "Sat, 01 Feb 2025 14:50:19 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1092,7 +1092,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 21 Jan 2025 20:39:01 GMT"
+          "Value": "Sat, 01 Feb 2025 14:50:19 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1137,7 +1137,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 21 Jan 2025 20:39:01 GMT"
+          "Value": "Sat, 01 Feb 2025 14:50:19 GMT"
         },
         {
           "Name": "Cache-Control",

@@ -3,7 +3,7 @@ using ServerStatusSite.Models;
 
 namespace ServerStatusSite.Components.Pages
 {
-    public partial class Login
+    public partial class Login : ComponentBase
     {
         [Inject]
         private NavigationManager Navigation { get; set; }

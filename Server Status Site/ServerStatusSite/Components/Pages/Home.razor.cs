@@ -1,9 +1,13 @@
-﻿using ServerStatusSite.Models;
+﻿using Microsoft.AspNetCore.Components;
+using ServerStatusSite.Converters;
+using ServerStatusSite.Models;
 
 namespace ServerStatusSite.Components.Pages
 {
-    public partial class Home
+    public partial class Home : ComponentBase
     {
+        [Inject]
+        private UserModel User { get; set; }
         private List<ServerModel> Servers = [];
 
         protected override void OnInitialized()
@@ -47,6 +51,13 @@ namespace ServerStatusSite.Components.Pages
 
                 Servers.Add(server);
             }
+        }
+
+        private string GetStyle()
+        {
+            StyleConverter _styleConverter = new();
+
+            return _styleConverter.GetTableDarkMode(User.DarkMode);
         }
     }
 }
