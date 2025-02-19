@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\ServerStatusSite.csproj": {}
+    "C:\\Users\\TobyH\\OneDrive - BriefYourMarket\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\ServerStatusSite.csproj": {}
   },
   "projects": {
-    "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\ServerStatusSite.csproj": {
+    "C:\\Users\\TobyH\\OneDrive - BriefYourMarket\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\ServerStatusSite.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\ServerStatusSite.csproj",
+        "projectUniqueName": "C:\\Users\\TobyH\\OneDrive - BriefYourMarket\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\ServerStatusSite.csproj",
         "projectName": "ServerStatusSite",
-        "projectPath": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\ServerStatusSite.csproj",
-        "packagesPath": "C:\\Users\\tobyh\\.nuget\\packages\\",
-        "outputPath": "D:\\System Folders\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\obj\\",
+        "projectPath": "C:\\Users\\TobyH\\OneDrive - BriefYourMarket\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\ServerStatusSite.csproj",
+        "packagesPath": "C:\\Users\\TobyH\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\TobyH\\OneDrive - BriefYourMarket\\Documents\\GitHub\\Other-Projects\\Server Status Site\\ServerStatusSite\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "D:\\Program Files\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\tobyh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TobyH\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,8 +26,8 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {},
+          "https://tfs.briefyourmarket.com/BYM2020/_packaging/BYMNuget/nuget/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
@@ -43,7 +43,7 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
+          "auditMode": "all"
         },
         "SdkAnalysisLevel": "9.0.100"
       },
@@ -69,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
