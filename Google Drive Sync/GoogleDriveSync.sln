@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Google Drive Sync", "Google Drive Sync\Google Drive Sync.csproj", "{8185C84B-AD50-4308-9686-2C94C3B48FBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Google Drive Sync.Tests", "Google Drive Sync.Tests\Google Drive Sync.Tests.csproj", "{8DC16AD5-89D3-4433-87E1-E0D9DD0A52D8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8185C84B-AD50-4308-9686-2C94C3B48FBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8185C84B-AD50-4308-9686-2C94C3B48FBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8185C84B-AD50-4308-9686-2C94C3B48FBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8185C84B-AD50-4308-9686-2C94C3B48FBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DC16AD5-89D3-4433-87E1-E0D9DD0A52D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DC16AD5-89D3-4433-87E1-E0D9DD0A52D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DC16AD5-89D3-4433-87E1-E0D9DD0A52D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DC16AD5-89D3-4433-87E1-E0D9DD0A52D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
