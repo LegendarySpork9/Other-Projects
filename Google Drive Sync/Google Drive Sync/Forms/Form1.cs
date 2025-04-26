@@ -28,11 +28,14 @@ namespace GoogleDriveSync
             //DGVFileInformation.Rows.Add("Test", "docx", "books", "22/04/2025", "22/04/2025", "No");
         }
 
-        private void BTNCompareClick(object sender, EventArgs e)
+        private async void BTNCompareClick(object sender, EventArgs e)
         {
             PBLoading.Image = Properties.Resources.LoadingSpinner;
 
-            AppService.CheckUpdates();
+            await Task.Run(() =>
+            {
+                AppService.CheckUpdates(PRBLoading);
+            });
         }
     }
 }

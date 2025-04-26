@@ -133,6 +133,7 @@
             // 
             // TBPDocumentChanges
             // 
+            this.TBPDocumentChanges.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TBPDocumentChanges.Location = new System.Drawing.Point(4, 5);
             this.TBPDocumentChanges.Margin = new System.Windows.Forms.Padding(0);
             this.TBPDocumentChanges.Name = "TBPDocumentChanges";
