@@ -67,6 +67,7 @@
             this.DGVFileInformation.Name = "DGVFileInformation";
             this.DGVFileInformation.Size = new System.Drawing.Size(844, 450);
             this.DGVFileInformation.TabIndex = 0;
+            this.DGVFileInformation.RowStateChanged += new System.Windows.Forms.DataGridViewRowStateChangedEventHandler(this.DGVFileInformationRowState);
             // 
             // FName
             // 
@@ -204,7 +205,6 @@
         private System.Windows.Forms.DataGridView DGVFileInformation;
         private System.Windows.Forms.TabControl TBCDocumentChanges;
         private System.Windows.Forms.TabPage TBPDocumentChanges;
-        private System.Windows.Forms.ProgressBar PRBLoading;
         private System.Windows.Forms.PictureBox PBLoading;
         private System.Windows.Forms.Button BTNCompare;
         private System.Windows.Forms.DataGridViewTextBoxColumn FName;
@@ -216,6 +216,7 @@
         private System.Windows.Forms.DataGridViewComboBoxColumn MType;
         private System.Windows.Forms.DataGridViewCheckBoxColumn UFile;
         private System.Windows.Forms.Button BTNSync;
+        private System.Windows.Forms.ProgressBar PRBLoading;
     }
 }
 

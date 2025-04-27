@@ -13,7 +13,14 @@ namespace GoogleDriveSync.Services
 {
     public class ApplicationService
     {
-        public void CheckUpdates()
+        public event Action<int> ProgressChanged;
+
+        private void OnProgressChanged(int progress)
+        {
+            ProgressChanged?.Invoke(progress);
+        }
+
+        public List<FileModel> CheckUpdates()
         {
             LoggerService _logger = new LoggerService();
             GoogleAPIService _googleAPIService = new GoogleAPIService(AppSettingsModel.DriveFolder);
@@ -23,13 +30,18 @@ namespace GoogleDriveSync.Services
             _logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking for updates in {AppSettingsModel.DriveFolder.Length} root folder(s)");
 
             List<FileModel> googleDrive = _googleAPIService.GetData();
+
+            OnProgressChanged(25);
+
             List<FileModel> localDrive = _documentService.GetData();
 
-            MessageBox.Show("Hello");
+            OnProgressChanged(50);
 
-            /*
+            List<FileModel> files = _fileFunction.CompareForChanges(googleDrive, localDrive);
 
-            _fileFunction.CheckForChanges(googleDrives[0], localDrives[0]);*/
+            OnProgressChanged(75);
+
+            return files;
         }
 
         public void SyncChanges()
