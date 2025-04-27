@@ -1,4 +1,7 @@
-﻿using System;
+﻿using GoogleDriveSync.Converters;
+using GoogleDriveSync.Models;
+using GoogleDriveSync.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +17,8 @@ namespace GoogleDriveSync
         [STAThread]
         static void Main()
         {
+            log4net.Config.XmlConfigurator.Configure();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainSyncPage());

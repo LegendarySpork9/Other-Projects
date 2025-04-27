@@ -3,7 +3,6 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using GoogleDriveSync.Converters;
-using GoogleDriveSync.Functions;
 using GoogleDriveSync.Models;
 using System;
 using System.Collections.Generic;
@@ -99,8 +98,6 @@ namespace GoogleDriveSync.Services
 
         public List<FileModel> GetData()
         {
-            FolderFunction _folderFunction = new FolderFunction();
-
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file(s) under folder {FolderName ?? FolderId}");
 
             List<FileModel> googleDrive = new List<FileModel>();
