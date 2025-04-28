@@ -20,6 +20,9 @@ namespace GoogleDriveSync
         private readonly ApplicationService AppService = new ApplicationService();
         private List<FileModel> Files = new List<FileModel>();
         private DataGridViewRow CurrentRow;
+        private bool TablePopulated = false;
+        private List<DataGridViewRow> RowsToUpload = new List<DataGridViewRow>();
+        private int UpdateFileCount = 0;
 
         public MainSyncPage()
         {
@@ -82,6 +85,7 @@ namespace GoogleDriveSync
                 DGVFileInformation.Rows.Add(file.Name, file.Type, path, file.Created, file.LastModified, hasChanges);
             }
 
+            TablePopulated = true;
             PRBLoading.Value = 100;
             PBLoading.Image = Properties.Resources.Tick;
             BTNCompare.Enabled = true;
@@ -97,25 +101,101 @@ namespace GoogleDriveSync
                 CurrentRow = e.Row;
 
                 FileModel file = Files.Find(c => c.Name == CurrentRow.Cells[0].Value.ToString() && c.Type == CurrentRow.Cells[1].Value.ToString());
-                string[] fileIdSplit = file.Id.Split(',');
-
-                TBId.Text = fileIdSplit[0];
-                TBName.Text = file.Name;
-                TBType.Text = file.Type;
-                TBPathIds.Text = file.PathIds;
-                TBGDPath.Text = file.Path.Remove(file.Path.IndexOf(','));
-                TBLPath.Text = fileIdSplit[1] ?? fileIdSplit[0];
-                TBHidden.Text = file.Hidden.ToString();
-                TBCreated.Text = file.Created.ToString();
-                TBModified.Text = file.LastModified.ToString();
-
-                foreach(ChangeModel change in file.Changes)
+                
+                if (file.Id.Contains(","))
                 {
-                    DGVChanges.Rows.Add(change.Field, change.OldValue, change.NewValue, change.Stream);
+                    TBId.Text = file.Id.Remove(file.Id.IndexOf(','));
+                    TBName.Text = file.Name;
+                    TBType.Text = file.Type;
+                    TBPathIds.Text = file.PathIds;
+                    TBGDPath.Text = file.Path.Remove(file.Path.IndexOf(','));
+                    TBLPath.Text = file.Path.Remove(0, file.Path.IndexOf(',') + 1);
+                    TBHidden.Text = file.Hidden.ToString();
+                    TBCreated.Text = file.Created.ToString();
+                    TBModified.Text = file.LastModified.ToString();
+
+                    foreach (ChangeModel change in file.Changes)
+                    {
+                        DGVChanges.Rows.Add(change.Field, change.OldValue, change.NewValue, change.Stream);
+                    }
+                }
+
+                else
+                {
+                    TBId.Text = "";
+                    TBName.Text = file.Name;
+                    TBType.Text = file.Type;
+                    TBPathIds.Text = file.PathIds;
+                    TBGDPath.Text = "";
+                    TBLPath.Text = file.Path;
+                    TBHidden.Text = file.Hidden.ToString();
+                    TBCreated.Text = file.Created.ToString();
+                    TBModified.Text = file.LastModified.ToString();
+
+                    foreach (ChangeModel change in file.Changes)
+                    {
+                        DGVChanges.Rows.Add(change.Field, change.OldValue, change.NewValue, change.Stream);
+                    }
                 }
 
                 TBCDocumentChanges.Visible = true;
             }
+        }
+
+        private void DGVFileInformationCellValue(object sender, DataGridViewCellEventArgs e)
+        {
+            if (TablePopulated)
+            {
+                DataGridViewRow row = DGVFileInformation.Rows[e.RowIndex];
+
+                if (row.Cells[6].Value != null && (row.Cells[7].Value != null && bool.Parse(row.Cells[7].Value.ToString())))
+                {
+                    RowsToUpload.Add(row);
+
+                    int previousUpdateFileCount = UpdateFileCount;
+                    UpdateFileCount++;
+
+                    BTNSync.Text = BTNSync.Text.Replace(char.Parse(previousUpdateFileCount.ToString()), char.Parse(UpdateFileCount.ToString()));
+
+                    if (UpdateFileCount > 0 && !BTNSync.Enabled)
+                    {
+                        BTNSync.Enabled = true;
+                    }
+
+                    if (UpdateFileCount == 0 && BTNSync.Enabled)
+                    {
+                        BTNSync.Enabled = false;
+                    }
+                }
+
+                else
+                {
+                    if (RowsToUpload.Contains(row))
+                    {
+                        RowsToUpload.Remove(row);
+
+                        int previousUpdateFileCount = UpdateFileCount;
+                        UpdateFileCount--;
+
+                        BTNSync.Text = BTNSync.Text.Replace(char.Parse(previousUpdateFileCount.ToString()), char.Parse(UpdateFileCount.ToString()));
+
+                        if (UpdateFileCount > 0 && !BTNSync.Enabled)
+                        {
+                            BTNSync.Enabled = true;
+                        }
+
+                        if (UpdateFileCount == 0 && BTNSync.Enabled)
+                        {
+                            BTNSync.Enabled = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void BTNSyncClick(object sender, EventArgs e)
+        {
+
         }
     }
 }
