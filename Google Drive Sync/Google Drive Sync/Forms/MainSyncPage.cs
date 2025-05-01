@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -55,11 +56,14 @@ namespace GoogleDriveSync
         private async void BTNCompareClick(object sender, EventArgs e)
         {
             BTNCompare.Enabled = false;
+            PRBLoading.Value = 0;
             PBLoading.Image = Properties.Resources.LoadingSpinner;
+            DGVFileInformation.Rows.Clear();
+            bool hasErrored = false;
 
             await Task.Run(() =>
             {
-                Files = AppService.CheckUpdates();
+                (Files, hasErrored) = AppService.CheckUpdates();
             });
 
             foreach (FileModel file in Files)
@@ -83,12 +87,64 @@ namespace GoogleDriveSync
                 }
 
                 DGVFileInformation.Rows.Add(file.Name, file.Type, path, file.Created, file.LastModified, hasChanges);
+                
+                if (hasChanges == "False")
+                {
+                    DGVFileInformation.Rows[DGVFileInformation.Rows.Count - 1].Cells[6].ReadOnly = true;
+                    DGVFileInformation.Rows[DGVFileInformation.Rows.Count - 1].Cells[7].ReadOnly = true;
+                }
             }
 
             TablePopulated = true;
             PRBLoading.Value = 100;
-            PBLoading.Image = Properties.Resources.Tick;
+
+            if (hasErrored)
+            {
+                PBLoading.Image = Properties.Resources.Cross;
+            }
+
+            else
+            {
+                PBLoading.Image = Properties.Resources.Tick;
+            }
+
             BTNCompare.Enabled = true;
+        }
+
+        private async void BTNSyncClick(object sender, EventArgs e)
+        {
+            BTNSync.Enabled = false;
+            BTNCompare.Enabled = false;
+            PRBLoading.Value = 0;
+            PBLoading.Image = Properties.Resources.LoadingSpinner;
+            bool hasErrored = false;
+
+            List<FileModel> files = new List<FileModel>();
+
+            foreach(DataGridViewRow row in RowsToUpload)
+            {
+                files.Add(Files.Find(c => c.Name == row.Cells[0].Value.ToString() && c.Type == row.Cells[1].Value.ToString()));
+            }
+
+            await Task.Run(() =>
+            {
+                hasErrored = AppService.SyncChanges(files);
+            });
+
+            PRBLoading.Value = 100;
+
+            if (hasErrored)
+            {
+                PBLoading.Image = Properties.Resources.Cross;
+            }
+
+            else
+            {
+                PBLoading.Image = Properties.Resources.Tick;
+            }
+
+            BTNCompare.Enabled = true;
+            BTNSync.Enabled = true;
         }
 
         private void DGVFileInformationRowState(object sender, DataGridViewRowStateChangedEventArgs e)
@@ -101,7 +157,7 @@ namespace GoogleDriveSync
                 CurrentRow = e.Row;
 
                 FileModel file = Files.Find(c => c.Name == CurrentRow.Cells[0].Value.ToString() && c.Type == CurrentRow.Cells[1].Value.ToString());
-                
+
                 if (file.Id.Contains(","))
                 {
                     TBId.Text = file.Id.Remove(file.Id.IndexOf(','));
@@ -122,19 +178,39 @@ namespace GoogleDriveSync
 
                 else
                 {
-                    TBId.Text = "";
-                    TBName.Text = file.Name;
-                    TBType.Text = file.Type;
-                    TBPathIds.Text = file.PathIds;
-                    TBGDPath.Text = "";
-                    TBLPath.Text = file.Path;
-                    TBHidden.Text = file.Hidden.ToString();
-                    TBCreated.Text = file.Created.ToString();
-                    TBModified.Text = file.LastModified.ToString();
-
-                    foreach (ChangeModel change in file.Changes)
+                    if (file.Id.Contains(@":\"))
                     {
-                        DGVChanges.Rows.Add(change.Field, change.OldValue, change.NewValue, change.Stream);
+                        TBId.Text = "";
+                        TBName.Text = file.Name;
+                        TBType.Text = file.Type;
+                        TBPathIds.Text = file.PathIds;
+                        TBGDPath.Text = "";
+                        TBLPath.Text = file.Path;
+                        TBHidden.Text = file.Hidden.ToString();
+                        TBCreated.Text = file.Created.ToString();
+                        TBModified.Text = file.LastModified.ToString();
+
+                        foreach (ChangeModel change in file.Changes)
+                        {
+                            DGVChanges.Rows.Add(change.Field, change.OldValue, change.NewValue, change.Stream);
+                        }
+                    }
+
+                    else
+                    {
+                        TBId.Text = file.Id;
+                        TBName.Text = file.Name;
+                        TBType.Text = file.Type;
+                        TBPathIds.Text = file.PathIds;
+                        TBGDPath.Text = file.Path;
+                        TBHidden.Text = file.Hidden.ToString();
+                        TBCreated.Text = file.Created.ToString();
+                        TBModified.Text = file.LastModified.ToString();
+
+                        foreach (ChangeModel change in file.Changes)
+                        {
+                            DGVChanges.Rows.Add(change.Field, change.OldValue, change.NewValue, change.Stream);
+                        }
                     }
                 }
 
@@ -191,11 +267,6 @@ namespace GoogleDriveSync
                     }
                 }
             }
-        }
-
-        private void BTNSyncClick(object sender, EventArgs e)
-        {
-
         }
     }
 }

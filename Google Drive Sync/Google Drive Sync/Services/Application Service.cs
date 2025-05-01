@@ -20,7 +20,7 @@ namespace GoogleDriveSync.Services
             ProgressChanged?.Invoke(progress);
         }
 
-        public List<FileModel> CheckUpdates()
+        public (List<FileModel>, bool) CheckUpdates()
         {
             LoggerService _logger = new LoggerService();
             GoogleAPIService _googleAPIService = new GoogleAPIService(AppSettingsModel.DriveFolder);
@@ -30,10 +30,12 @@ namespace GoogleDriveSync.Services
             _logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking for updates in {AppSettingsModel.DriveFolder.Length} root folder(s)");
 
             List<FileModel> googleDrive = _googleAPIService.GetData();
+            bool hasErrored = _googleAPIService.GetHasErrored();
 
             OnProgressChanged(25);
 
             List<FileModel> localDrive = _documentService.GetData();
+            hasErrored = _documentService.GetHasErrored();
 
             OnProgressChanged(50);
 
@@ -41,12 +43,12 @@ namespace GoogleDriveSync.Services
 
             OnProgressChanged(75);
 
-            return files;
+            return (files, hasErrored);
         }
 
-        public void SyncChanges()
+        public bool SyncChanges(List<FileModel> files)
         {
-
+            return false;
         }
     }
 }

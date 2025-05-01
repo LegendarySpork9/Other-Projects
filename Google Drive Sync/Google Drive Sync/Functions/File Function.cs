@@ -137,6 +137,48 @@ namespace GoogleDriveSync.Functions
                 }
             }
 
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Compared Local Drive");
+
+            foreach (FileModel googleFile in googleDrive)
+            {
+                List<ChangeModel> changes = new List<ChangeModel>();
+                FileModel file = files.Find(c => c.Name == googleFile.Name && c.Type == googleFile.Type);
+
+                if (file == null)
+                {
+                    changes.Add(new ChangeModel
+                    {
+                        Field = "Path",
+                        OldValue = googleFile.Path,
+                        NewValue = "Not Downloaded",
+                        Stream = "Up"
+                    });
+
+                    changes.Add(new ChangeModel
+                    {
+                        Field = "Last Modified",
+                        OldValue = googleFile.LastModified.ToString(),
+                        NewValue = "Not Downloaded",
+                        Stream = "Up"
+                    });
+
+                    files.Add(new FileModel
+                    {
+                        Id = googleFile.Id,
+                        Name = googleFile.Name,
+                        Type = googleFile.Type,
+                        PathIds = googleFile.PathIds,
+                        Path = googleFile.Path,
+                        Created = googleFile.Created,
+                        LastModified = googleFile.LastModified,
+                        Changes = changes
+                    });
+
+                    differences += 2;
+                }
+            }
+
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Compared Google Drive");
             _logger.LogMessage(StandardValues.LoggerValues.Info, $"Found {differences} change(s) between Google Drive and the Local Drive");
 
             return files;

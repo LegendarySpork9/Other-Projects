@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace localDriveSync.Services
 {
@@ -13,12 +14,15 @@ namespace localDriveSync.Services
         LoggerService Logger = new LoggerService();
         private readonly string FolderPath;
         private readonly string FolderName;
+        private bool HasErrored = false;
 
         public DocumentService(string folder)
         {
             FolderPath = folder;
             FolderName = folder.Remove(0, folder.LastIndexOf('\\') + 1);
         }
+
+        public bool GetHasErrored() => HasErrored;
 
         public List<FileModel> GetData()
         {
@@ -53,18 +57,35 @@ namespace localDriveSync.Services
 
             string[] folderPaths = Array.Empty<string>();
             string[] folderNames = Array.Empty<string>();
-            string[] folders = Directory.GetDirectories(folder);
 
-            if (folders.Length > 0)
+            try
             {
-                foreach (string folderPath in folders)
+                string[] folders = Directory.GetDirectories(folder);
+
+                if (folders.Length > 0)
                 {
-                    if (!AppSettingsModel.IgnoreFolders.Contains(_localDriveConverter.GetObjectName(folderPath)))
+                    foreach (string folderPath in folders)
                     {
-                        folderPaths = folderPaths.Append(folderPath).ToArray();
-                        folderNames = folderNames.Append(_localDriveConverter.GetObjectName(folderPath)).ToArray();
+                        if (!AppSettingsModel.IgnoreFolders.Contains(_localDriveConverter.GetObjectName(folderPath)))
+                        {
+                            folderPaths = folderPaths.Append(folderPath).ToArray();
+                            folderNames = folderNames.Append(_localDriveConverter.GetObjectName(folderPath)).ToArray();
+
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {_localDriveConverter.GetObjectName(folderPath)}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Path: {folderPath}");
+                        }
                     }
                 }
+            }
+
+            catch (Exception ex)
+            {
+                HasErrored = true;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the sub folders from the Local Drive under folder {_localDriveConverter.GetObjectName(folder)}");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to get the sub folders from the Local Drive under folder {_localDriveConverter.GetObjectName(folder)}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {folderPaths.Length} folder(s) under folder {_localDriveConverter.GetObjectName(folder)}");
@@ -80,30 +101,49 @@ namespace localDriveSync.Services
 
             List<FileModel> localDrive = new List<FileModel>();
 
-            string[] filePaths = Directory.GetFiles(folder);
-
-            if (filePaths.Length > 0)
+            try
             {
-                foreach (string filePath in filePaths)
+                string[] filePaths = Directory.GetFiles(folder);
+
+                if (filePaths.Length > 0)
                 {
-                    if (!AppSettingsModel.IgnoreFiles.Contains(_localDriveConverter.GetObjectName(filePath)) && !filePath.Contains("~$e"))
+                    foreach (string filePath in filePaths)
                     {
-                        (DateTime created, DateTime modified, bool hidden) = GetFileInformation(filePath);
-
-                        string[] nameSplit = _localDriveConverter.GetObjectName(filePath).Split('.');
-
-                        localDrive.Add(new FileModel()
+                        if (!AppSettingsModel.IgnoreFiles.Contains(_localDriveConverter.GetObjectName(filePath)) && !filePath.Contains("~$e"))
                         {
-                            Id = filePath,
-                            Name = nameSplit[0],
-                            Type = nameSplit[1],
-                            Path = path,
-                            Hidden = hidden,
-                            Created = created,
-                            LastModified = modified
-                        });
+                            (DateTime created, DateTime modified, bool hidden) = GetFileInformation(filePath);
+
+                            string[] nameSplit = _localDriveConverter.GetObjectName(filePath).Split('.');
+
+                            localDrive.Add(new FileModel()
+                            {
+                                Id = filePath,
+                                Name = nameSplit[0],
+                                Type = nameSplit[1],
+                                Path = path,
+                                Hidden = hidden,
+                                Created = created,
+                                LastModified = modified
+                            });
+
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Id: {filePath}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Name: {nameSplit[0]}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Type: {nameSplit[1]}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path: {path}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hidden: {hidden}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created Date: {created}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Modified Date: {modified}");
+                        }
                     }
                 }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the files from the Local Drive under folder {_localDriveConverter.GetObjectName(folder)}");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to get the files from the Local Drive under folder {_localDriveConverter.GetObjectName(folder)}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {localDrive.Count} file(s) under folder {_localDriveConverter.GetObjectName(folder)}");

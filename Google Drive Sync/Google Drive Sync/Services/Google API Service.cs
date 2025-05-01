@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace GoogleDriveSync.Services
 {
@@ -17,12 +18,15 @@ namespace GoogleDriveSync.Services
         private readonly LoggerService Logger = new LoggerService();
         private readonly string FolderId;
         private readonly string FolderName;
+        private bool HasErrored = false;
 
         public GoogleAPIService(string folderId)
         {
             FolderId = folderId;
             FolderName = GetFolderName(folderId);
         }
+
+        public bool GetHasErrored() => HasErrored;
 
         private string GetFolderName(string folderId)
         {
@@ -72,6 +76,8 @@ namespace GoogleDriveSync.Services
                         if (file.Id == folderId)
                         {
                             folderName = file.Name;
+
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {folderName}");
                         }
                     }
                 }
@@ -79,8 +85,12 @@ namespace GoogleDriveSync.Services
 
             catch (Exception ex)
             {
+                HasErrored = true;
+
                 Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the files from Google Drive for folder id {folderId}");
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to get the files from Google Drive for folder id {folderId}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             if (!string.IsNullOrEmpty(folderName))
@@ -175,14 +185,21 @@ namespace GoogleDriveSync.Services
                     {
                         folderIds = folderIds.Append(folder.Id).ToArray();
                         folderNames = folderNames.Append(folder.Name).ToArray();
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Id: {folder.Id}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {folder.Name}");
                     }
                 }
             }
 
             catch (Exception ex)
             {
+                HasErrored = true;
+
                 Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the sub folders from Google Drive for folder id {folderId}");
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to get the sub folders from Google Drive for folder id {folderId}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {folderIds.Length} folder(s) under folder {folderId}");
@@ -250,14 +267,26 @@ namespace GoogleDriveSync.Services
                             Created = DateTime.Parse(file.CreatedTimeRaw),
                             LastModified = DateTime.Parse(file.ModifiedTimeRaw)
                         });
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Id: {file.Id}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Name: {nameSplit[0]}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Type: {nameSplit[1]}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path Ids: {pathIds}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path: {path}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created Date: {file.CreatedTimeRaw}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Modified Date: {file.ModifiedTimeRaw}");
                     }
                 }
             }
 
             catch (Exception ex)
             {
+                HasErrored = true;
+
                 Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the files from Google Drive for folder id {folderId}");
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to get the files from Google Drive for folder id {folderId}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {googleDrive.Count} file(s) under folder {folderId}");
