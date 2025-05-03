@@ -1,4 +1,6 @@
-﻿namespace GoogleDriveSync.Converters
+﻿using System;
+
+namespace GoogleDriveSync.Converters
 {
     internal static class StandardValues
     {

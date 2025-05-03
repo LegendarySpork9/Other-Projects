@@ -189,5 +189,33 @@ namespace localDriveSync.Services
                 path = path.Replace($@"\{folderNames[i]}", "");
             }
         }
+
+        public void DeleteFile(string file) => File.Delete(file);
+
+        public void UnblockFile(string file)
+        {
+            string adsPath = $"{file}:Zone.Identifier";
+
+            if (File.Exists(adsPath))
+            {
+                File.Delete(adsPath);
+            }
+        }
+
+        public void HideFile(string file, bool hidden)
+        {
+            if (File.Exists(file))
+            {
+                if (hidden)
+                {
+                    File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.Hidden);
+                }
+
+                else
+                {
+                    File.SetAttributes(file, File.GetAttributes(file) & ~FileAttributes.Hidden);
+                }
+            }
+        }
     }
 }

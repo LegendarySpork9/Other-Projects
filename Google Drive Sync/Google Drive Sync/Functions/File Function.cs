@@ -26,20 +26,20 @@ namespace GoogleDriveSync.Functions
                 {
                     DateTime lastModified = DateTime.Parse("01/01/1900");
                     
-                    if (googleFile.Path != localFile.Path)
+                    if (localFile.Path != googleFile.Path)
                     {
                         changes.Add(new ChangeModel
                         {
                             Field = "Path",
-                            OldValue = googleFile.Path,
-                            NewValue = localFile.Path,
-                            Stream = "Down"
+                            OldValue = localFile.Path,
+                            NewValue = googleFile.Path,
+                            Stream = "Up"
                         });
 
                         differences++;
                     }
 
-                    if (googleFile.LastModified != localFile.LastModified)
+                    if (localFile.LastModified.ToString("dd/MM/yyyy HH:mm:ss") != googleFile.LastModified.ToString("dd/MM/yyyy HH:mm:ss"))
                     {
                         if (googleFile.LastModified > localFile.LastModified)
                         {
@@ -108,16 +108,16 @@ namespace GoogleDriveSync.Functions
                     changes.Add(new ChangeModel
                     {
                         Field = "Path",
-                        OldValue = localFile.Path,
-                        NewValue = "Not Uploaded",
+                        OldValue = "Not Uploaded",
+                        NewValue = localFile.Path,
                         Stream = "Down"
                     });
 
                     changes.Add(new ChangeModel
                     {
                         Field = "Last Modified",
-                        OldValue = localFile.LastModified.ToString(),
-                        NewValue = "Not Uploaded",
+                        OldValue = "Not Uploaded",
+                        NewValue = localFile.LastModified.ToString(),
                         Stream = "Down"
                     });
 
@@ -149,16 +149,16 @@ namespace GoogleDriveSync.Functions
                     changes.Add(new ChangeModel
                     {
                         Field = "Path",
-                        OldValue = googleFile.Path,
-                        NewValue = "Not Downloaded",
+                        OldValue = "Not Downloaded",
+                        NewValue = googleFile.Path,
                         Stream = "Up"
                     });
 
                     changes.Add(new ChangeModel
                     {
                         Field = "Last Modified",
-                        OldValue = googleFile.LastModified.ToString(),
-                        NewValue = "Not Downloaded",
+                        OldValue = "Not Downloaded",
+                        NewValue = googleFile.LastModified.ToString(),
                         Stream = "Up"
                     });
 

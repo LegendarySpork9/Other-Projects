@@ -1,8 +1,11 @@
 ﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
+using Google.Apis.Upload;
 using Google.Apis.Util.Store;
 using GoogleDriveSync.Converters;
+using GoogleDriveSync.Functions;
 using GoogleDriveSync.Models;
 using System;
 using System.Collections.Generic;
@@ -19,6 +22,7 @@ namespace GoogleDriveSync.Services
         private readonly string FolderId;
         private readonly string FolderName;
         private bool HasErrored = false;
+        private List<KeyValuePair<string, string>> Folders = new List<KeyValuePair<string, string>>();
 
         public GoogleAPIService(string folderId)
         {
@@ -28,34 +32,20 @@ namespace GoogleDriveSync.Services
 
         public bool GetHasErrored() => HasErrored;
 
+        public void ResetHasErrored() => HasErrored = false;
+
         private string GetFolderName(string folderId)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder name for folder id {folderId}");
 
             string folderName = string.Empty;
 
-            string[] scopes = { DriveService.Scope.DriveReadonly };
-            string applicationName = "Google Drive Sync";
-
             try
             {
-                FileStream stream = new FileStream(AppSettingsModel.Credentials, FileMode.Open, FileAccess.Read);
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Opened stream to Google Drive OAuth Credentials");
-
-                UserCredential credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.FromStream(stream).Secrets,
-                    scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore("token.json", true)).Result;
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Generated User Credentials");
-
                 DriveService service = new DriveService(new BaseClientService.Initializer()
                 {
-                    HttpClientInitializer = credential,
-                    ApplicationName = applicationName,
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
                 });
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
@@ -67,17 +57,19 @@ namespace GoogleDriveSync.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Search Query");
 
                 var response = request.Execute();
-                IList<Google.Apis.Drive.v3.Data.File> files = response.Files;
+                IList<Google.Apis.Drive.v3.Data.File> driveFolders = response.Files;
 
-                if (files != null && files.Count > 0)
+                if (driveFolders != null && driveFolders.Count > 0)
                 {
-                    foreach (Google.Apis.Drive.v3.Data.File file in files)
+                    foreach (Google.Apis.Drive.v3.Data.File folder in driveFolders)
                     {
-                        if (file.Id == folderId)
+                        if (folder.Id == folderId)
                         {
-                            folderName = file.Name;
+                            folderName = folder.Name;
 
                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {folderName}");
+
+                            Folders.Add(new KeyValuePair<string, string>(folderId, folderName));
                         }
                     }
                 }
@@ -104,6 +96,41 @@ namespace GoogleDriveSync.Services
             }
 
             return folderName;
+        }
+
+        private UserCredential GetCredentials()
+        {
+            UserCredential credential = null;
+
+            string[] scopes = { DriveService.Scope.Drive };
+
+            try
+            {
+                FileStream credentialsStream = new FileStream(AppSettingsModel.Credentials, FileMode.Open, FileAccess.Read);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Opened stream to Google Drive OAuth Credentials");
+
+                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                        GoogleClientSecrets.FromStream(credentialsStream).Secrets,
+                        scopes,
+                        "user",
+                        CancellationToken.None,
+                        new FileDataStore("token.json", true)).Result;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Generated User Credentials");
+            }
+
+            catch (Exception ex)
+            {
+                HasErrored = true;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to generate user credentials");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to generate user credentials", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            return credential;
         }
 
         public List<FileModel> GetData()
@@ -141,28 +168,12 @@ namespace GoogleDriveSync.Services
             string[] folderIds = Array.Empty<string>();
             string[] folderNames = Array.Empty<string>();
 
-            string[] scopes = { DriveService.Scope.DriveReadonly };
-            string applicationName = "Google Drive Sync";
-
             try
             {
-                FileStream stream = new FileStream(AppSettingsModel.Credentials, FileMode.Open, FileAccess.Read);
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Opened stream to Google Drive OAuth Credentials");
-
-                UserCredential credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.FromStream(stream).Secrets,
-                    scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore("token.json", true)).Result;
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Generated User Credentials");
-
                 DriveService service = new DriveService(new BaseClientService.Initializer()
                 {
-                    HttpClientInitializer = credential,
-                    ApplicationName = applicationName,
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
                 });
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
@@ -188,6 +199,8 @@ namespace GoogleDriveSync.Services
 
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Id: {folder.Id}");
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {folder.Name}");
+
+                        Folders.Add(new KeyValuePair<string, string>(folder.Id, folder.Name));
                     }
                 }
             }
@@ -213,28 +226,12 @@ namespace GoogleDriveSync.Services
 
             List<FileModel> googleDrive = new List<FileModel>();
 
-            string[] scopes = { DriveService.Scope.DriveReadonly };
-            string applicationName = "Google Drive Sync";
-
             try
             {
-                FileStream stream = new FileStream(AppSettingsModel.Credentials, FileMode.Open, FileAccess.Read);
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Opened stream to Google Drive OAuth Credentials");
-
-                UserCredential credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.FromStream(stream).Secrets,
-                    scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore("token.json", true)).Result;
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Generated User Credentials");
-
                 DriveService service = new DriveService(new BaseClientService.Initializer()
                 {
-                    HttpClientInitializer = credential,
-                    ApplicationName = applicationName,
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
                 });
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
@@ -264,8 +261,8 @@ namespace GoogleDriveSync.Services
                             Type = nameSplit[1],
                             PathIds = pathIds,
                             Path = path,
-                            Created = DateTime.Parse(file.CreatedTimeRaw),
-                            LastModified = DateTime.Parse(file.ModifiedTimeRaw)
+                            Created = file.CreatedTime.Value,
+                            LastModified = file.ModifiedTime.Value
                         });
 
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Id: {file.Id}");
@@ -309,6 +306,266 @@ namespace GoogleDriveSync.Services
 
                 pathIds = pathIds.Replace($@"\{folderIds[i]}", "");
                 path = path.Replace($@"\{folderNames[i]}", "");
+            }
+        }
+
+        public void CreateFile(FileModel file)
+        {
+            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+            GoogleDriveConverter _googleDriveConverter = new GoogleDriveConverter();
+            LoggerFunction _loggerFunction = new LoggerFunction();
+
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploading {file.Name}.{file.Type} to Google Drive");
+
+            IUploadProgress requestStatus = null;
+
+            try
+            {
+                DriveService service = new DriveService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
+                });
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
+
+                Google.Apis.Drive.v3.Data.File fileMetaData = new Google.Apis.Drive.v3.Data.File
+                {
+                    Name = $"{file.Name}.{file.Type}",
+                    Parents = new List<string> { Folders.Find(c => c.Value == _googleDriveFunction.RemoveStringCharacters(file.Path, new char[] { '\\' }, "Right")).Key },
+                    CreatedTime = file.Created,
+                    ModifiedTime = file.LastModified
+                };
+                
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created File Meta Data: {_loggerFunction.FormatFileMetaData(fileMetaData, "Create")}");
+
+                FileStream fileStream = new FileStream(file.Id, FileMode.Open);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Opened File");
+
+                FilesResource.CreateMediaUpload createRequest = service.Files.Create(fileMetaData, fileStream, _googleDriveConverter.GetMimeType($".{file.Type}"));
+                createRequest.Fields = "id, name";
+                requestStatus = createRequest.Upload();
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                fileStream.Close();
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Closed File");
+            }
+
+            catch (Exception ex)
+            {
+                HasErrored = true;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            if (requestStatus.Status == UploadStatus.Completed)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploaded {file.Name}.{file.Type} to Google Drive");
+            }
+
+            else
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Failed to upload {file.Name}.{file.Type} to Google Drive. Returned Code {requestStatus.Status}");
+            }
+        }
+
+        public void UpdateFile(FileModel file)
+        {
+            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+            GoogleDriveConverter _googleDriveConverter = new GoogleDriveConverter();
+            LoggerFunction _loggerFunction = new LoggerFunction();
+
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploading {file.Name}.{file.Type} to Google Drive");
+
+            IUploadProgress requestStatus = null;
+
+            try
+            {
+                DriveService service = new DriveService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
+                });
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
+
+                Google.Apis.Drive.v3.Data.File fileMetaData = new Google.Apis.Drive.v3.Data.File
+                {
+                    ModifiedTime = file.LastModified
+                };
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created File Meta Data: {_loggerFunction.FormatFileMetaData(fileMetaData, "Update")}");
+
+                FileStream fileStream = new FileStream(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right"), FileMode.Open);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Opened File");
+
+                FilesResource.UpdateMediaUpload updateRequest = service.Files.Update(fileMetaData, _googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Left"), fileStream, _googleDriveConverter.GetMimeType($".{file.Type}"));
+                updateRequest.Fields = "id, name";
+                requestStatus = updateRequest.Upload();
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                fileStream.Close();
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Closed File");
+            }
+
+            catch (Exception ex)
+            {
+                HasErrored = true;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            if (requestStatus.Status == UploadStatus.Completed)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploaded {file.Name}.{file.Type} to Google Drive");
+            }
+
+            else
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Failed to upload {file.Name}.{file.Type} to Google Drive. Returned Code {requestStatus.Status}");
+            }
+        }
+
+        public void MoveFile(FileModel file)
+        {
+            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+            GoogleDriveConverter _googleDriveConverter = new GoogleDriveConverter();
+            LoggerFunction _loggerFunction = new LoggerFunction();
+
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploading {file.Name}.{file.Type} to Google Drive");
+
+            IUploadProgress requestStatus = null;
+
+            try
+            {
+                DriveService service = new DriveService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
+                });
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
+
+                Google.Apis.Drive.v3.Data.File fileMetaData = new Google.Apis.Drive.v3.Data.File
+                {
+                    ModifiedTime = file.LastModified
+                };
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created File Meta Data: {_loggerFunction.FormatFileMetaData(fileMetaData, "Move")}");
+
+                FileStream fileStream = new FileStream(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right"), FileMode.Open);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Opened File");
+
+                FilesResource.UpdateMediaUpload moveRequest = service.Files.Update(fileMetaData, _googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Left"), fileStream, _googleDriveConverter.GetMimeType($".{file.Type}"));
+                moveRequest.RemoveParents = _googleDriveFunction.RemoveStringCharacters(file.PathIds, new char[] { '\\' }, "Right");
+                moveRequest.AddParents = Folders.Find(c => c.Value == _googleDriveFunction.RemoveStringCharacters(file.Path, new char[] { ',', '\\' }, "Right")).Key;
+                moveRequest.Fields = "id, name, parents";
+                requestStatus = moveRequest.Upload();
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                fileStream.Close();
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Closed File");
+            }
+
+            catch (Exception ex)
+            {
+                HasErrored = true;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            if (requestStatus != null && requestStatus.Status == UploadStatus.Completed)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploaded {file.Name}.{file.Type} to Google Drive");
+            }
+
+            else
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Failed to upload {file.Name}.{file.Type} to Google Drive. Returned Code {requestStatus.Status}");
+            }
+        }
+
+        public void DownloadFile(FileModel file)
+        {
+            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+            GoogleDriveConverter _googleDriveConverter = new GoogleDriveConverter();
+            FolderFunction _folderFunction = new FolderFunction();
+
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Downloading {file.Name}.{file.Type} to Local Drive");
+
+            try
+            {
+                DriveService service = new DriveService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
+                });
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
+
+                string filePath = _googleDriveConverter.GetFilePath(AppSettingsModel.LocalFolder.Remove(AppSettingsModel.LocalFolder.LastIndexOf('\\')), _googleDriveFunction.RemoveStringCharacters(file.Path, new char[] { ',' }, "Left"), $"{file.Name}.{file.Type}");
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Path: {filePath}");
+
+                _folderFunction.CheckPath(filePath);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Directories Checked");
+
+                FilesResource.GetRequest downloadRequest = service.Files.Get(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Left"));
+                MemoryStream stream = new MemoryStream();
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                downloadRequest.MediaDownloader.ProgressChanged += progress =>
+                {
+                    switch (progress.Status)
+                    {
+                        case DownloadStatus.Downloading:
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Download File: {progress.BytesDownloaded} bytes");
+                            break;
+
+                        case DownloadStatus.Completed:
+                            System.IO.File.WriteAllBytes(filePath, stream.ToArray());
+                            System.IO.File.SetCreationTime(filePath, file.Created);
+                            System.IO.File.SetLastWriteTime(filePath, file.LastModified);
+                            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Downloaded {file.Name}.{file.Type} to Local Drive");
+                            break;
+
+                        case DownloadStatus.Failed:
+                            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Failed to download {file.Name}.{file.Type} to Local Drive");
+                            break;
+                    }
+                };
+
+                downloadRequest.Download(stream);
+            }
+
+            catch (Exception ex)
+            {
+                HasErrored = true;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }

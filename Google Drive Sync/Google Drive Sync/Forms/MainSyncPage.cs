@@ -3,16 +3,8 @@ using GoogleDriveSync.Models;
 using GoogleDriveSync.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace GoogleDriveSync
 {
@@ -23,7 +15,6 @@ namespace GoogleDriveSync
         private DataGridViewRow CurrentRow;
         private bool TablePopulated = false;
         private List<DataGridViewRow> RowsToUpload = new List<DataGridViewRow>();
-        private int UpdateFileCount = 0;
 
         public MainSyncPage()
         {
@@ -56,9 +47,14 @@ namespace GoogleDriveSync
         private async void BTNCompareClick(object sender, EventArgs e)
         {
             BTNCompare.Enabled = false;
+            BTNSync.Enabled = false;
+            BTNSync.Text = "Sync 0 File(s)";
+            DGVFileInformation.Rows.Clear();
+            RowsToUpload.Clear();
+            TBCDocumentChanges.Visible = false;
+
             PRBLoading.Value = 0;
             PBLoading.Image = Properties.Resources.LoadingSpinner;
-            DGVFileInformation.Rows.Clear();
             bool hasErrored = false;
 
             await Task.Run(() =>
@@ -115,21 +111,56 @@ namespace GoogleDriveSync
         {
             BTNSync.Enabled = false;
             BTNCompare.Enabled = false;
+            DGVFileInformation.ReadOnly = true;
+            TBCDocumentChanges.Visible = false;
+
             PRBLoading.Value = 0;
             PBLoading.Image = Properties.Resources.LoadingSpinner;
             bool hasErrored = false;
 
-            List<FileModel> files = new List<FileModel>();
+            List<FileModel> uploadFiles = new List<FileModel>();
+            List<FileModel> downloadFiles = new List<FileModel>();
 
-            foreach(DataGridViewRow row in RowsToUpload)
+            foreach (DataGridViewRow row in RowsToUpload)
             {
-                files.Add(Files.Find(c => c.Name == row.Cells[0].Value.ToString() && c.Type == row.Cells[1].Value.ToString()));
+                if (row.Cells[6].Value.ToString() == "Up Stream")
+                {
+                    uploadFiles.Add(Files.Find(c => c.Name == row.Cells[0].Value.ToString() && c.Type == row.Cells[1].Value.ToString()));
+                }
+
+                else
+                {
+                    downloadFiles.Add(Files.Find(c => c.Name == row.Cells[0].Value.ToString() && c.Type == row.Cells[1].Value.ToString()));
+                }
             }
 
             await Task.Run(() =>
             {
-                hasErrored = AppService.SyncChanges(files);
+                hasErrored = AppService.SyncChanges(uploadFiles, downloadFiles);
             });
+
+            foreach (FileModel file in uploadFiles)
+            {
+                file.Changes.Clear();
+            }
+
+            foreach (FileModel file in downloadFiles)
+            {
+                file.Changes.Clear();
+            }
+
+            DGVFileInformation.CellValueChanged -= DGVFileInformationCellValue;
+
+            foreach (DataGridViewRow row in RowsToUpload)
+            {
+                int index = DGVFileInformation.Rows.IndexOf(row);
+
+                DGVFileInformation.Rows[index].Cells[5].Value = "False";
+                DGVFileInformation.Rows[index].Cells[6].Value = null;
+                DGVFileInformation.Rows[index].Cells[7].Value = null;
+            }
+
+            DGVFileInformation.CellValueChanged += DGVFileInformationCellValue;
 
             PRBLoading.Value = 100;
 
@@ -143,8 +174,10 @@ namespace GoogleDriveSync
                 PBLoading.Image = Properties.Resources.Tick;
             }
 
+            BTNSync.Text = "Sync 0 File(s)";
+            RowsToUpload.Clear();
+            DGVFileInformation.ReadOnly = false;
             BTNCompare.Enabled = true;
-            BTNSync.Enabled = true;
         }
 
         private void DGVFileInformationRowState(object sender, DataGridViewRowStateChangedEventArgs e)
@@ -226,19 +259,18 @@ namespace GoogleDriveSync
 
                 if (row.Cells[6].Value != null && (row.Cells[7].Value != null && bool.Parse(row.Cells[7].Value.ToString())))
                 {
+                    int previousUpdateFileCount = RowsToUpload.Count;
+
                     RowsToUpload.Add(row);
 
-                    int previousUpdateFileCount = UpdateFileCount;
-                    UpdateFileCount++;
+                    BTNSync.Text = BTNSync.Text.Replace(previousUpdateFileCount.ToString(), RowsToUpload.Count.ToString());
 
-                    BTNSync.Text = BTNSync.Text.Replace(char.Parse(previousUpdateFileCount.ToString()), char.Parse(UpdateFileCount.ToString()));
-
-                    if (UpdateFileCount > 0 && !BTNSync.Enabled)
+                    if (RowsToUpload.Count > 0 && !BTNSync.Enabled)
                     {
                         BTNSync.Enabled = true;
                     }
 
-                    if (UpdateFileCount == 0 && BTNSync.Enabled)
+                    if (RowsToUpload.Count == 0 && BTNSync.Enabled)
                     {
                         BTNSync.Enabled = false;
                     }
@@ -248,19 +280,18 @@ namespace GoogleDriveSync
                 {
                     if (RowsToUpload.Contains(row))
                     {
+                        int previousUpdateFileCount = RowsToUpload.Count;
+
                         RowsToUpload.Remove(row);
 
-                        int previousUpdateFileCount = UpdateFileCount;
-                        UpdateFileCount--;
+                        BTNSync.Text = BTNSync.Text.Replace(previousUpdateFileCount.ToString(), RowsToUpload.Count.ToString());
 
-                        BTNSync.Text = BTNSync.Text.Replace(char.Parse(previousUpdateFileCount.ToString()), char.Parse(UpdateFileCount.ToString()));
-
-                        if (UpdateFileCount > 0 && !BTNSync.Enabled)
+                        if (RowsToUpload.Count > 0 && !BTNSync.Enabled)
                         {
                             BTNSync.Enabled = true;
                         }
 
-                        if (UpdateFileCount == 0 && BTNSync.Enabled)
+                        if (RowsToUpload.Count == 0 && BTNSync.Enabled)
                         {
                             BTNSync.Enabled = false;
                         }

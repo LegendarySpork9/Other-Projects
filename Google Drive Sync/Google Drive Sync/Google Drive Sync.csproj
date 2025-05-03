@@ -70,6 +70,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\Google Drive Converter.cs" />
+    <Compile Include="Converters\Progress Bar Value Converter.cs" />
     <Compile Include="Forms\MainSyncPage.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,6 +80,9 @@
     </Compile>
     <Compile Include="Functions\File Function.cs" />
     <Compile Include="Converters\Local Drive Converter.cs" />
+    <Compile Include="Functions\Folder Function.cs" />
+    <Compile Include="Functions\Google Drive Function.cs" />
+    <Compile Include="Functions\Logger Function.cs" />
     <Compile Include="Models\App Settings Model.cs" />
     <Compile Include="Models\Change Model.cs" />
     <Compile Include="Models\File Model.cs" />
