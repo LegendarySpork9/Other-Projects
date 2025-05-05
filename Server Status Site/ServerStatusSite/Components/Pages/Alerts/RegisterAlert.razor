@@ -1,0 +1,32 @@
+﻿@page "/registeralert"
+
+<PageTitle>Register Alert</PageTitle>
+
+<div class="container">
+    <center class="@GetStyle("Form")">
+        <div style="display: flex; gap: 83.5px;">
+            <label>Reporter:</label>
+            <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="User.DiscordName" />
+        </div>
+        <br />
+        <div style="display: flex; gap: 63px;">
+            <label>Component:</label>
+            <select style="@GetStyle("Input")" @bind="Component">
+                <option value="PC">PC</option>
+                <option value="Server">Server</option>
+                <option value="Hamachi">Hamachi</option>
+            </select>
+        </div>
+        <br />
+        <div style="display: flex; gap: 13.25px;">
+            <label>Component Status:</label>
+            <select style="@GetStyle("Input")" @bind="ComponentStatus">
+                <option value="Online">Online</option>
+                <option value="Offline">Offline</option>
+                <option value="Unknown">Unknown</option>
+            </select>
+        </div>
+        <br />
+        <button class="btn btn-primary" @onclick="RegisterClick">Register</button>
+    </center>
+</div>

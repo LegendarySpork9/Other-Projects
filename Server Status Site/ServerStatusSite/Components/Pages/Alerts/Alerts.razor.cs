@@ -25,7 +25,8 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
         private void RegisterAlert()
         {
-            ReportedAlerts.Add(new AlertModel
+            Navigation.NavigateTo("/registeralert");
+            /*ReportedAlerts.Add(new AlertModel
             {
                 Id = ReportedAlerts.Count + 1,
                 Occured = DateTime.UtcNow,
@@ -35,7 +36,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
                 AlertStatus = "Reported"
             });
 
-            ReportedAlerts = ReportedAlerts.OrderByDescending(c => c.Id).ToList();
+            ReportedAlerts = ReportedAlerts.OrderByDescending(c => c.Id).ToList();*/
         }
 
         private void OpenClick(AlertModel alert)
