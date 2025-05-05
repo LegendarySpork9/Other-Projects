@@ -1,9 +1,0 @@
-wwwroot\app.css
-wwwroot\bootstrap\bootstrap.min.css
-wwwroot\bootstrap\bootstrap.min.css.map
-wwwroot\Images\Account Icon.png
-wwwroot\Images\favicon.png
-wwwroot\Images\Game Icon.png
-wwwroot\Images\Hamachi Icon.png
-wwwroot\Images\Login Background.png
-wwwroot\Login Background.gif
