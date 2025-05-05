@@ -64,5 +64,14 @@
                 _ => string.Empty
             };
         }
+
+        public string GetTableRowDarkMode(bool darkMode)
+        {
+            return darkMode switch
+            {
+                true => "dark-mode",
+                _ => string.Empty
+            };
+        }
     }
 }
