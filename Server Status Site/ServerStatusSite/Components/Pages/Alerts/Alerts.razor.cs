@@ -12,6 +12,21 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private UserModel User { get; set; }
         private List<AlertModel> ReportedAlerts = [];
 
+        protected override void OnInitialized()
+        {
+            ReportedAlerts.Add(new AlertModel
+            {
+                Id = ReportedAlerts.Count + 1,
+                Occured = DateTime.UtcNow,
+                Reporter = "LegendarySpork9",
+                Component = "Hamachi",
+                ComponentStatus = "Offline",
+                AlertStatus = "Reported"
+            });
+
+            ReportedAlerts = ReportedAlerts.OrderByDescending(c => c.Id).ToList();
+        }
+
         private string GetStyle(string component = null)
         {
             StyleConverter _styleConverter = new();
@@ -26,22 +41,11 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private void RegisterAlert()
         {
             Navigation.NavigateTo("/registeralert");
-            /*ReportedAlerts.Add(new AlertModel
-            {
-                Id = ReportedAlerts.Count + 1,
-                Occured = DateTime.UtcNow,
-                Reporter = "LegendarySpork9",
-                Component = "Hamachi",
-                ComponentStatus = "Offline",
-                AlertStatus = "Reported"
-            });
-
-            ReportedAlerts = ReportedAlerts.OrderByDescending(c => c.Id).ToList();*/
         }
 
         private void OpenClick(AlertModel alert)
         {
-            Navigation.NavigateTo($"/alerts?alertId={alert.Id}");
+            Navigation.NavigateTo($"/editalert?alertId={alert.Id}");
         }
     }
 }
