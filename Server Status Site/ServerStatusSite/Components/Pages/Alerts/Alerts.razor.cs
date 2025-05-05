@@ -45,7 +45,10 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
         private void OpenClick(AlertModel alert)
         {
-            Navigation.NavigateTo($"/editalert?alertId={alert.Id}");
+            if (User.Admin)
+            {
+                Navigation.NavigateTo($"/editalert?alertId={alert.Id}");
+            }
         }
     }
 }

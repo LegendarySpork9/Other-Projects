@@ -16,5 +16,6 @@
                 OnDarkModeChanged?.Invoke();
             }
         }
+        public bool Admin { get; set; }
     }
 }

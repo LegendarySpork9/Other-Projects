@@ -27,6 +27,13 @@ namespace ServerStatusSite.Components.Pages
         {
             if (User.Username == "Hello" && User.Password == "Matey")
             {
+                User.Admin = true;
+                Navigation.NavigateTo(ReturnUrl);
+            }
+
+            else if (User.Username == "Hey" && User.Password == "Matey")
+            {
+                User.Admin = false;
                 Navigation.NavigateTo(ReturnUrl);
             }
 
