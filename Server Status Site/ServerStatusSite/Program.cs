@@ -1,6 +1,7 @@
 using ServerStatusSite.Components;
 using ServerStatusSite.Middleware;
 using ServerStatusSite.Models;
+using ServerStatusSite.Services;
 
 namespace ServerStatusSite
 {
@@ -8,6 +9,8 @@ namespace ServerStatusSite
     {
         public static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure(new FileInfo(Path.Combine(AppContext.BaseDirectory, "log4net.config")));
+
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
@@ -16,6 +19,7 @@ namespace ServerStatusSite
 
             builder.Configuration.Bind("AppSettings", appSettings);
             builder.Services.AddSingleton(appSettings);
+            builder.Services.AddSingleton<APIService>();
 
             builder.Services.AddScoped<UserModel>();
 
