@@ -1,10 +1,19 @@
 ﻿using Microsoft.AspNetCore.Components;
+using ServerStatusSite.Converters;
+using ServerStatusSite.Functions;
 using ServerStatusSite.Models;
+using ServerStatusSite.Services;
 
 namespace ServerStatusSite.Components.Pages
 {
     public partial class Login : ComponentBase
     {
+        [Inject]
+        private LoggerService Logger { get; set; }
+        [Inject]
+        private APIService APIService { get; set; }
+        [Inject]
+        private IHttpContextAccessor HttpContextAccessor { get; set; }
         [Inject]
         private NavigationManager Navigation { get; set; }
         [Inject]
@@ -14,31 +23,47 @@ namespace ServerStatusSite.Components.Pages
 
         protected override void OnInitialized()
         {
-            Uri uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-            var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
-
-            if (queryParams.TryGetValue("returnUrl", out var returnUrl))
+            if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null && HttpContextAccessor.HttpContext.Connection != null && HttpContextAccessor.HttpContext.Connection.RemoteIpAddress != null)
             {
-                ReturnUrl = returnUrl;
+                Logger.ChangeIdentifier(HttpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString());
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Login Page");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Url: {Navigation.Uri}");
+
+                Uri uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+                var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+                if (queryParams.TryGetValue("returnUrl", out var returnUrl))
+                {
+                    ReturnUrl = returnUrl;
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Return Url: {ReturnUrl}");
+                }
+
+                APIService.SetLogger(Logger);
             }
         }
 
         private void LoginClick()
         {
-            if (User.Username == "Hello" && User.Password == "Matey")
-            {
-                User.Admin = true;
-                Navigation.NavigateTo(ReturnUrl);
-            }
+            HashFunction _hasFunction = new();
 
-            else if (User.Username == "Hey" && User.Password == "Matey")
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Login");
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Username: {User.Username}");
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Password: {User.Password}");
+
+            APIService.Authorise();
+            List<UserModel> users = APIService.GetUsers();
+            UserModel user = users.Find(c => c.Username == User.Username && c.Password == _hasFunction.HashString(User.Password));
+
+            if (user != null)
             {
-                User.Admin = false;
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Login Successful.");
                 Navigation.NavigateTo(ReturnUrl);
             }
 
             else
             {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Login Failed.");
                 ShowError = true;
             }
         }
