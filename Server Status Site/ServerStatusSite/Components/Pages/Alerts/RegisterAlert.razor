@@ -9,19 +9,31 @@
             <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="User.DiscordName" />
         </div>
         <br />
-        <div style="display: flex; gap: 63px;">
-            <label>Component:</label>
-            <select style="@GetStyle("Input")" @bind="Component">
-                <option value="PC">PC</option>
-                <option value="Server">Server</option>
-                <option value="Hamachi">Hamachi</option>
+        <div style="display: flex; gap: 98.5px">
+            <label>Server:</label>
+            <select style="@GetStyle("Input");width: 201px" @bind="Server">
+                <option value="" disabled selected>Select an option</option>
+                @foreach (string server in ServersNames)
+                {
+                    <option value="@server">@server</option>
+                }
             </select>
         </div>
         <br />
-        <div style="display: flex; gap: 13.25px;">
+        <div style="display: flex; gap: 63px">
+            <label>Component:</label>
+            <select style="@GetStyle("Input");width: 201px" @bind="Component">
+                <option value="" disabled selected>Select an option</option>
+                <option value="PC Status">PC</option>
+                <option value="Hamachi Status">Hamachi</option>
+                <option value="Server Status">Server</option>
+            </select>
+        </div>
+        <br />
+        <div style="display: flex; gap: 13.25px">
             <label>Component Status:</label>
-            <select style="@GetStyle("Input")" @bind="ComponentStatus">
-                <option value="Online">Online</option>
+            <select style="@GetStyle("Input");width: 201px" @bind="ComponentStatus">
+                <option value="" disabled selected>Select an option</option>
                 <option value="Offline">Offline</option>
                 <option value="Unknown">Unknown</option>
             </select>

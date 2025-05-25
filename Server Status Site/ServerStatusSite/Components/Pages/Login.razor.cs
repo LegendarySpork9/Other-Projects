@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using ServerStatusSite.Converters;
 using ServerStatusSite.Functions;
-using ServerStatusSite.Models;
+using ServerStatusSite.Models.Data;
 using ServerStatusSite.Services;
 
 namespace ServerStatusSite.Components.Pages
@@ -58,6 +58,9 @@ namespace ServerStatusSite.Components.Pages
             if (user != null)
             {
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Login Successful.");
+                Logger.ChangeIdentifier(user.Username);
+                APIService.SetLogger(Logger);
+                User.UpdateModel(APIService.GetUserSettings(user));
                 Navigation.NavigateTo(ReturnUrl);
             }
 

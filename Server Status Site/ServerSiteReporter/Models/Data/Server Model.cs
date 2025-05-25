@@ -1,4 +1,4 @@
-﻿namespace ServerStatusSite.Models
+﻿namespace ServerSiteReporter.Models.Data
 {
     public class ServerModel
     {
@@ -6,6 +6,5 @@
         public string Game { get; set; }
         public string GameVersion { get; set; }
         public string IPAddress { get; set; }
-        public List<StatusModel> Statuses { get; set; } = new List<StatusModel>();
     }
 }

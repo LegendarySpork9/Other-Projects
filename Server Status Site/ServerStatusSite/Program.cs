@@ -2,6 +2,7 @@ using ServerStatusSite.Components;
 using ServerStatusSite.Converters;
 using ServerStatusSite.Middleware;
 using ServerStatusSite.Models;
+using ServerStatusSite.Models.Data;
 using ServerStatusSite.Services;
 
 namespace ServerStatusSite

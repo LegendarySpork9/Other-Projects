@@ -1,4 +1,4 @@
-﻿namespace ServerStatusSite.Models
+﻿namespace ServerStatusSite.Models.Data
 {
     public class StatusModel
     {

@@ -1,4 +1,4 @@
-﻿namespace ServerStatusSite.Models
+﻿namespace ServerStatusSite.Models.Data
 {
     public class UserModel
     {
@@ -18,6 +18,14 @@
                 _DarkMode = value;
                 OnDarkModeChanged?.Invoke();
             }
+        }
+
+        public void UpdateModel(UserModel user)
+        {
+            UserId = user.UserId;
+            DiscordName = user.DiscordName;
+            Admin = user.Admin;
+            DarkMode = user.DarkMode;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using ServerStatusSite.Converters;
-using ServerStatusSite.Models;
+using ServerStatusSite.Models.Data;
 
 namespace ServerStatusSite.Components.Layout
 {

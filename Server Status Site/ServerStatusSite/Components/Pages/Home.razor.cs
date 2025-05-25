@@ -1,56 +1,41 @@
 ﻿using Microsoft.AspNetCore.Components;
 using ServerStatusSite.Converters;
 using ServerStatusSite.Models;
+using ServerStatusSite.Models.Data;
+using ServerStatusSite.Services;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace ServerStatusSite.Components.Pages
 {
     public partial class Home : ComponentBase
     {
         [Inject]
+        private LoggerService Logger { get; set; }
+        [Inject]
+        private APIService APIService { get; set; }
+        [Inject]
+        private AppSettingsModel AppSettings { get; set; }
+        [Inject]
         private UserModel User { get; set; }
         private List<ServerModel> Servers = [];
+        private Timer RefreshTimer { get; set; }
 
         protected override void OnInitialized()
         {
-            for (int i = 0; i < 2; i++)
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Home Page");
+
+            RefreshTimer = new()
             {
-                List<StatusModel> statuses = [];
+                Interval = AppSettings.RefreshTime * 1000
+            };
+            RefreshTimer.Elapsed += (sender, e) => TimerElapsed(sender, e);
 
-                StatusModel status = new()
-                {
-                    Status = "Online",
-                    StatusClass = "online"
-                };
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {RefreshTimer.Interval / 1000 / 60} minutes");
 
-                statuses.Add(status);
+            Servers = APIService.GetServers();
 
-                status = new()
-                {
-                    Status = "Unknown",
-                    StatusClass = "unknown"
-                };
-
-                statuses.Add(status);
-
-                status = new()
-                {
-                    Status = "Offline",
-                    StatusClass = "offline"
-                };
-
-                statuses.Add(status);
-
-                ServerModel server = new()
-                {
-                    HostName = "HunterNas",
-                    Game = "Minecraft",
-                    GameVersion = "1.12.2",
-                    IPAddress = "25.35.45.248",
-                    Statuses = statuses
-                };
-
-                Servers.Add(server);
-            }
+            RefreshTimer.Start();
         }
 
         private string GetStyle()
@@ -58,6 +43,11 @@ namespace ServerStatusSite.Components.Pages
             StyleConverter _styleConverter = new();
 
             return _styleConverter.GetTableDarkMode(User.DarkMode);
+        }
+
+        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            Servers = APIService.GetServers();
         }
     }
 }
