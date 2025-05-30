@@ -38,6 +38,11 @@
                 <option value="Unknown">Unknown</option>
             </select>
         </div>
+        @if (ShowError)
+        {
+            <br />
+            <label class="register-fail">There is already an alert registered for the given details.</label>
+        }
         <br />
         <button class="btn btn-primary" @onclick="RegisterClick">Register</button>
     </center>

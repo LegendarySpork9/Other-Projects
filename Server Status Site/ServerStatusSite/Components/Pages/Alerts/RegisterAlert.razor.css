@@ -21,3 +21,13 @@ button:focus {
     height: 75vh;
     margin: 0 auto;
 }
+
+.register-fail {
+    display: block;
+    width: 300px;
+    border: 2px solid red;
+    margin: auto;
+    color: white;
+    background-color: red;
+    text-align: left;
+}

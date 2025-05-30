@@ -24,6 +24,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private string Server { get; set; }
         private string Component { get; set; }
         private string ComponentStatus { get; set; }
+        private bool ShowError { get; set; } = false;
 
         protected override void OnInitialized()
         {
@@ -51,42 +52,53 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
         private void RegisterClick()
         {
-            DiscordService _discordService = new(Logger, AppSettings);
+            APIAlertsModel alerts = APIService.GetAlerts(1);
+            AlertModel alert = alerts.Alerts.Find(c => c.Server == Server && c.Component == Component && c.AlertStatus != "Resolved");
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Register");
-
-            string[] gameDetails = Server.Split('(');
-            ServerModel server = Servers.Find(c => c.Game == gameDetails[0].Trim() && c.GameVersion == gameDetails[1].Replace(")", ""));
-
-            APINewAlertsModel alert = new()
+            if (alert == null)
             {
-                Reporter = User.DiscordName,
-                Component = Component,
-                ComponentStatus = ComponentStatus,
-                AlertStatus = "Reported",
-                HostName = server.HostName,
-                Game = server.Game,
-                GameVersion = server.GameVersion
-            };
+                DiscordService _discordService = new(Logger, AppSettings);
 
-            if (APIService.RegisterAlert(alert))
-            {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
-            }
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Register");
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Alert Register Complete");
+                string[] gameDetails = Server.Split('(');
+                ServerModel server = Servers.Find(c => c.Game == gameDetails[0].Trim() && c.GameVersion == gameDetails[1].Replace(")", ""));
 
-            if (AppSettings.RecipientIds.Contains(','))
-            {
-                _discordService.SendNotification(AppSettings.RecipientIds.Split(',')[0], $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                APINewAlertsModel newAlert = new()
+                {
+                    Reporter = User.DiscordName,
+                    Component = Component,
+                    ComponentStatus = ComponentStatus,
+                    AlertStatus = "Reported",
+                    HostName = server.HostName,
+                    Game = server.Game,
+                    GameVersion = server.GameVersion
+                };
+
+                if (APIService.RegisterAlert(newAlert))
+                {
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
+                }
+
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Alert Register Complete");
+
+                if (AppSettings.RecipientIds.Contains(','))
+                {
+                    _discordService.SendNotification(AppSettings.RecipientIds.Split(',')[0], $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                }
+
+                else
+                {
+                    _discordService.SendNotification(AppSettings.RecipientIds, $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                }
+
+                Navigation.NavigateTo("/alerts");
             }
 
             else
             {
-                _discordService.SendNotification(AppSettings.RecipientIds, $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                ShowError = true;
             }
-
-            Navigation.NavigateTo("/alerts");
         }
     }
 }
