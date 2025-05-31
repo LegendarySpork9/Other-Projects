@@ -50,6 +50,7 @@ namespace ServerSiteReporter.Services
         public void Start()
         {
             Run();
+            Thread.Sleep(1000);
             RefreshTimer.Start();
         }
 
