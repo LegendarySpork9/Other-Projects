@@ -56,6 +56,9 @@ namespace ServerSiteReporter.Services
 
         private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {DateTime.UtcNow}");
             Run();
         }
 

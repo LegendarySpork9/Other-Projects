@@ -73,7 +73,7 @@ namespace ServerSiteReporter.Services
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching servers from API");
 
-            if (ExpiryTime < DateTime.UtcNow)
+            if (ExpiryTime <= DateTime.UtcNow)
             {
                 Authorise();
             }
@@ -132,6 +132,12 @@ namespace ServerSiteReporter.Services
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.Property("ipAddress").Value}");
                     }
                 }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Authorise();
+                    return GetServers();
+                }
             }
 
             catch (Exception ex)
@@ -148,7 +154,7 @@ namespace ServerSiteReporter.Services
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Registering server event in API");
 
-            if (ExpiryTime < DateTime.UtcNow)
+            if (ExpiryTime <= DateTime.UtcNow)
             {
                 Authorise();
             }
@@ -195,6 +201,12 @@ namespace ServerSiteReporter.Services
                     registered = true;
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Register Successful");
+                }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Authorise();
+                    return RegisterServerEvent(status);
                 }
             }
 

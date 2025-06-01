@@ -75,7 +75,7 @@ namespace ServerSiteAutomation.Services
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching servers from API");
 
-            if (ExpiryTime < DateTime.UtcNow)
+            if (ExpiryTime <= DateTime.UtcNow)
             {
                 Authorise();
             }
@@ -171,6 +171,12 @@ namespace ServerSiteAutomation.Services
                         }
                     }
                 }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Authorise();
+                    return GetServers();
+                }
             }
 
             catch (Exception ex)
@@ -187,7 +193,7 @@ namespace ServerSiteAutomation.Services
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching server statuses from API");
 
-            if (ExpiryTime < DateTime.UtcNow)
+            if (ExpiryTime <= DateTime.UtcNow)
             {
                 Authorise();
             }
@@ -250,6 +256,12 @@ namespace ServerSiteAutomation.Services
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {server.Property("gameVersion").Value}");
                     }
                 }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Authorise();
+                    return GetServerStatuses(component);
+                }
             }
 
             catch (Exception ex)
@@ -266,7 +278,7 @@ namespace ServerSiteAutomation.Services
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching alerts from API");
 
-            if (ExpiryTime < DateTime.UtcNow)
+            if (ExpiryTime <= DateTime.UtcNow)
             {
                 Authorise();
             }
@@ -341,6 +353,12 @@ namespace ServerSiteAutomation.Services
                         }
                     }
                 }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Authorise();
+                    return GetAlerts(pageNumber);
+                }
             }
 
             catch (Exception ex)
@@ -359,7 +377,7 @@ namespace ServerSiteAutomation.Services
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Registering alert in API");
 
-            if (ExpiryTime < DateTime.UtcNow)
+            if (ExpiryTime <= DateTime.UtcNow)
             {
                 Authorise();
             }
@@ -409,6 +427,12 @@ namespace ServerSiteAutomation.Services
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Register Successful");
                 }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Authorise();
+                    return RegisterAlert(alert);
+                }
             }
 
             catch (Exception ex)
@@ -425,7 +449,7 @@ namespace ServerSiteAutomation.Services
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Registering server event in API");
 
-            if (ExpiryTime < DateTime.UtcNow)
+            if (ExpiryTime <= DateTime.UtcNow)
             {
                 Authorise();
             }
@@ -472,6 +496,12 @@ namespace ServerSiteAutomation.Services
                     registered = true;
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Register Successful");
+                }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Authorise();
+                    return RegisterServerEvent(status);
                 }
             }
 
