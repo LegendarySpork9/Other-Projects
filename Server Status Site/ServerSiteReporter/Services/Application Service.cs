@@ -1,4 +1,5 @@
 ﻿using ServerSiteReporter.Converters;
+using ServerSiteReporter.Functions;
 using ServerSiteReporter.Models;
 using ServerSiteReporter.Models.API;
 using ServerSiteReporter.Models.Data;
@@ -35,31 +36,42 @@ namespace ServerSiteReporter.Services
 
         public void Setup()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Automation Service");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application Service");
 
             RefreshTimer = new()
             {
-                Interval = AppSettingsModel.RefreshTime * 1000
+                AutoReset = false
             };
             RefreshTimer.Elapsed += (sender, e) => TimerElapsed(sender, e);
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {RefreshTimer.Interval / 1000 / 60} minutes");
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Automation Service");
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {AppSettingsModel.RefreshTime} minutes");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Application Service");
         }
 
         public void Start()
         {
+            AutomationFunction _automationFunction = new();
+
             Run();
-            Thread.Sleep(1000);
+
+            RefreshTimer.Interval = _automationFunction.GetTimerInterval(DateTime.UtcNow.AddMinutes(AppSettingsModel.RefreshTime)).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
         private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
+            AutomationFunction _automationFunction = new();
+
             Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {DateTime.UtcNow}");
+
+            DateTime nextElapse = DateTime.UtcNow.AddMinutes(AppSettingsModel.RefreshTime);
+
             Run();
+
+            RefreshTimer.Interval = _automationFunction.GetTimerInterval(nextElapse).TotalMilliseconds;
+            RefreshTimer.Start();
         }
 
         private void Run()

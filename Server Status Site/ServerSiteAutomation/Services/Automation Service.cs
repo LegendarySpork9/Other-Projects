@@ -1,4 +1,5 @@
 ﻿using ServerSiteAutomation.Converters;
+using ServerSiteAutomation.Functions;
 using ServerSiteAutomation.Models;
 using ServerSiteAutomation.Models.API;
 using ServerSiteAutomation.Models.Data;
@@ -12,34 +13,45 @@ namespace ServerSiteAutomation.Services
         private readonly LoggerService Logger = new();
         private readonly APIService APIService = new();
         private Timer RefreshTimer;
-
+        
         public void Setup()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Automation Service");
 
             RefreshTimer = new()
             {
-                Interval = AppSettingsModel.RefreshTime * 1000
+                AutoReset = false
             };
             RefreshTimer.Elapsed += (sender, e) => TimerElapsed(sender, e);
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {RefreshTimer.Interval / 1000 / 60} minutes");
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {AppSettingsModel.RefreshTime} minutes");
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Automation Service");
         }
 
         public void Start()
         {
+            AutomationFunction _automationFunction = new();
+
             Run();
-            Thread.Sleep(1000);
+
+            RefreshTimer.Interval = _automationFunction.GetTimerInterval(DateTime.UtcNow.AddMinutes(AppSettingsModel.RefreshTime)).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
         private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
+            AutomationFunction _automationFunction = new();
+
             Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {DateTime.UtcNow}");
+
+            DateTime nextElapse = DateTime.UtcNow.AddMinutes(AppSettingsModel.RefreshTime);
+
             Run();
+
+            RefreshTimer.Interval = _automationFunction.GetTimerInterval(nextElapse).TotalMilliseconds;
+            RefreshTimer.Start();
         }
 
         private void Run()
@@ -64,7 +76,7 @@ namespace ServerSiteAutomation.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Hamachi Status: {hamachiStatus.Status}");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Server Status: {serverStatus.Status}");
 
-                DateTime refreshPeriod = DateTime.UtcNow.AddSeconds(-AppSettingsModel.RefreshTime);
+                DateTime refreshPeriod = DateTime.UtcNow.AddMinutes(-AppSettingsModel.RefreshTime);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Period: {refreshPeriod}");
 

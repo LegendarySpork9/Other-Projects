@@ -13,6 +13,7 @@ namespace ServerSiteReporter.Services
         private readonly string[] Endpoints = AppSettingsModel.Endpoints.Split(',');
         private string BearerToken { get; set; }
         public DateTime ExpiryTime { get; set; }
+        public int RetryCount { get; set; } = 0;
 
         public void Authorise()
         {
@@ -57,6 +58,7 @@ namespace ServerSiteReporter.Services
                     ExpiryTime = DateTime.Parse(infoContent.Property("expires").Value.ToString());
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Expiry Time: {ExpiryTime}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Info, "Obtained Bearer token from API");
                 }
             }
 
@@ -64,9 +66,8 @@ namespace ServerSiteReporter.Services
             {
                 Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to obtain Bearer token from API");
             }
-
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Obtained Bearer token from API");
         }
 
         public List<ServerModel> GetServers()
@@ -131,12 +132,26 @@ namespace ServerSiteReporter.Services
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {gameVersion}");
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.Property("ipAddress").Value}");
                     }
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched servers from API");
                 }
 
                 else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    Authorise();
-                    return GetServers();
+                    if (RetryCount != 4)
+                    {
+                        RetryCount++;
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+
+                        Authorise();
+                        servers = GetServers();
+                    }
+
+                    else
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch servers from API");
+                    }
                 }
             }
 
@@ -144,9 +159,10 @@ namespace ServerSiteReporter.Services
             {
                 Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch servers from API");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched servers from API");
+            RetryCount = 0;
             return servers;
         }
 
@@ -201,12 +217,25 @@ namespace ServerSiteReporter.Services
                     registered = true;
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Register Successful");
+                    Logger.LogMessage(StandardValues.LoggerValues.Info, "Registered server event in API");
                 }
 
                 else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    Authorise();
-                    return RegisterServerEvent(status);
+                    if (RetryCount != 4)
+                    {
+                        RetryCount++;
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+
+                        Authorise();
+                        registered = RegisterServerEvent(status);
+                    }
+
+                    else
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to register server event in API");
+                    }
                 }
             }
 
@@ -214,9 +243,10 @@ namespace ServerSiteReporter.Services
             {
                 Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to register server event in API");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Registered server event in API");
+            RetryCount = 0;
             return registered;
         }
     }
