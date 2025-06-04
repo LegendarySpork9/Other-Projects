@@ -1,8 +1,6 @@
-﻿using ServerSiteReporter.Models;
-
-namespace ServerSiteReporter.Functions
+﻿namespace ServerSiteReporter.Functions
 {
-    internal class AutomationFunction
+    internal class ApplicationFunction
     {
         public TimeSpan GetTimerInterval(DateTime nextElapse)
         {

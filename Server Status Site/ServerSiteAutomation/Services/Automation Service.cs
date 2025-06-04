@@ -13,7 +13,8 @@ namespace ServerSiteAutomation.Services
         private readonly LoggerService Logger = new();
         private readonly APIService APIService = new();
         private Timer RefreshTimer;
-        
+        private DateTime NextElapse;
+
         public void Setup()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Automation Service");
@@ -34,7 +35,10 @@ namespace ServerSiteAutomation.Services
 
             Run();
 
-            RefreshTimer.Interval = _automationFunction.GetTimerInterval(DateTime.UtcNow.AddMinutes(AppSettingsModel.RefreshTime)).TotalMilliseconds;
+            DateTime currentTime = DateTime.UtcNow;
+            NextElapse = currentTime.AddMinutes(AppSettingsModel.RefreshTime).AddMilliseconds(-currentTime.Millisecond);
+
+            RefreshTimer.Interval = _automationFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
@@ -46,11 +50,11 @@ namespace ServerSiteAutomation.Services
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {DateTime.UtcNow}");
 
-            DateTime nextElapse = DateTime.UtcNow.AddMinutes(AppSettingsModel.RefreshTime);
+            NextElapse = NextElapse.AddMinutes(AppSettingsModel.RefreshTime);
 
             Run();
 
-            RefreshTimer.Interval = _automationFunction.GetTimerInterval(nextElapse).TotalMilliseconds;
+            RefreshTimer.Interval = _automationFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
         }
 

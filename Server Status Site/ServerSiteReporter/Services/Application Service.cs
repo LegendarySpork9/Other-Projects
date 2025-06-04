@@ -33,6 +33,7 @@ namespace ServerSiteReporter.Services
         private readonly LoggerService Logger = new();
         private readonly APIService APIService = new();
         private Timer RefreshTimer;
+        private DateTime NextElapse;
 
         public void Setup()
         {
@@ -50,27 +51,30 @@ namespace ServerSiteReporter.Services
 
         public void Start()
         {
-            AutomationFunction _automationFunction = new();
+            ApplicationFunction _automationFunction = new();
 
             Run();
 
-            RefreshTimer.Interval = _automationFunction.GetTimerInterval(DateTime.UtcNow.AddMinutes(AppSettingsModel.RefreshTime)).TotalMilliseconds;
+            DateTime currentTime = DateTime.UtcNow;
+            NextElapse = currentTime.AddMinutes(AppSettingsModel.RefreshTime).AddMilliseconds(-currentTime.Millisecond);
+
+            RefreshTimer.Interval = _automationFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
         private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
-            AutomationFunction _automationFunction = new();
+            ApplicationFunction _automationFunction = new();
 
             Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {DateTime.UtcNow}");
 
-            DateTime nextElapse = DateTime.UtcNow.AddMinutes(AppSettingsModel.RefreshTime);
+            NextElapse = NextElapse.AddMinutes(AppSettingsModel.RefreshTime);
 
             Run();
 
-            RefreshTimer.Interval = _automationFunction.GetTimerInterval(nextElapse).TotalMilliseconds;
+            RefreshTimer.Interval = _automationFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
