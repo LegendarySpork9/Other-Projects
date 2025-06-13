@@ -1,8 +1,10 @@
-﻿using ServerSiteReporter.Converters;
-using ServerSiteReporter.Functions;
+﻿using ServerSiteCommon.Converters;
+using ServerSiteCommon.Functions;
+using ServerSiteCommon.Models;
+using ServerSiteCommon.Models.API;
+using ServerSiteCommon.Models.Data;
+using ServerSiteCommon.Services;
 using ServerSiteReporter.Models;
-using ServerSiteReporter.Models.API;
-using ServerSiteReporter.Models.Data;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -30,11 +32,26 @@ namespace ServerSiteReporter.Services
 
         delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
-        private readonly LoggerService Logger = new();
-        private readonly APIService APIService = new();
+        private LoggerService Logger = new();
+        private readonly APIService APIService;
+        public SharedSettingsModel SharedSettings;
         private Timer RefreshTimer;
         private DateTime NextElapse;
 
+        // Sets the class's global variables.
+        public ApplicationService(SharedSettingsModel sharedSettings)
+        {
+            SharedSettings = sharedSettings;
+            APIService = new(sharedSettings);
+        }
+
+        // Sets the logger.
+        public void SetLogger(LoggerService _loggerService)
+        {
+            Logger = _loggerService;
+        }
+
+        // Configures the timer and API service logger.
         public void Setup()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application Service");
@@ -45,39 +62,41 @@ namespace ServerSiteReporter.Services
             };
             RefreshTimer.Elapsed += (sender, e) => TimerElapsed(sender, e);
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {AppSettingsModel.RefreshTime} minutes");
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {SharedSettings.RefreshTime} minutes");
+
+            APIService.SetLogger(Logger);
+
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Application Service");
         }
 
+        // Performs the first run and starts the timer.
         public void Start()
         {
-            ApplicationFunction _automationFunction = new();
-
             Run();
 
             DateTime currentTime = DateTime.UtcNow;
-            NextElapse = currentTime.AddMinutes(AppSettingsModel.RefreshTime).AddMilliseconds(-currentTime.Millisecond);
+            NextElapse = currentTime.AddMinutes(SharedSettings.RefreshTime).AddMilliseconds(-currentTime.Millisecond);
 
-            RefreshTimer.Interval = _automationFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
+            RefreshTimer.Interval = TimerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
+        // Performs a run then restarts the timer.
         private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
-            ApplicationFunction _automationFunction = new();
-
             Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {DateTime.UtcNow}");
 
-            NextElapse = NextElapse.AddMinutes(AppSettingsModel.RefreshTime);
+            NextElapse = NextElapse.AddMinutes(SharedSettings.RefreshTime);
 
             Run();
 
-            RefreshTimer.Interval = _automationFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
+            RefreshTimer.Interval = TimerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
+        // Runs the status checks.
         private void Run()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Running Event Register");
@@ -234,6 +253,7 @@ namespace ServerSiteReporter.Services
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Ran Event Register");
         }
 
+        // Tries to ping a given IP address.
         private string PingAddress(string ipAddress)
         {
             string response = string.Empty;
@@ -269,6 +289,7 @@ namespace ServerSiteReporter.Services
             return response;
         }
 
+        // Checks if a process with the given name is running.
         private bool ServerRunning(string game)
         {
             bool running = false;

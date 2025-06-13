@@ -1,6 +1,8 @@
-﻿using ServerSiteAutomation.Converters;
-using ServerSiteAutomation.Models;
-using ServerSiteAutomation.Services;
+﻿using ServerSiteAutomation.Services;
+using ServerSiteCommon.Converters;
+using ServerSiteCommon.Functions;
+using ServerSiteCommon.Models;
+using ServerSiteCommon.Services;
 
 namespace ServerSiteAutomation
 {
@@ -11,20 +13,25 @@ namespace ServerSiteAutomation
             log4net.Config.XmlConfigurator.Configure();
 
             LoggerService _loggerService = new();
-            AutomationService _automationService = new();
+            _loggerService.ChangeIdentifier("Automation");
+            SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig();
 
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Webhook URL: {AppSettingsModel.WebookURL}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient Id: {AppSettingsModel.RecipientId}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Base URL: {AppSettingsModel.BaseURL}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Credentials: {AppSettingsModel.Credentials}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Endpoints: {AppSettingsModel.Endpoints}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Payload Location: {AppSettingsModel.PayloadLocation}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Time: {AppSettingsModel.RefreshTime}");
+            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Webhook URL: {sharedSettings.WebhookURL}");
+            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient Id: {sharedSettings.RecipientId}");
+            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Base URL: {sharedSettings.BaseURL}");
+            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Credentials: {sharedSettings.Credentials}");
+            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Endpoints: {sharedSettings.Endpoints}");
+            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Payload Location: {sharedSettings.PayloadLocation}");
+            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Time: {sharedSettings.RefreshTime}");
+
+            AutomationService _automationService = new(sharedSettings);
+            _automationService.SetLogger(_loggerService);
+            _automationService.Setup();
+
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
 
-            _automationService.Setup();
             _automationService.Start();
 
             Console.ReadLine();

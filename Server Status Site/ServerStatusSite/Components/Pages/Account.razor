@@ -3,33 +3,28 @@
 <PageTitle>Account</PageTitle>
 
 <div class="container">
-    <center class="@GetStyle("Form")">
-        <img src="/Images/Account Icon.png" height="100" width="100" />
-        <br />
-        <br />
-        <div style="display: flex; gap: 41px;">
-            <label>Username:</label>
-            <input type="text" style="@GetStyle("Input")" @bind="Username" />
-        </div>
-        <br />
-        <div style="display: flex; gap: 44px;">
-            <label>Password:</label>
-            <input type="password" style="@GetStyle("Input")" @bind ="Password" />
-        </div>
-        <br />
-        <div style="display: flex; gap: 13px;">
-            <label>Discord Name:</label>
-            <input type="text" style="@GetStyle("Input")" @bind ="DiscordName" />
-        </div>
-        <br />
-        <div style="display: flex; gap: 33px; align-items: center;">
-            <label>Dark Mode:</label>
-            <label class="switch">
-                <input type="checkbox" @bind="DarkMode">
-                <span class="slider round"></span>
-            </label>
-        </div>
-        <br />
-        <button class="btn btn-primary" @onclick="SaveClick">Save</button>
-    </center>
+    <div class="@GetStyle("Form")" style="display: grid; grid-template-columns: 150px 1fr; row-gap: 1rem;">
+        <center style="grid-column: span 2; margin-bottom: 1rem;">
+            <img src="/Images/Account Icon.png" height="100" width="100" />
+        </center>
+
+        <label>Username:</label>
+        <input type="text" style="@GetStyle("Input")" @bind="Username" />
+
+        <label>Password:</label>
+        <input type="password" style="@GetStyle("Input")" @bind="Password" />
+
+        <label>Discord Name:</label>
+        <input type="text" style="@GetStyle("Input")" @bind="DiscordName" />
+
+        <label>Dark Mode:</label>
+        <label class="switch">
+            <input type="checkbox" @bind="DarkMode">
+            <span class="slider round"></span>
+        </label>
+
+        <center style="grid-column: span 2;">
+            <button class="btn btn-primary" @onclick="SaveClick">Save</button>
+        </center>
+    </div>
 </div>

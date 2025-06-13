@@ -1,9 +1,9 @@
+using ServerSiteCommon.Converters;
+using ServerSiteCommon.Models;
+using ServerSiteCommon.Models.Data;
+using ServerSiteCommon.Services;
 using ServerStatusSite.Components;
-using ServerStatusSite.Converters;
 using ServerStatusSite.Middleware;
-using ServerStatusSite.Models;
-using ServerStatusSite.Models.Data;
-using ServerStatusSite.Services;
 
 namespace ServerStatusSite
 {
@@ -23,13 +23,13 @@ namespace ServerStatusSite
 
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-            AppSettingsModel appSettings = new();
+            SharedSettingsModel sharedSettings = new();
 
-            builder.Configuration.Bind("AppSettings", appSettings);
+            builder.Configuration.Bind("AppSettings", sharedSettings);
 
             _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Loaded Configuration");
 
-            builder.Services.AddSingleton(appSettings);
+            builder.Services.AddSingleton(sharedSettings);
             builder.Services.AddSingleton<APIService>();
             builder.Services.AddSingleton<LoggerService>();
             builder.Services.AddScoped<UserModel>();

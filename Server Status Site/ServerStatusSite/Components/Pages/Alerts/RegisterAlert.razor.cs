@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
+using ServerSiteCommon.Converters;
+using ServerSiteCommon.Models;
+using ServerSiteCommon.Models.API;
+using ServerSiteCommon.Models.Data;
+using ServerSiteCommon.Services;
 using ServerStatusSite.Converters;
-using ServerStatusSite.Models;
-using ServerStatusSite.Models.API;
-using ServerStatusSite.Models.Data;
-using ServerStatusSite.Services;
 
 namespace ServerStatusSite.Components.Pages.Alerts
 {
@@ -14,7 +15,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         [Inject]
         private APIService APIService { get; set; }
         [Inject]
-        private AppSettingsModel AppSettings { get; set; }
+        private SharedSettingsModel SharedSettings { get; set; }
         [Inject]
         private NavigationManager Navigation { get; set; }
         [Inject]
@@ -57,7 +58,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
             if (alert == null)
             {
-                DiscordService _discordService = new(Logger, AppSettings);
+                DiscordService _discordService = new(Logger, SharedSettings);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Register");
 
@@ -82,14 +83,14 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, "Alert Register Complete");
 
-                if (AppSettings.RecipientIds.Contains(','))
+                if (SharedSettings.RecipientIds.Contains(','))
                 {
-                    _discordService.SendNotification(AppSettings.RecipientIds.Split(',')[0], $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                    _discordService.SendNotification(SharedSettings.RecipientIds.Split(',')[0], $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
                 }
 
                 else
                 {
-                    _discordService.SendNotification(AppSettings.RecipientIds, $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                    _discordService.SendNotification(SharedSettings.RecipientIds, $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
                 }
 
                 Navigation.NavigateTo("/alerts");

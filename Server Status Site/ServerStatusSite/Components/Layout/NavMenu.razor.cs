@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
+using ServerSiteCommon.Models.Data;
 using ServerStatusSite.Converters;
-using ServerStatusSite.Models.Data;
 
 namespace ServerStatusSite.Components.Layout
 {
@@ -9,11 +9,13 @@ namespace ServerStatusSite.Components.Layout
         [Inject]
         private UserModel User { get; set; }
 
+        // Subscribes the layout to the DarkMode event.
         protected override void OnInitialized()
         {
             User.OnDarkModeChanged += StateHasChanged;
         }
 
+        // Returns the CSS to change the menu to dark mode.
         private string GetStyle(string component = null)
         {
             StyleConverter _styleConverter = new();
@@ -25,6 +27,7 @@ namespace ServerStatusSite.Components.Layout
             };
         }
 
+        // Unsubscribes the layout from the DarkMode event.
         public void Dispose()
         {
             User.OnDarkModeChanged -= StateHasChanged;

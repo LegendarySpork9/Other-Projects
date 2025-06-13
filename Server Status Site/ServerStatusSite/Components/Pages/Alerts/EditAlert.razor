@@ -3,41 +3,31 @@
 <PageTitle>Edit Alert</PageTitle>
 
 <div class="container">
-    <center class="@GetStyle("Form")">
-        <div style="display: flex; gap: 83.5px;">
-            <label>Reporter:</label>
-            <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Reporter" />
-        </div>
-        <br />
-        <div style="display: flex; gap: 85.5px;">
-            <label>Occured:</label>
-            <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Occured" />
-        </div>
-        <br />
-        <div style="display: flex; gap: 100px;">
-            <label>Server:</label>
-            <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Server" />
-        </div>
-        <br />
-        <div style="display: flex; gap: 63px;">
-            <label>Component:</label>
-            <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Component" />
-        </div>
-        <br />
-        <div style="display: flex; gap: 13.25px;">
-            <label>Component Status:</label>
-            <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.ComponentStatus" />
-        </div>
-        <br />
-        <div style="display: flex; gap: 63px;">
-            <label>Alert Status:</label>
-            <select style="@GetStyle("Input")" @bind="Alert.AlertStatus">
-                <option value="Reported">Reported</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Investigating">Investigating</option>
-            </select>
-        </div>
-        <br />
-        <button class="btn btn-primary" @onclick="SaveClick">Save</button>
-    </center>
+    <div class="@GetStyle("Form")" style="display: grid; grid-template-columns: 150px 1fr; row-gap: 1rem;">
+        <label>Reporter:</label>
+        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Reporter" />
+
+        <label>Occured:</label>
+        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Occured" />
+
+        <label>Server:</label>
+        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Server" />
+
+        <label>Component:</label>
+        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Component" />
+
+        <label>Component Status:</label>
+        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.ComponentStatus" />
+
+        <label>Alert Status:</label>
+        <select style="@GetStyle("Input")" @bind="Alert.AlertStatus">
+            <option value="Reported">Reported</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Investigating">Investigating</option>
+        </select>
+        
+        <center style="grid-column: span 2;">
+            <button class="btn btn-primary" @onclick="SaveClick">Save</button>
+        </center>
+    </div>
 </div>

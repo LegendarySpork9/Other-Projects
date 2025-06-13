@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
+using ServerSiteCommon.Converters;
+using ServerSiteCommon.Models;
+using ServerSiteCommon.Models.Data;
+using ServerSiteCommon.Services;
 using ServerStatusSite.Converters;
-using ServerStatusSite.Models;
-using ServerStatusSite.Models.Data;
-using ServerStatusSite.Services;
 
 namespace ServerStatusSite.Components.Pages.Alerts
 {
@@ -13,7 +14,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         [Inject]
         private APIService APIService { get; set; }
         [Inject]
-        private AppSettingsModel AppSettings { get; set; }
+        private SharedSettingsModel SharedSettings { get; set; }
         [Inject]
         private NavigationManager Navigation { get; set; }
         [Inject]
@@ -53,7 +54,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
         private void SaveClick()
         {
-            DiscordService _discordService = new(Logger, AppSettings);
+            DiscordService _discordService = new(Logger, SharedSettings);
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Save");
 
@@ -64,13 +65,14 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Alert Save Complete");
 
-            if (AppSettings.RecipientIds.Contains(','))
+            if (SharedSettings.RecipientIds.Contains(','))
             {
-                _discordService.SendNotification(AppSettings.RecipientIds.Split(',')[1], $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
+                _discordService.SendNotification(SharedSettings.RecipientIds.Split(',')[1], $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
             }
+
             else
             {
-                _discordService.SendNotification(AppSettings.RecipientIds, $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
+                _discordService.SendNotification(SharedSettings.RecipientIds, $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
             }
 
             Navigation.NavigateTo("/alerts");

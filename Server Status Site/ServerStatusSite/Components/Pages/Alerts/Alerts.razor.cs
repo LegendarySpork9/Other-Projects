@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
+using ServerSiteCommon.Converters;
+using ServerSiteCommon.Models;
+using ServerSiteCommon.Models.API;
+using ServerSiteCommon.Models.Data;
+using ServerSiteCommon.Services;
 using ServerStatusSite.Converters;
-using ServerStatusSite.Models;
-using ServerStatusSite.Models.API;
-using ServerStatusSite.Models.Data;
-using ServerStatusSite.Services;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -16,7 +17,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         [Inject]
         private APIService APIService { get; set; }
         [Inject]
-        private AppSettingsModel AppSettings { get; set; }
+        private SharedSettingsModel SharedSettings { get; set; }
         [Inject]
         private NavigationManager Navigation { get; set; }
         [Inject]
@@ -31,7 +32,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
             RefreshTimer = new()
             {
-                Interval = AppSettings.RefreshTime * 1000
+                Interval = SharedSettings.RefreshTime * 1000
             };
             RefreshTimer.Elapsed += (sender, e) => TimerElapsed(sender, e);
 

@@ -1,15 +1,15 @@
-﻿using ServerStatusSite.Models;
+﻿using ServerSiteCommon.Models;
 
 namespace ServerStatusSite.Middleware
 {
     public class URLValidationMiddleware
     {
-        private readonly AppSettingsModel AppSettings;
+        private readonly SharedSettingsModel SharedSettings;
         private readonly RequestDelegate Next;
 
-        public URLValidationMiddleware(AppSettingsModel appSettings, RequestDelegate next)
+        public URLValidationMiddleware(SharedSettingsModel sharedSettings, RequestDelegate next)
         {
-            AppSettings = appSettings;
+            SharedSettings = sharedSettings;
             Next = next;
         }
 
@@ -17,7 +17,7 @@ namespace ServerStatusSite.Middleware
         {
             string referer = context.Request.Headers.Referer.ToString();
 
-            if (string.IsNullOrWhiteSpace(referer) || (!referer.Contains(AppSettings.Domain, StringComparison.OrdinalIgnoreCase) && !referer.Contains("localhost", StringComparison.OrdinalIgnoreCase)))
+            if (string.IsNullOrWhiteSpace(referer) || (!referer.Contains(SharedSettings.Domain, StringComparison.OrdinalIgnoreCase) && !referer.Contains("localhost", StringComparison.OrdinalIgnoreCase)))
             {
                 if (!context.Request.Path.StartsWithSegments("/login", StringComparison.OrdinalIgnoreCase))
                 {
