@@ -2,6 +2,6 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ActiveDebugProfile>https</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>C:\Users\TobyH\OneDrive - Nurtur Limited\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\Properties\PublishProfiles\FolderProfile.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>D:\System Folders\Documents\GitHub\Other-Projects\Server Status Site\ServerStatusSite\Properties\PublishProfiles\Debug.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

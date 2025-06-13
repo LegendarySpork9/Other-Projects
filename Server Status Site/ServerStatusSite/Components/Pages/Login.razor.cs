@@ -21,6 +21,7 @@ namespace ServerStatusSite.Components.Pages
         private string ReturnUrl { get; set; } = "/";
         private bool ShowError { get; set; } = false;
 
+        // Captures the URL the user was trying to access and sets the API logger.
         protected override void OnInitialized()
         {
             if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null && HttpContextAccessor.HttpContext.Connection != null && HttpContextAccessor.HttpContext.Connection.RemoteIpAddress != null)
@@ -43,6 +44,7 @@ namespace ServerStatusSite.Components.Pages
             }
         }
 
+        // Checks the user details and sends the user to the return URL.
         private void LoginClick()
         {
             HashFunction _hasFunction = new();

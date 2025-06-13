@@ -19,6 +19,7 @@ namespace ServerStatusSite.Components.Pages
         private string DiscordName { get; set; }
         private bool DarkMode { get; set; }
 
+        // Loads the user data of the logged in user.
         protected override void OnInitialized()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Home Page");
@@ -34,6 +35,7 @@ namespace ServerStatusSite.Components.Pages
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Dark Mode: {DarkMode}");
         }
 
+        // Returns the CSS to change the page to dark mode.
         public string GetStyle(string component)
         {
             StyleConverter _styleConverter = new();
@@ -46,6 +48,7 @@ namespace ServerStatusSite.Components.Pages
             };
         }
 
+        // Updates the user data.
         private void SaveClick()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting User Save");

@@ -5,6 +5,7 @@ namespace ServerStatusSite.Functions
 {
     public class HashFunction
     {
+        // Converts the given string to its hashed value.
         public string HashString(string value)
         {
             string hashString = null;

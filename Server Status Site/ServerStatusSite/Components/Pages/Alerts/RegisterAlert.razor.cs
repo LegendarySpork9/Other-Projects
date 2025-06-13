@@ -27,6 +27,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private string ComponentStatus { get; set; }
         private bool ShowError { get; set; } = false;
 
+        // Loads the servers from the API.
         protected override void OnInitialized()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Register Alerts Page");
@@ -39,6 +40,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
             }
         }
 
+        // Returns the css to change the page to dark mode.
         public string GetStyle(string component)
         {
             StyleConverter _styleConverter = new();
@@ -51,6 +53,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
             };
         }
 
+        // Adds an alert to the API.
         private void RegisterClick()
         {
             APIAlertsModel alerts = APIService.GetAlerts(1);
@@ -58,7 +61,8 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
             if (alert == null)
             {
-                DiscordService _discordService = new(Logger, SharedSettings);
+                DiscordService _discordService = new(SharedSettings);
+                _discordService.SetLogger(Logger);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Register");
 

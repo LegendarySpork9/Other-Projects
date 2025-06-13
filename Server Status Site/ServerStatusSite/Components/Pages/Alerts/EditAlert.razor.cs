@@ -22,6 +22,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private AlertModel Alert { get; set; }
         private int AlertId { get; set; } = 0;
 
+        // Gets the data about the given alert.
         protected override void OnInitialized()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Edit Alerts Page");
@@ -40,6 +41,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
             Alert = APIService.GetAlert(AlertId);
         }
 
+        // Returns the CSS to change the page to dark mode.
         public string GetStyle(string component)
         {
             StyleConverter _styleConverter = new();
@@ -52,9 +54,11 @@ namespace ServerStatusSite.Components.Pages.Alerts
             };
         }
 
+        // Updates the alert data then sends the user back to the alerts page. 
         private void SaveClick()
         {
-            DiscordService _discordService = new(Logger, SharedSettings);
+            DiscordService _discordService = new(SharedSettings);
+            _discordService.SetLogger(Logger);
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Save");
 

@@ -402,65 +402,68 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JArray responseContent = JArray.Parse(response.Content);
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Servers Returned: {responseContent.Count}");
-
-                    List<APIStatusModel> pcStatuses = GetServerStatuses("PC Status");
-                    List<APIStatusModel> hamachiStatuses = GetServerStatuses("Hamachi Status");
-                    List<APIStatusModel> serverStatuses = GetServerStatuses("Server Status");
-
-                    foreach (JObject server in responseContent)
+                    if (!response.Content.Contains("No data returned by given parameters."))
                     {
-                        string hostName = server.Property("hostName").Value.ToString();
-                        string game = server.Property("game").Value.ToString();
-                        string gameVersion = server.Property("gameVersion").Value.ToString();
-                        string ipAddress = server.Property("ipAddress").Value.ToString();
+                        JArray responseContent = JArray.Parse(response.Content);
 
-                        APIStatusModel pcStatus = pcStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
-                        APIStatusModel hamachiStatus = hamachiStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
-                        APIStatusModel serverStatus = serverStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Servers Returned: {responseContent.Count}");
 
-                        if (pcStatus != null && hamachiStatus != null && serverStatus != null)
+                        List<APIStatusModel> pcStatuses = GetServerStatuses("PC Status");
+                        List<APIStatusModel> hamachiStatuses = GetServerStatuses("Hamachi Status");
+                        List<APIStatusModel> serverStatuses = GetServerStatuses("Server Status");
+
+                        foreach (JObject server in responseContent)
                         {
-                            List<StatusModel> statuses = new()
-                            {
-                                new StatusModel()
-                                {
-                                    Status = pcStatus.Status,
-                                    StatusClass = _apiConverter.GetStatusClass(pcStatus.Status)
-                                },
-                                new StatusModel()
-                                {
-                                    Status = hamachiStatus.Status,
-                                    StatusClass = _apiConverter.GetStatusClass(hamachiStatus.Status)
-                                },
-                                new StatusModel()
-                                {
-                                    Status = serverStatus.Status,
-                                    StatusClass = _apiConverter.GetStatusClass(serverStatus.Status)
-                                }
-                            };
+                            string hostName = server.Property("hostName").Value.ToString();
+                            string game = server.Property("game").Value.ToString();
+                            string gameVersion = server.Property("gameVersion").Value.ToString();
+                            string ipAddress = server.Property("ipAddress").Value.ToString();
 
-                            servers.Add(new ServerModel()
-                            {
-                                HostName = hostName,
-                                Game = game,
-                                GameVersion = gameVersion,
-                                IPAddress = server.Property("ipAddress").Value.ToString(),
-                                Statuses = statuses
-                            });
+                            APIStatusModel pcStatus = pcStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
+                            APIStatusModel hamachiStatus = hamachiStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
+                            APIStatusModel serverStatus = serverStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {hostName}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game: {game}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {gameVersion}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.Property("ipAddress").Value}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status: {statuses[0].Status}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status Class: {statuses[0].StatusClass}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hamachi Status: {statuses[1].Status}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hamachi Status Class: {statuses[1].StatusClass}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status: {statuses[2].Status}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status Class: {statuses[2].StatusClass}");
+                            if (pcStatus != null && hamachiStatus != null && serverStatus != null)
+                            {
+                                List<StatusModel> statuses = new()
+                                {
+                                    new StatusModel()
+                                    {
+                                        Status = pcStatus.Status,
+                                        StatusClass = _apiConverter.GetStatusClass(pcStatus.Status)
+                                    },
+                                    new StatusModel()
+                                    {
+                                        Status = hamachiStatus.Status,
+                                        StatusClass = _apiConverter.GetStatusClass(hamachiStatus.Status)
+                                    },
+                                    new StatusModel()
+                                    {
+                                        Status = serverStatus.Status,
+                                        StatusClass = _apiConverter.GetStatusClass(serverStatus.Status)
+                                    }
+                                };
+
+                                servers.Add(new ServerModel()
+                                {
+                                    HostName = hostName,
+                                    Game = game,
+                                    GameVersion = gameVersion,
+                                    IPAddress = server.Property("ipAddress").Value.ToString(),
+                                    Statuses = statuses
+                                });
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {hostName}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game: {game}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {gameVersion}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.Property("ipAddress").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status: {statuses[0].Status}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status Class: {statuses[0].StatusClass}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hamachi Status: {statuses[1].Status}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hamachi Status Class: {statuses[1].StatusClass}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status: {statuses[2].Status}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status Class: {statuses[2].StatusClass}");
+                            }
                         }
                     }
 
@@ -800,44 +803,47 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JObject responseContent = JObject.Parse(response.Content);
-                    JArray alertsContent = JArray.Parse(responseContent.Property("entries").Value.ToString());
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alerts Returned: {alertsContent.Count}");
-
-                    if (alertsContent.Count > 0)
+                    if (!response.Content.Contains("No data returned by given parameters."))
                     {
-                        foreach (JObject alert in alertsContent)
-                        {
-                            JObject server = JObject.Parse(alert.Property("server").Value.ToString());
+                        JObject responseContent = JObject.Parse(response.Content);
+                        JArray alertsContent = JArray.Parse(responseContent.Property("entries").Value.ToString());
 
-                            alerts.Alerts.Add(new AlertModel
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alerts Returned: {alertsContent.Count}");
+
+                        if (alertsContent.Count > 0)
+                        {
+                            foreach (JObject alert in alertsContent)
                             {
-                                Id = int.Parse(alert.Property("alertId").Value.ToString()),
-                                Occured = DateTime.Parse(alert.Property("alertDate").Value.ToString()),
-                                Server = $"{server.Property("game").Value} ({server.Property("gameVersion").Value})",
-                                Reporter = alert.Property("reporter").Value.ToString(),
-                                Component = alert.Property("component").Value.ToString(),
-                                ComponentStatus = alert.Property("componentStatus").Value.ToString(),
-                                AlertStatus = alert.Property("alertStatus").Value.ToString()
-                            });
+                                JObject server = JObject.Parse(alert.Property("server").Value.ToString());
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alert.Property("alertId").Value}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alert.Property("alertDate").Value}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {server.Property("game").Value} ({server.Property("gameVersion").Value}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alert.Property("reporter").Value}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alert.Property("component").Value}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alert.Property("componentStatus").Value}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alert.Property("alertStatus").Value}");
-                        }
+                                alerts.Alerts.Add(new AlertModel
+                                {
+                                    Id = int.Parse(alert.Property("alertId").Value.ToString()),
+                                    Occured = DateTime.Parse(alert.Property("alertDate").Value.ToString()),
+                                    Server = $"{server.Property("game").Value} ({server.Property("gameVersion").Value})",
+                                    Reporter = alert.Property("reporter").Value.ToString(),
+                                    Component = alert.Property("component").Value.ToString(),
+                                    ComponentStatus = alert.Property("componentStatus").Value.ToString(),
+                                    AlertStatus = alert.Property("alertStatus").Value.ToString()
+                                });
 
-                        if (int.Parse(responseContent.Property("totalPageCount").Value.ToString()) > 1)
-                        {
-                            alerts.MultiplePages = true;
-                            alerts.PageCount = int.Parse(responseContent.Property("totalPageCount").Value.ToString());
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alert.Property("alertId").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alert.Property("alertDate").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {server.Property("game").Value} ({server.Property("gameVersion").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alert.Property("reporter").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alert.Property("component").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alert.Property("componentStatus").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alert.Property("alertStatus").Value}");
+                            }
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Multiple Pages: {alerts.MultiplePages}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page Count: {alerts.PageCount}");
+                            if (int.Parse(responseContent.Property("totalPageCount").Value.ToString()) > 1)
+                            {
+                                alerts.MultiplePages = true;
+                                alerts.PageCount = int.Parse(responseContent.Property("totalPageCount").Value.ToString());
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Multiple Pages: {alerts.MultiplePages}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page Count: {alerts.PageCount}");
+                            }
                         }
                     }
 

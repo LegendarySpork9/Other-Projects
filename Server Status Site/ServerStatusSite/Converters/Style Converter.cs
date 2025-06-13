@@ -1,5 +1,6 @@
 ﻿namespace ServerStatusSite.Converters
 {
+    // Returns the CSS to change the component to dark mode.
     public class StyleConverter
     {
         public string GetTopBarDarkMode(bool darkMode)
