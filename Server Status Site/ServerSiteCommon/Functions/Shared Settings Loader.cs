@@ -8,8 +8,14 @@ namespace ServerSiteCommon.Functions
 {
     public static class SharedSettingsLoader
     {
+        // Loads the given configuration file.
+        public static Configuration LoadConfig(string config) => ConfigurationManager.OpenMappedExeConfiguration(new ()
+            {
+                ExeConfigFilename = config
+    },ConfigurationUserLevel.None);
+
         // Loads the app settings dynamically from the App.config.
-        public static SharedSettingsModel LoadSettingsFromConfig()
+        public static SharedSettingsModel LoadSettingsFromConfig(Configuration config)
         {
             LoggerService _logger = new();
 
@@ -18,7 +24,7 @@ namespace ServerSiteCommon.Functions
 
             foreach (PropertyInfo property in properties)
             {
-                object? configurationValue = ConfigurationManager.AppSettings[property.Name];
+                object? configurationValue = config.AppSettings.Settings[property.Name]?.Value;
 
                 if (configurationValue != null)
                 {

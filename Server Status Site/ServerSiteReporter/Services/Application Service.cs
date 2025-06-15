@@ -13,7 +13,7 @@ using Timer = System.Timers.Timer;
 
 namespace ServerSiteReporter.Services
 {
-    internal class ApplicationService
+    public class ApplicationService
     {
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
@@ -34,7 +34,7 @@ namespace ServerSiteReporter.Services
 
         private LoggerService Logger = new();
         private readonly APIService APIService;
-        public SharedSettingsModel SharedSettings;
+        private SharedSettingsModel SharedSettings;
         private Timer RefreshTimer;
         private DateTime NextElapse;
 

@@ -14,7 +14,7 @@ namespace ServerSiteCommon.Services
         private string[] Endpoints { get; set; }
         private string BearerToken { get; set; }
         public DateTime ExpiryTime { get; set; }
-        public int RetryCount { get; set; } = 0;
+        private int RetryCount { get; set; } = 0;
 
         // Sets the class's global variables.
         public APIService(SharedSettingsModel sharedSettings)

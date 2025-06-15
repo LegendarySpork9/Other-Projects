@@ -32,7 +32,9 @@ namespace ServerSiteCommon.Services
 
                 try
                 {
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {SharedSettings.WebhookURL}");
+                    string url = SharedSettings.WebhookURL + "?wait=true";
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient: {recipientId}");
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Message: {message}");
 
@@ -48,7 +50,7 @@ namespace ServerSiteCommon.Services
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Content");
 
-                    HttpRequestMessage request = new(HttpMethod.Post, SharedSettings.WebhookURL)
+                    HttpRequestMessage request = new(HttpMethod.Post, url)
                     {
                         Content = content
                     };

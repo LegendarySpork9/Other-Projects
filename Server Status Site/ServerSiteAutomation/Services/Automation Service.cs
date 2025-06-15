@@ -13,7 +13,7 @@ namespace ServerSiteAutomation.Services
     {
         private LoggerService Logger = new();
         private readonly APIService APIService;
-        public SharedSettingsModel SharedSettings;
+        private SharedSettingsModel SharedSettings;
         private Timer RefreshTimer;
         private DateTime NextElapse;
 

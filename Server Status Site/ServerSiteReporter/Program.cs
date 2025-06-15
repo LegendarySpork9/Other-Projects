@@ -5,6 +5,7 @@ using ServerSiteCommon.Services;
 using ServerSiteReporter.Models;
 using ServerSiteReporter.Services;
 using System.Configuration;
+using System.Reflection;
 
 namespace ServerSiteReporter
 {
@@ -16,7 +17,7 @@ namespace ServerSiteReporter
 
             LoggerService _loggerService = new();
             _loggerService.ChangeIdentifier("Reporter");
-            SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig();
+            SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig($"{Assembly.GetExecutingAssembly().Location}.config"));
 
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");

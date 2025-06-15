@@ -3,6 +3,7 @@ using ServerSiteCommon.Converters;
 using ServerSiteCommon.Functions;
 using ServerSiteCommon.Models;
 using ServerSiteCommon.Services;
+using System.Reflection;
 
 namespace ServerSiteAutomation
 {
@@ -14,7 +15,7 @@ namespace ServerSiteAutomation
 
             LoggerService _loggerService = new();
             _loggerService.ChangeIdentifier("Automation");
-            SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig();
+            SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig($"{Assembly.GetExecutingAssembly().Location}.config"));
 
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
