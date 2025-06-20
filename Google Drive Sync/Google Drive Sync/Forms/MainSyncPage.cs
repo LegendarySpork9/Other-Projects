@@ -14,7 +14,7 @@ namespace GoogleDriveSync
         private List<FileModel> Files = new List<FileModel>();
         private DataGridViewRow CurrentRow;
         private bool TablePopulated = false;
-        private List<DataGridViewRow> RowsToUpload = new List<DataGridViewRow>();
+        private List<DataGridViewRow> RowsToUpdate = new List<DataGridViewRow>();
 
         public MainSyncPage()
         {
@@ -50,7 +50,7 @@ namespace GoogleDriveSync
             BTNSync.Enabled = false;
             BTNSync.Text = "Sync 0 File(s)";
             DGVFileInformation.Rows.Clear();
-            RowsToUpload.Clear();
+            RowsToUpdate.Clear();
             TBCDocumentChanges.Visible = false;
 
             PRBLoading.Value = 0;
@@ -104,6 +104,8 @@ namespace GoogleDriveSync
                 PBLoading.Image = Properties.Resources.Tick;
             }
 
+            PBUp.Enabled = true;
+            PBDown.Enabled = true;
             BTNCompare.Enabled = true;
         }
 
@@ -121,7 +123,7 @@ namespace GoogleDriveSync
             List<FileModel> uploadFiles = new List<FileModel>();
             List<FileModel> downloadFiles = new List<FileModel>();
 
-            foreach (DataGridViewRow row in RowsToUpload)
+            foreach (DataGridViewRow row in RowsToUpdate)
             {
                 if (row.Cells[6].Value.ToString() == "Up Stream")
                 {
@@ -151,7 +153,7 @@ namespace GoogleDriveSync
 
             DGVFileInformation.CellValueChanged -= DGVFileInformationCellValue;
 
-            foreach (DataGridViewRow row in RowsToUpload)
+            foreach (DataGridViewRow row in RowsToUpdate)
             {
                 int index = DGVFileInformation.Rows.IndexOf(row);
 
@@ -175,7 +177,7 @@ namespace GoogleDriveSync
             }
 
             BTNSync.Text = "Sync 0 File(s)";
-            RowsToUpload.Clear();
+            RowsToUpdate.Clear();
             DGVFileInformation.ReadOnly = false;
             BTNCompare.Enabled = true;
         }
@@ -259,43 +261,80 @@ namespace GoogleDriveSync
 
                 if (row.Cells[6].Value != null && (row.Cells[7].Value != null && bool.Parse(row.Cells[7].Value.ToString())))
                 {
-                    int previousUpdateFileCount = RowsToUpload.Count;
-
-                    RowsToUpload.Add(row);
-
-                    BTNSync.Text = BTNSync.Text.Replace(previousUpdateFileCount.ToString(), RowsToUpload.Count.ToString());
-
-                    if (RowsToUpload.Count > 0 && !BTNSync.Enabled)
+                    if (!RowsToUpdate.Contains(row))
                     {
-                        BTNSync.Enabled = true;
+                        int previousUpdateFileCount = RowsToUpdate.Count;
+
+                        RowsToUpdate.Add(row);
+
+                        BTNSync.Text = BTNSync.Text.Replace(previousUpdateFileCount.ToString(), RowsToUpdate.Count.ToString());
+
+                        if (RowsToUpdate.Count > 0 && !BTNSync.Enabled)
+                        {
+                            BTNSync.Enabled = true;
+                        }
+
+                        if (RowsToUpdate.Count == 0 && BTNSync.Enabled)
+                        {
+                            BTNSync.Enabled = false;
+                        }
                     }
 
-                    if (RowsToUpload.Count == 0 && BTNSync.Enabled)
+                    else
                     {
-                        BTNSync.Enabled = false;
+                        RowsToUpdate.Remove(row);
+                        RowsToUpdate.Add(row);
                     }
                 }
 
                 else
                 {
-                    if (RowsToUpload.Contains(row))
+                    if (RowsToUpdate.Contains(row))
                     {
-                        int previousUpdateFileCount = RowsToUpload.Count;
+                        int previousUpdateFileCount = RowsToUpdate.Count;
 
-                        RowsToUpload.Remove(row);
+                        RowsToUpdate.Remove(row);
 
-                        BTNSync.Text = BTNSync.Text.Replace(previousUpdateFileCount.ToString(), RowsToUpload.Count.ToString());
+                        BTNSync.Text = BTNSync.Text.Replace(previousUpdateFileCount.ToString(), RowsToUpdate.Count.ToString());
 
-                        if (RowsToUpload.Count > 0 && !BTNSync.Enabled)
+                        if (RowsToUpdate.Count > 0 && !BTNSync.Enabled)
                         {
                             BTNSync.Enabled = true;
                         }
 
-                        if (RowsToUpload.Count == 0 && BTNSync.Enabled)
+                        if (RowsToUpdate.Count == 0 && BTNSync.Enabled)
                         {
                             BTNSync.Enabled = false;
                         }
                     }
+                }
+            }
+        }
+
+        private void SyncUp(object sender, EventArgs e)
+        {
+            RowsToUpdate.Clear();
+
+            foreach (DataGridViewRow row in DGVFileInformation.Rows)
+            {
+                if (bool.Parse(row.Cells[5].Value.ToString()))
+                {
+                    row.Cells[6].Value = "Up Stream";
+                    row.Cells[7].Value = true;
+                }                
+            }
+        }
+
+        private void SyncDown(object sender, EventArgs e)
+        {
+            RowsToUpdate.Clear();
+
+            foreach (DataGridViewRow row in DGVFileInformation.Rows)
+            {
+                if (bool.Parse(row.Cells[5].Value.ToString()))
+                {
+                    row.Cells[6].Value = "Down Stream";
+                    row.Cells[7].Value = true;
                 }
             }
         }

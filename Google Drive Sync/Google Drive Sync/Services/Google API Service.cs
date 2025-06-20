@@ -194,13 +194,16 @@ namespace GoogleDriveSync.Services
 
                     foreach (Google.Apis.Drive.v3.Data.File folder in driveFolders)
                     {
-                        folderIds = folderIds.Append(folder.Id).ToArray();
-                        folderNames = folderNames.Append(folder.Name).ToArray();
+                        if (!AppSettingsModel.IgnoreFolders.Contains(folder.Name))
+                        {
+                            folderIds = folderIds.Append(folder.Id).ToArray();
+                            folderNames = folderNames.Append(folder.Name).ToArray();
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Id: {folder.Id}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {folder.Name}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Id: {folder.Id}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {folder.Name}");
 
-                        Folders.Add(new KeyValuePair<string, string>(folder.Id, folder.Name));
+                            Folders.Add(new KeyValuePair<string, string>(folder.Id, folder.Name));
+                        }
                     }
                 }
             }
@@ -252,26 +255,29 @@ namespace GoogleDriveSync.Services
 
                     foreach (Google.Apis.Drive.v3.Data.File file in driveFiles)
                     {
-                        string[] nameSplit = file.Name.Split('.');
-
-                        googleDrive.Add(new FileModel()
+                        if (!AppSettingsModel.IgnoreFiles.Contains(file.Name))
                         {
-                            Id = file.Id,
-                            Name = nameSplit[0],
-                            Type = nameSplit[1],
-                            PathIds = pathIds,
-                            Path = path,
-                            Created = file.CreatedTime.Value,
-                            LastModified = file.ModifiedTime.Value
-                        });
+                            string[] nameSplit = file.Name.Split('.');
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Id: {file.Id}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Name: {nameSplit[0]}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Type: {nameSplit[1]}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path Ids: {pathIds}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path: {path}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created Date: {file.CreatedTimeRaw}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Modified Date: {file.ModifiedTimeRaw}");
+                            googleDrive.Add(new FileModel()
+                            {
+                                Id = file.Id,
+                                Name = nameSplit[0],
+                                Type = nameSplit[1],
+                                PathIds = pathIds,
+                                Path = path,
+                                Created = file.CreatedTime.Value,
+                                LastModified = file.ModifiedTime.Value
+                            });
+
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Id: {file.Id}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Name: {nameSplit[0]}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Type: {nameSplit[1]}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path Ids: {pathIds}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path: {path}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created Date: {file.CreatedTimeRaw}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Modified Date: {file.ModifiedTimeRaw}");
+                        }
                     }
                 }
             }

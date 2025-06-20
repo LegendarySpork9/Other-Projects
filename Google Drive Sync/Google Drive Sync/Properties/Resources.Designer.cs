@@ -73,6 +73,16 @@ namespace GoogleDriveSync.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Down_Arrow {
+            get {
+                object obj = ResourceManager.GetObject("Down Arrow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap LoadingSpinner {
             get {
                 object obj = ResourceManager.GetObject("LoadingSpinner", resourceCulture);
@@ -86,6 +96,16 @@ namespace GoogleDriveSync.Properties {
         internal static System.Drawing.Bitmap Tick {
             get {
                 object obj = ResourceManager.GetObject("Tick", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Up_Arrow {
+            get {
+                object obj = ResourceManager.GetObject("Up Arrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

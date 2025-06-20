@@ -123,9 +123,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Cross.png" />
+    <Content Include="Content\Down Arrow.png" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\LoadingSpinner.gif" />
     <Content Include="Content\Tick.png" />
+    <Content Include="Content\Up Arrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

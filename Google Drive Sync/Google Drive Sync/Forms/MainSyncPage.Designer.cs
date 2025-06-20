@@ -64,13 +64,17 @@
             this.LBName = new System.Windows.Forms.Label();
             this.LBId = new System.Windows.Forms.Label();
             this.PRBLoading = new System.Windows.Forms.ProgressBar();
-            this.PBLoading = new System.Windows.Forms.PictureBox();
             this.BTNCompare = new System.Windows.Forms.Button();
             this.BTNSync = new System.Windows.Forms.Button();
+            this.PBDown = new System.Windows.Forms.PictureBox();
+            this.PBUp = new System.Windows.Forms.PictureBox();
+            this.PBLoading = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.DGVFileInformation)).BeginInit();
             this.TBCDocumentChanges.SuspendLayout();
             this.TBPDocumentChanges.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DGVChanges)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PBDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PBUp)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PBLoading)).BeginInit();
             this.SuspendLayout();
             // 
@@ -390,16 +394,6 @@
             this.PRBLoading.Size = new System.Drawing.Size(400, 23);
             this.PRBLoading.TabIndex = 0;
             // 
-            // PBLoading
-            // 
-            this.PBLoading.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PBLoading.Location = new System.Drawing.Point(838, 0);
-            this.PBLoading.Name = "PBLoading";
-            this.PBLoading.Size = new System.Drawing.Size(23, 23);
-            this.PBLoading.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.PBLoading.TabIndex = 2;
-            this.PBLoading.TabStop = false;
-            // 
             // BTNCompare
             // 
             this.BTNCompare.Location = new System.Drawing.Point(544, 473);
@@ -421,11 +415,49 @@
             this.BTNSync.UseVisualStyleBackColor = true;
             this.BTNSync.Click += new System.EventHandler(this.BTNSyncClick);
             // 
+            // PBDown
+            // 
+            this.PBDown.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.PBDown.Enabled = false;
+            this.PBDown.Image = global::GoogleDriveSync.Properties.Resources.Down_Arrow;
+            this.PBDown.Location = new System.Drawing.Point(727, 473);
+            this.PBDown.Name = "PBDown";
+            this.PBDown.Size = new System.Drawing.Size(23, 23);
+            this.PBDown.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.PBDown.TabIndex = 6;
+            this.PBDown.TabStop = false;
+            this.PBDown.Click += new System.EventHandler(this.SyncDown);
+            // 
+            // PBUp
+            // 
+            this.PBUp.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.PBUp.Enabled = false;
+            this.PBUp.Image = global::GoogleDriveSync.Properties.Resources.Up_Arrow;
+            this.PBUp.Location = new System.Drawing.Point(515, 473);
+            this.PBUp.Name = "PBUp";
+            this.PBUp.Size = new System.Drawing.Size(23, 23);
+            this.PBUp.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.PBUp.TabIndex = 5;
+            this.PBUp.TabStop = false;
+            this.PBUp.Click += new System.EventHandler(this.SyncUp);
+            // 
+            // PBLoading
+            // 
+            this.PBLoading.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.PBLoading.Location = new System.Drawing.Point(838, 0);
+            this.PBLoading.Name = "PBLoading";
+            this.PBLoading.Size = new System.Drawing.Size(23, 23);
+            this.PBLoading.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.PBLoading.TabIndex = 2;
+            this.PBLoading.TabStop = false;
+            // 
             // MainSyncPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1249, 496);
+            this.Controls.Add(this.PBDown);
+            this.Controls.Add(this.PBUp);
             this.Controls.Add(this.BTNSync);
             this.Controls.Add(this.BTNCompare);
             this.Controls.Add(this.PBLoading);
@@ -442,6 +474,8 @@
             this.TBPDocumentChanges.ResumeLayout(false);
             this.TBPDocumentChanges.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DGVChanges)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PBDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PBUp)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PBLoading)).EndInit();
             this.ResumeLayout(false);
 
@@ -487,6 +521,8 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn UFile;
         private System.Windows.Forms.TextBox TBLPath;
         private System.Windows.Forms.Label LBLocalPath;
+        private System.Windows.Forms.PictureBox PBUp;
+        private System.Windows.Forms.PictureBox PBDown;
     }
 }
 
