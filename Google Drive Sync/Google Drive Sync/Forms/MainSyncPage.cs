@@ -338,5 +338,86 @@ namespace GoogleDriveSync
                 }
             }
         }
+
+        private void CBAutoSyncChecked(object sender, EventArgs e)
+        {
+            if (CBAutoSync.Checked)
+            {
+                BTNCompare.Enabled = false;
+                PBUp.Enabled = false;
+                PBDown.Enabled = false;
+
+                TMAutoSync.Enabled = true;
+                TMAutoSync.Start();
+            }
+
+            else
+            {
+                TMAutoSync.Enabled = false;
+                BTNCompare.Enabled = true;
+            }
+        }
+
+        private async void TMAutoSyncElapsedAsync(object sender, EventArgs e)
+        {
+            TMAutoSync.Stop();
+
+            PRBLoading.Value = 0;
+            PBLoading.Image = Properties.Resources.LoadingSpinner;
+            bool hasErrored = false;
+
+            await Task.Run(() =>
+            {
+                (Files, hasErrored) = AppService.CheckUpdates();
+            });
+
+            PRBLoading.Value = 0;
+
+            List<FileModel> uploadFiles = new List<FileModel>();
+            List<FileModel> downloadFiles = new List<FileModel>();
+
+            foreach (FileModel file in Files)
+            {
+                if (file.Changes.Count > 0)
+                {
+                    ChangeModel modifiedChange = file.Changes.Find(c => c.Field == "Modified");
+
+                    if (modifiedChange.Stream == "Up")
+                    {
+                        downloadFiles.Add(file);
+                    }
+
+                    else
+                    {
+                        uploadFiles.Add(file);
+                    }
+                }
+            }
+
+            await Task.Run(() =>
+            {
+                hasErrored = AppService.SyncChanges(uploadFiles, downloadFiles);
+            });
+
+            if (hasErrored)
+            {
+                PBLoading.Image = Properties.Resources.Cross;
+            }
+
+            else
+            {
+                PBLoading.Image = Properties.Resources.Tick;
+            }
+
+            PRBLoading.Value = 100;
+            TMAutoSync.Start();
+        }
+
+        private void Exit(object sender, FormClosedEventArgs e)
+        {
+            LoggerService _logger = new LoggerService();
+
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+        }
     }
 }

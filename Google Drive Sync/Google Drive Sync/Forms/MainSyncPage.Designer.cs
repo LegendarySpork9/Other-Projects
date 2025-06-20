@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainSyncPage));
             this.DGVFileInformation = new System.Windows.Forms.DataGridView();
             this.FName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -69,6 +70,8 @@
             this.PBDown = new System.Windows.Forms.PictureBox();
             this.PBUp = new System.Windows.Forms.PictureBox();
             this.PBLoading = new System.Windows.Forms.PictureBox();
+            this.CBAutoSync = new System.Windows.Forms.CheckBox();
+            this.TMAutoSync = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.DGVFileInformation)).BeginInit();
             this.TBCDocumentChanges.SuspendLayout();
             this.TBPDocumentChanges.SuspendLayout();
@@ -451,11 +454,28 @@
             this.PBLoading.TabIndex = 2;
             this.PBLoading.TabStop = false;
             // 
+            // CBAutoSync
+            // 
+            this.CBAutoSync.AutoSize = true;
+            this.CBAutoSync.Location = new System.Drawing.Point(351, 3);
+            this.CBAutoSync.Name = "CBAutoSync";
+            this.CBAutoSync.Size = new System.Drawing.Size(75, 17);
+            this.CBAutoSync.TabIndex = 7;
+            this.CBAutoSync.Text = "Auto Sync";
+            this.CBAutoSync.UseVisualStyleBackColor = true;
+            this.CBAutoSync.CheckedChanged += new System.EventHandler(this.CBAutoSyncChecked);
+            // 
+            // TMAutoSync
+            // 
+            this.TMAutoSync.Interval = 15000;
+            this.TMAutoSync.Tick += new System.EventHandler(this.TMAutoSyncElapsedAsync);
+            // 
             // MainSyncPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1249, 496);
+            this.Controls.Add(this.CBAutoSync);
             this.Controls.Add(this.PBDown);
             this.Controls.Add(this.PBUp);
             this.Controls.Add(this.BTNSync);
@@ -469,6 +489,7 @@
             this.MinimumSize = new System.Drawing.Size(1265, 535);
             this.Name = "MainSyncPage";
             this.Text = "Google Drive Sync";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Exit);
             ((System.ComponentModel.ISupportInitialize)(this.DGVFileInformation)).EndInit();
             this.TBCDocumentChanges.ResumeLayout(false);
             this.TBPDocumentChanges.ResumeLayout(false);
@@ -478,6 +499,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.PBUp)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PBLoading)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -523,6 +545,8 @@
         private System.Windows.Forms.Label LBLocalPath;
         private System.Windows.Forms.PictureBox PBUp;
         private System.Windows.Forms.PictureBox PBDown;
+        private System.Windows.Forms.CheckBox CBAutoSync;
+        private System.Windows.Forms.Timer TMAutoSync;
     }
 }
 
