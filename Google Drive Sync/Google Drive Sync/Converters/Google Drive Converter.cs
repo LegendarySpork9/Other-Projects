@@ -13,7 +13,6 @@
                 case ".xls": return "application/vnd.ms-excel";
                 case ".xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
                 case ".png": return "image/png";
-                case ".jpg":
                 case ".jpeg": return "image/jpeg";
                 default: return "application/octet-stream";
             }

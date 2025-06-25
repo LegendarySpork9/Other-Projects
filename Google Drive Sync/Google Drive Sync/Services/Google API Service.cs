@@ -315,6 +315,77 @@ namespace GoogleDriveSync.Services
             }
         }
 
+        private void CreateFolder(string folderName, string parent)
+        {
+            LoggerFunction _loggerFunction = new LoggerFunction();
+
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Creating {folderName} folder in Google Drive");
+
+            Google.Apis.Drive.v3.Data.File folder = new Google.Apis.Drive.v3.Data.File();
+
+            try
+            {
+                DriveService service = new DriveService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
+                });
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
+
+                Google.Apis.Drive.v3.Data.File fileMetaData = new Google.Apis.Drive.v3.Data.File
+                {
+                    Name = folderName,
+                    MimeType = "application/vnd.google-apps.folder",
+                    Parents = new List<string> { parent }
+                };
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created File Meta Data: \"{folderName}\", \"{fileMetaData.MimeType}\"");
+
+                FilesResource.CreateRequest createRequest = service.Files.Create(fileMetaData);
+                createRequest.Fields = "id";
+                folder = createRequest.Execute();
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+            }
+
+            catch (Exception ex)
+            {
+                HasErrored = true;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to create {folderName} in Google Drive");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to create {folderName} in Google Drive", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            if (!string.IsNullOrWhiteSpace(folder.Id))
+            {
+                Folders.Add(new KeyValuePair<string, string>(folder.Id, folderName));
+
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Created {folderName} in Google Drive");
+            }
+        }
+
+        private void CheckFolders(string[] folders)
+        {
+            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+
+            for (int x = 0; x < folders.Length; x++)
+            {
+                string folderId = Folders.Find(c => c.Value == folders[x]).Key;
+
+                if (string.IsNullOrWhiteSpace(folderId))
+                {
+                    Logger.LogMessage(StandardValues.LoggerValues.Warning, $"{folders[x]} folder not found in Google Drive");
+
+                    string parent = Folders.Find(c => c.Value == folders[x - 1]).Key;
+
+                    CreateFolder(folders[x], parent);
+                }
+            }
+        }
+
         public void CreateFile(FileModel file)
         {
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
@@ -324,6 +395,8 @@ namespace GoogleDriveSync.Services
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploading {file.Name}.{file.Type} to Google Drive");
 
             IUploadProgress requestStatus = null;
+
+            CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
 
             try
             {
@@ -453,6 +526,8 @@ namespace GoogleDriveSync.Services
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploading {file.Name}.{file.Type} to Google Drive");
 
             IUploadProgress requestStatus = null;
+
+            CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
 
             try
             {
