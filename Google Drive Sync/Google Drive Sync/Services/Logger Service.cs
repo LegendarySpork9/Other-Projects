@@ -6,6 +6,7 @@ namespace GoogleDriveSync.Services
     {
         private readonly ILog Logger = LogManager.GetLogger("Logs");
 
+        // Sends a message to the specified logs.
         public void LogMessage(string level, string message)
         {
             switch (level)

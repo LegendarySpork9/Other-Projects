@@ -31,6 +31,7 @@ namespace GoogleDriveSync
             AppService.ProgressChanged += ProgressChanged;
         }
 
+        // Increases the value of the pogress bar.
         private void ProgressChanged(int value)
         {
             if (PRBLoading.InvokeRequired)
@@ -44,6 +45,7 @@ namespace GoogleDriveSync
             }
         }
 
+        // Populates the file information grid.
         private async void BTNCompareClick(object sender, EventArgs e)
         {
             BTNCompare.Enabled = false;
@@ -109,6 +111,7 @@ namespace GoogleDriveSync
             BTNCompare.Enabled = true;
         }
 
+        // Triggers the process of syncing the chosen files.
         private async void BTNSyncClick(object sender, EventArgs e)
         {
             BTNSync.Enabled = false;
@@ -182,6 +185,7 @@ namespace GoogleDriveSync
             BTNCompare.Enabled = true;
         }
 
+        // Loads the file information into the information box.
         private void DGVFileInformationRowState(object sender, DataGridViewRowStateChangedEventArgs e)
         {
             if (e.StateChanged != DataGridViewElementStates.Selected) return;
@@ -253,6 +257,7 @@ namespace GoogleDriveSync
             }
         }
 
+        // Checks merge type and update cells to see if a merge should be done.
         private void DGVFileInformationCellValue(object sender, DataGridViewCellEventArgs e)
         {
             if (TablePopulated)
@@ -311,6 +316,7 @@ namespace GoogleDriveSync
             }
         }
 
+        // Sets all files with changes to be synced up stream.
         private void SyncUp(object sender, EventArgs e)
         {
             RowsToUpdate.Clear();
@@ -325,6 +331,7 @@ namespace GoogleDriveSync
             }
         }
 
+        // Sets all files with changes to be synced down stream.
         private void SyncDown(object sender, EventArgs e)
         {
             RowsToUpdate.Clear();
@@ -339,6 +346,7 @@ namespace GoogleDriveSync
             }
         }
 
+        // Starts the auto sync timer.
         private void CBAutoSyncChecked(object sender, EventArgs e)
         {
             if (CBAutoSync.Checked)
@@ -358,6 +366,7 @@ namespace GoogleDriveSync
             }
         }
 
+        // Performs the auto sync process.
         private async void TMAutoSyncElapsedAsync(object sender, EventArgs e)
         {
             TMAutoSync.Stop();

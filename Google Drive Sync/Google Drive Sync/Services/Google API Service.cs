@@ -24,16 +24,20 @@ namespace GoogleDriveSync.Services
         private bool HasErrored = false;
         private List<KeyValuePair<string, string>> Folders = new List<KeyValuePair<string, string>>();
 
+        // Sets the class's global variables.
         public GoogleAPIService(string folderId)
         {
             FolderId = folderId;
             FolderName = GetFolderName(folderId);
         }
 
+        // Returns the value of the HasErrored variable.
         public bool GetHasErrored() => HasErrored;
 
+        // Resets the HasErrored variable.
         public void ResetHasErrored() => HasErrored = false;
 
+        // Gets the name of the given folder id.
         private string GetFolderName(string folderId)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder name for folder id {folderId}");
@@ -98,6 +102,7 @@ namespace GoogleDriveSync.Services
             return folderName;
         }
 
+        // Generates credentials from the specified json file.
         private UserCredential GetCredentials()
         {
             UserCredential credential = null;
@@ -133,6 +138,7 @@ namespace GoogleDriveSync.Services
             return credential;
         }
 
+        // Obtains all the files and folders of the specified directory.
         public List<FileModel> GetData()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file(s) under folder {FolderName ?? FolderId}");
@@ -161,6 +167,7 @@ namespace GoogleDriveSync.Services
             return googleDrive;
         }
 
+        // Obtains all the folders under a given folder.
         private (string[], string[]) GetFolders(string folderId)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder information for folder(s) under folder {folderId}");
@@ -223,6 +230,7 @@ namespace GoogleDriveSync.Services
             return (folderIds, folderNames);
         }
 
+        // Obtains all the files under a given folder.
         private List<FileModel> GetFiles(string folderId, string pathIds, string path)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file information for file(s) under folder {folderId}");
@@ -297,6 +305,7 @@ namespace GoogleDriveSync.Services
             return googleDrive;
         }
 
+        // Loops through all folders and sub folders to obtain all files.
         private void TraverseFolders(List<FileModel> googleDrive, string folderId, string pathIds, string path)
         {
             (string[] folderIds, string[] folderNames) = GetFolders(folderId);
@@ -315,6 +324,7 @@ namespace GoogleDriveSync.Services
             }
         }
 
+        // Creates a folder under the specified folder.
         private void CreateFolder(string folderName, string parent)
         {
             LoggerFunction _loggerFunction = new LoggerFunction();
@@ -367,6 +377,7 @@ namespace GoogleDriveSync.Services
             }
         }
 
+        // Checks if the required folders exist.
         private void CheckFolders(string[] folders)
         {
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
@@ -386,6 +397,7 @@ namespace GoogleDriveSync.Services
             }
         }
 
+        // Uploads a new file.
         public void CreateFile(FileModel file)
         {
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
@@ -454,6 +466,7 @@ namespace GoogleDriveSync.Services
             }
         }
 
+        // Modifies the existing file.
         public void UpdateFile(FileModel file)
         {
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
@@ -517,6 +530,7 @@ namespace GoogleDriveSync.Services
             }
         }
 
+        // Changes the location of the file.
         public void MoveFile(FileModel file)
         {
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
@@ -584,6 +598,7 @@ namespace GoogleDriveSync.Services
             }
         }
 
+        // Removes the file.
         public void DownloadFile(FileModel file)
         {
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();

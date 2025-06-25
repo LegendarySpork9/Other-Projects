@@ -12,11 +12,13 @@ namespace GoogleDriveSync.Services
         private readonly GoogleAPIService GoogleAPI = new GoogleAPIService(AppSettingsModel.DriveFolder);
         public event Action<int> ProgressChanged;
 
+        // Increases the value of the pogress bar.
         private void OnProgressChanged(int progress)
         {
             ProgressChanged?.Invoke(progress);
         }
 
+        // Runs the process of checking for updates.
         public (List<FileModel>, bool) CheckUpdates()
         {
             LoggerService _logger = new LoggerService();
@@ -51,6 +53,7 @@ namespace GoogleDriveSync.Services
             return (files, hasErrored);
         }
 
+        // Runs the process of updating the files selected.
         public bool SyncChanges(List<FileModel> uploadFiles, List<FileModel> downloadFiles)
         {
             LoggerService _logger = new LoggerService();

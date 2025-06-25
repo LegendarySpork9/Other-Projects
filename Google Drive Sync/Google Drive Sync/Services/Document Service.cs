@@ -16,14 +16,17 @@ namespace localDriveSync.Services
         private readonly string FolderName;
         private bool HasErrored = false;
 
+        // Sets the class's global variables.
         public DocumentService(string folder)
         {
             FolderPath = folder;
             FolderName = folder.Remove(0, folder.LastIndexOf('\\') + 1);
         }
 
+        // Returns the value of the HasErrored variable.
         public bool GetHasErrored() => HasErrored;
 
+        // Obtains all the files and folders of the specified directory.
         public List<FileModel> GetData()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder(s) and file(s) under folder {FolderName}");
@@ -49,6 +52,7 @@ namespace localDriveSync.Services
             return localDrive;
         }
 
+        // Obtains all the folders under a given folder.
         public (string[], string[]) GetFolders(string folder)
         {
             LocalDriveConverter _localDriveConverter = new LocalDriveConverter();
@@ -93,6 +97,7 @@ namespace localDriveSync.Services
             return (folderPaths, folderNames);
         }
 
+        // Obtains all the files under a given folder.
         public List<FileModel> GetFiles(string folder, string path)
         {
             LocalDriveConverter _localDriveConverter = new LocalDriveConverter();
@@ -151,6 +156,7 @@ namespace localDriveSync.Services
             return localDrive;
         }
 
+        // Obtains specific information about the file.
         private (DateTime, DateTime, bool) GetFileInformation(string file)
         {
             LocalDriveConverter _localDriveConverter = new LocalDriveConverter();
@@ -174,6 +180,7 @@ namespace localDriveSync.Services
             return (created, modified, hidden);
         }
 
+        // Loops through all folders and sub folders to obtain all files.
         private void TraverseFolders(List<FileModel> localDrive, string folder, string path)
         {
             (string[] folderPaths, string[] folderNames) = GetFolders(folder);
@@ -190,8 +197,10 @@ namespace localDriveSync.Services
             }
         }
 
+        // Delets the given file.
         public void DeleteFile(string file) => File.Delete(file);
 
+        // Unblocks the given file.
         public void UnblockFile(string file)
         {
             string adsPath = $"{file}:Zone.Identifier";
@@ -202,6 +211,7 @@ namespace localDriveSync.Services
             }
         }
 
+        // Hides the given file if it was already hidden.
         public void HideFile(string file, bool hidden)
         {
             if (File.Exists(file))

@@ -4,6 +4,7 @@ namespace GoogleDriveSync.Functions
 {
     internal class FolderFunction
     {
+        // Creates the local directory if it is not present.
         public void CheckPath(string filePath)
         {
             string fileDirectory = Path.GetDirectoryName(filePath);

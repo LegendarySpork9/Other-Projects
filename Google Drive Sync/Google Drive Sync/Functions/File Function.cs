@@ -8,6 +8,7 @@ namespace GoogleDriveSync.Functions
 {
     public class FileFunction
     {
+        // Compares the files and records the changes.
         public List<FileModel> CompareForChanges(List<FileModel> googleDrive, List<FileModel> localDrive)
         {
             LoggerService _logger = new LoggerService();

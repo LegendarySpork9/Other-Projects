@@ -2,6 +2,7 @@
 {
     internal class GoogleDriveConverter
     {
+        // Returns the google drive file type.
         public string GetMimeType(string fileType)
         {
             switch (fileType)
@@ -18,6 +19,7 @@
             }
         }
 
+        // Returns the full file path of a file.
         public string GetFilePath(string root, string sourcePath, string file) => $@"{root}\{sourcePath}\{file}";
     }
 }
