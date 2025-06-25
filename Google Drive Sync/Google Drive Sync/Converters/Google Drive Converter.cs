@@ -1,6 +1,6 @@
 ﻿namespace GoogleDriveSync.Converters
 {
-    internal class GoogleDriveConverter
+    public class GoogleDriveConverter
     {
         // Returns the google drive file type.
         public string GetMimeType(string fileType)
