@@ -422,6 +422,7 @@ namespace GoogleDriveSync
             TMAutoSync.Start();
         }
 
+        // Logs the closing message.
         private void Exit(object sender, FormClosedEventArgs e)
         {
             LoggerService _logger = new LoggerService();

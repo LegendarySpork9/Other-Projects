@@ -1,6 +1,6 @@
 ﻿namespace GoogleDriveSync.Functions
 {
-    internal class GoogleDriveFunction
+    public class GoogleDriveFunction
     {
         // Returns the final folder in the given string.
         public string RemoveStringCharacters(string value, char[] characters, string direction)
