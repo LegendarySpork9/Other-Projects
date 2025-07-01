@@ -2,7 +2,7 @@
 
 namespace GoogleDriveSync.Models
 {
-    internal class AppSettingsModel
+    public static class AppSettingsModel
     {
         public static string Credentials = ConfigurationManager.AppSettings["CredentialsLocation"].ToString();
         public static string DriveFolder = ConfigurationManager.AppSettings["GoogleDriveFolder"].ToString();
