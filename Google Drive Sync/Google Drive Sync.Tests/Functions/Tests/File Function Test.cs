@@ -2,7 +2,7 @@
 using GoogleDriveSync.Models;
 using Moq;
 
-namespace GoogleDriveSync.Tests.Functions
+namespace GoogleDriveSync.Tests.Functions.Tests
 {
     [TestClass]
     public class FileFunctionTest

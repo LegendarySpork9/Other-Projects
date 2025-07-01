@@ -1,7 +1,7 @@
 ﻿using GoogleDriveSync.Functions;
 using Moq;
 
-namespace GoogleDriveSync.Tests.Functions
+namespace GoogleDriveSync.Tests.Functions.Tests
 {
     [TestClass]
     public class GoogleDriveFunctionTest
