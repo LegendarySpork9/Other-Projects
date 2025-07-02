@@ -598,7 +598,7 @@ namespace GoogleDriveSync.Services
             }
         }
 
-        // Removes the file.
+        // Downloads the file.
         public void DownloadFile(FileModel file)
         {
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
@@ -652,6 +652,51 @@ namespace GoogleDriveSync.Services
                 };
 
                 downloadRequest.Download(stream);
+            }
+
+            catch (Exception ex)
+            {
+                HasErrored = true;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+
+                MessageBox.Show($"An error occured when trying to upload {file.Name}.{file.Type} to Google Drive", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        // Removes the file.
+        public void DeleteFile(FileModel file)
+        {
+            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Deleting {file.Name}.{file.Type} from Google Drive");
+
+            try
+            {
+                DriveService service = new DriveService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = GetCredentials(),
+                    ApplicationName = "Google Drive Sync",
+                });
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
+
+                FilesResource.DeleteRequest deleteRequest = service.Files.Delete(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Left"));
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                string result = deleteRequest.Execute();
+
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    Logger.LogMessage(StandardValues.LoggerValues.Info, $"Deleted {file.Name}.{file.Type} from Google Drive");
+                }
+
+                else
+                {
+                    Logger.LogMessage(StandardValues.LoggerValues.Info, $"Failed to delete {file.Name}.{file.Type} from Google Drive. Returned {result}");
+                }
             }
 
             catch (Exception ex)

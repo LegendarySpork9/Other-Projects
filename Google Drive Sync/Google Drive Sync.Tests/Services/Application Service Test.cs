@@ -2,23 +2,12 @@
 using GoogleDriveSync.Services;
 using GoogleDriveSync.Tests.Functions;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GoogleDriveSync.Tests.Services.Tests
+namespace GoogleDriveSync.Tests.Services
 {
     [TestClass]
     public class ApplicationServiceTest
     {
-        // Deletes the Upload Test file from Google Drive.
-        [TestInitialize]
-        public void Setup()
-        {
-
-        }
 
         // Checks whether the CheckUpdates method returns the expected list.
         [TestMethod]
@@ -38,14 +27,24 @@ namespace GoogleDriveSync.Tests.Services.Tests
         {
             Mock<ApplicationService> _mockApplicationService = new();
 
-            string file = $"{AppSettingsModel.LocalFolder}\\Upload Test.txt";
-            ApplicationServiceTestFunction.UpdateTestNumber("TestSyncChangesUploadCreate", file);
-            FileInfo info = new(file);
+            List<FileModel> files = _mockApplicationService.Object.CheckUpdates().Item1;
+            FileModel file = files.Find(c => c.Name == "Upload Test");
+
+            if (file.PathIds != null)
+            {
+                Mock<GoogleAPIService> _mockGoogleAPIService = new(AppSettingsModel.DriveFolder);
+
+                _mockGoogleAPIService.Object.DeleteFile(file);
+            }
+
+            string filePath = $"{AppSettingsModel.LocalFolder}\\Upload Test.txt";
+            ApplicationServiceTestFunction.UpdateTestNumber("TestSyncChangesUploadCreate", filePath);
+            FileInfo info = new(filePath);
 
             Mock<List<FileModel>> uploadFiles = new();
             uploadFiles.Object.Add(new()
             {
-                Id = file,
+                Id = filePath,
                 Name = "Upload Test",
                 Type = "txt",
                 Path = "Test",
