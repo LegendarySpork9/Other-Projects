@@ -1,13 +1,12 @@
 ﻿using GoogleDriveSync.Converters;
 using GoogleDriveSync.Models;
-using GoogleDriveSync.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace localDriveSync.Services
+namespace GoogleDriveSync.Services
 {
     public class DocumentService
     {
