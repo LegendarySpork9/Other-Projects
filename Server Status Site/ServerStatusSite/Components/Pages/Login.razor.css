@@ -1,0 +1,28 @@
+﻿.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: url('/Login Background.gif');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.login-form {
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    margin: auto;
+    background-color: white;
+}
+
+.login-fail {
+    display: block;
+    width: 200px;
+    border: 2px solid red;
+    margin: auto;
+    color: white;
+    background-color: red;
+    text-align: left;
+}

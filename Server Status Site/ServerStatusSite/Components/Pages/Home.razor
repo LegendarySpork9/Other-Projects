@@ -1,0 +1,68 @@
+﻿@page "/"
+@layout Layout.MainLayout
+
+<PageTitle>Home</PageTitle>
+
+<table class="table">
+    <tbody style="@GetStyle()">
+        @if (Servers.Count != 0)
+        {
+            @foreach (var server in Servers)
+            {
+                <tr>
+                    <td>
+                    </td>
+                    <td>
+                        <center>
+                            <h1>@server.HostName</h1>
+                            <p>@server.Game @server.GameVersion</p>
+                        </center>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <center>
+                            <img src="/Images/Login Background.png" height="200" width="200" />
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <img src="/Images/Hamachi Icon.png" height="200" width="200" />
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <img src="/Images/Game Icon.png" height="200" width="200" />
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <center>
+                            <label>PC Status: <span class="@server.Statuses[0].StatusClass">@server.Statuses[0].Status</span></label>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <label>Hamachi Status: <span class="@server.Statuses[1].StatusClass">@server.Statuses[1].Status</span></label>
+                        </center>
+                    </td>
+                    <td>
+                        <center>
+                            <label>Server Status: <span class="@server.Statuses[2].StatusClass">@server.Statuses[2].Status</span></label>
+                        </center>
+                    </td>
+                </tr>
+            }
+        }
+
+        else
+        {
+            <center>
+                <p>No active servers registered in API. If this is wrong, please speak with an administrator.</p>
+            </center>
+        }
+    </tbody>
+</table>
