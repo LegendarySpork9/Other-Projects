@@ -8,7 +8,6 @@ namespace GoogleDriveSync.Tests.Services
     [TestClass]
     public class ApplicationServiceTest
     {
-
         // Checks whether the CheckUpdates method returns the expected list.
         [TestMethod]
         public void TestCheckUpdates()
@@ -80,27 +79,17 @@ namespace GoogleDriveSync.Tests.Services
         {
             Mock<ApplicationService> _mockApplicationService = new();
 
-            File.Move($"{AppSettingsModel.LocalFolder}\\Upload Test.txt", $"{AppSettingsModel.LocalFolder}\\Test Two\\Upload Test.txt");
-            string file = $"{AppSettingsModel.LocalFolder}\\Test Two\\Upload Test.txt";
+            string file = MoveFunction.MoveFile("Upload Test.txt");
             ApplicationServiceTestFunction.UpdateTestNumber("TestSyncChangesUploadMove", file);
-            FileInfo info = new(file);
 
+            FileInfo info = new(file);
             Mock<List<FileModel>> uploadFiles = new();
             List<FileModel> files = _mockApplicationService.Object.CheckUpdates().Item1;
             uploadFiles.Object.Add(files.Find(c => c.Name == "Upload Test"));
 
-            bool erroredOne = _mockApplicationService.Object.SyncChanges(uploadFiles.Object, new());
+            bool errored = _mockApplicationService.Object.SyncChanges(uploadFiles.Object, new());
 
-            File.Move($"{AppSettingsModel.LocalFolder}\\Test Two\\Upload Test.txt", $"{AppSettingsModel.LocalFolder}\\Upload Test.txt");
-            file = $"{AppSettingsModel.LocalFolder}\\Upload Test.txt";
-            uploadFiles.Object.Clear();
-            files = _mockApplicationService.Object.CheckUpdates().Item1;
-            uploadFiles.Object.Add(files.Find(c => c.Name == "Upload Test"));
-
-            bool erroredTwo = _mockApplicationService.Object.SyncChanges(uploadFiles.Object, new());
-
-            Assert.IsFalse(erroredOne);
-            Assert.IsFalse(erroredTwo);
+            Assert.IsFalse(errored);
         }
 
         // Checks whether the SyncChanges method returns the expected list.

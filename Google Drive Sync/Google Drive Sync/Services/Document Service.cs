@@ -52,7 +52,7 @@ namespace GoogleDriveSync.Services
         }
 
         // Obtains all the folders under a given folder.
-        public (string[], string[]) GetFolders(string folder)
+        private (string[], string[]) GetFolders(string folder)
         {
             LocalDriveConverter _localDriveConverter = new LocalDriveConverter();
 
@@ -97,7 +97,7 @@ namespace GoogleDriveSync.Services
         }
 
         // Obtains all the files under a given folder.
-        public List<FileModel> GetFiles(string folder, string path)
+        private List<FileModel> GetFiles(string folder, string path)
         {
             LocalDriveConverter _localDriveConverter = new LocalDriveConverter();
 

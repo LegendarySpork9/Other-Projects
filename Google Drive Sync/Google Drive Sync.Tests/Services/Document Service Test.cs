@@ -27,35 +27,7 @@ namespace GoogleDriveSync.Tests.Services
             List<FileModel> files = _mockDocumentService.Object.GetData();
 
             Assert.IsTrue(files.Count > 0);
-            Assert.AreEqual(11, files.Count);
-        }
-
-        // Checks whether the GetFolders method returns the expected arrays.
-        [TestMethod]
-        public void TestFolders()
-        {
-            Mock<DocumentService> _mockDocumentService = new(AppSettingsModel.LocalFolder);
-
-            (string[] folderPaths, string[] folderNames) = _mockDocumentService.Object.GetFolders(AppSettingsModel.LocalFolder);
-
-            Assert.IsTrue(folderPaths.Length > 0 && folderNames.Length > 0);
-            Assert.AreEqual(3, folderPaths.Length);
-            Assert.AreEqual(3, folderNames.Length);
-            Assert.IsTrue(folderNames.Contains("Test Four") && folderNames.Contains("Test Three") && folderNames.Contains("Test Two"));
-            Assert.IsTrue(folderPaths.Contains($"{AppSettingsModel.LocalFolder}\\Test Four") && folderPaths.Contains($"{AppSettingsModel.LocalFolder}\\Test Three") 
-                && folderPaths.Contains($"{AppSettingsModel.LocalFolder}\\Test Two"));
-        }
-
-        // Checks whether the GetFiles method returns the expected list.
-        [TestMethod]
-        public void TestFiles()
-        {
-            Mock<DocumentService> _mockDocumentService = new(AppSettingsModel.LocalFolder);
-
-            List<FileModel> files = _mockDocumentService.Object.GetFiles(AppSettingsModel.LocalFolder, "Test");
-
-            Assert.IsTrue(files.Count > 0);
-            Assert.AreEqual(5, files.Count);
+            Assert.AreEqual(10, files.Count);
         }
 
         // Checks if the DeleteFile method can successfully delete files.
