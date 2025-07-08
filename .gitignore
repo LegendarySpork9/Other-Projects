@@ -3,6 +3,11 @@
 
 # Odds
 */.vs/
+**/.vs/
+***/.vs/
 
 # Obj
-**{Oo]bj/
+***[Oo]bj/
+
+# Credentials
+***[Cc]redentials.json
