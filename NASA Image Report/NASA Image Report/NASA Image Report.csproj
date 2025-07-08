@@ -6,6 +6,18 @@
     <RootNamespace>NASAImageReport</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>Content\Logo.ico</ApplicationIcon>
+    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <Title>NASA Image Reporter</Title>
+    <Version>1.0.1</Version>
+    <Authors>Hunter Industries</Authors>
+    <Product>NASA Image Reporter</Product>
+    <Description>An application that gathers NASA's image of the day, as well as every image taken by the Perseverance rover over the current Sol date.</Description>
+    <Copyright>Copyright ©  2025</Copyright>
+    <PackageIcon>Logo.ico</PackageIcon>
+    <RepositoryUrl>https://github.com/LegendarySpork9/Other-Projects/tree/main/NASA%20Image%20Report</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,9 +33,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\Logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="111.4.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Content\Logo.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

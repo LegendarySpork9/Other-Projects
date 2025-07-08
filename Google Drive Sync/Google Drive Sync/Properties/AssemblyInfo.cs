@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Github To Codecks")]
-[assembly: AssemblyDescription("The application takes the issues from a given GitHub repository and creates a card in the given Codecks project.")]
+[assembly: AssemblyTitle("Google Drive Sync")]
+[assembly: AssemblyDescription("A form of source control that syncs a Google Drive folder with a folder on the target machine. The user can choose which direction to sync the changes or enable the auto sync, which will sync based on the direction of the changes.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hunter Industries")]
-[assembly: AssemblyProduct("Github To Codecks")]
-[assembly: AssemblyCopyright("Copyright ©  2024")]
+[assembly: AssemblyProduct("Google Drive Sync")]
+[assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9c4f38e4-80cc-402a-884f-4bfcf0aa4e3f")]
+[assembly: Guid("8185c84b-ad50-4308-9686-2c94c3b48fbf")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,8 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Build and Revision Numbers
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.1.0")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]

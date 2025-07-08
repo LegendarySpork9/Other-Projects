@@ -9,5 +9,8 @@
 # Obj
 ***[Oo]bj/
 
+# Credentials
+***[Cc]redentials.json
+
 # Publish Profiles
 ***[Pp]ublish[Pp]rofiles
