@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Github To Codecks")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("The application takes the issues from a given GitHub repository and creates a card in the given Codecks project.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Hunter Industries")]
 [assembly: AssemblyProduct("Github To Codecks")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
