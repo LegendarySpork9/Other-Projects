@@ -29,10 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Site\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ServerSiteAutomation\ServerSiteAutomation.csproj" />
     <ProjectReference Include="..\ServerSiteReporter\ServerSiteReporter.csproj" />
     <ProjectReference Include="..\ServerStatusSite\ServerStatusSite.csproj" />

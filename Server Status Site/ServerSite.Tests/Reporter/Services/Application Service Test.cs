@@ -11,6 +11,7 @@ namespace ServerSite.Tests.Reporter.Services
         private Mock<ApplicationService> MockApplicationService;
         private LoggerService Logger;
 
+        // Sets the global variables that the tests to use.
         [TestInitialize]
         public void ConfigureAutomationService()
         {
@@ -19,6 +20,7 @@ namespace ServerSite.Tests.Reporter.Services
             Logger.ChangeIdentifier("UnitTest");
         }
 
+        // Checks whether the SetLogger method works as expected.
         [TestMethod]
         public void TestSetLogger()
         {
@@ -35,6 +37,7 @@ namespace ServerSite.Tests.Reporter.Services
             }
         }
 
+        // Checks whether the Setup method works as expected.
         [TestMethod]
         public void TestSetup()
         {
@@ -53,6 +56,7 @@ namespace ServerSite.Tests.Reporter.Services
             }
         }
 
+        // Checks whether the Start method runs as expected.
         [TestMethod]
         public void TestStart()
         {
