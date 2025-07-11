@@ -21,6 +21,14 @@
         <input type="password" @bind="User.Password" />
         <br />
         <br />
-        <button class="btn btn-primary" @onclick="LoginClick">Login</button>
+        @if (Loading)
+        {
+            <div class="spinner-border text-primary" role="status"></div>
+        }
+
+        else
+        {
+            <button class="btn btn-primary" @onclick="LoginClick">Login</button>
+        }
     </center>
 </div>

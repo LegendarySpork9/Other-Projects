@@ -20,6 +20,7 @@ namespace ServerStatusSite.Components.Pages
         private UserModel User { get; set; }
         private string ReturnUrl { get; set; } = "/";
         private bool ShowError { get; set; } = false;
+        private bool Loading { get; set; } = false;
 
         // Captures the URL the user was trying to access and sets the API logger.
         protected override void OnInitialized()
@@ -45,16 +46,19 @@ namespace ServerStatusSite.Components.Pages
         }
 
         // Checks the user details and sends the user to the return URL.
-        private void LoginClick()
+        private async Task LoginClick()
         {
             HashFunction _hasFunction = new();
+
+            Loading = true;
+            StateHasChanged();
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Login");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Username: {User.Username}");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Password: {User.Password}");
 
-            APIService.Authorise();
-            List<UserModel> users = APIService.GetUsers();
+            await APIService.AuthoriseAsync();
+            List<UserModel> users = await APIService.GetUsersAsync();
             UserModel user = users.Find(c => c.Username == User.Username && c.Password == _hasFunction.HashString(User.Password));
 
             if (user != null)
@@ -71,6 +75,8 @@ namespace ServerStatusSite.Components.Pages
                 Logger.LogMessage(StandardValues.LoggerValues.Info, "Login Failed.");
                 ShowError = true;
             }
+
+            Loading = false;
         }
     }
 }

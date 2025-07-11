@@ -4,6 +4,7 @@ using ServerSiteCommon.Converters;
 using ServerSiteCommon.Models;
 using ServerSiteCommon.Models.API;
 using ServerSiteCommon.Models.Data;
+using System.Runtime.CompilerServices;
 
 namespace ServerSiteCommon.Services
 {
@@ -58,6 +59,62 @@ namespace ServerSiteCommon.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
                 RestResponse response = client.Execute(request);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    JObject responseContent = JObject.Parse(response.Content);
+                    BearerToken = responseContent.Property("token").Value.ToString();
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {BearerToken}");
+
+                    JObject infoContent = JObject.Parse(responseContent.Property("info").Value.ToString());
+                    ExpiryTime = DateTime.Parse(infoContent.Property("expires").Value.ToString());
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Expiry Time: {ExpiryTime}");
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+            }
+
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Obtained Bearer token from API");
+        }
+
+        // Gets a bearer token from the API.
+        public async Task AuthoriseAsync()
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Obtaining Bearer token from API");
+
+            try
+            {
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Authorisation:")).Replace("Authorisation:", "");
+                string url = SharedSettings.BaseURL + authEndpoint;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+
+                RestClient client = new(url);
+                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
+                client.AddDefaultHeader("Accept", "application/json");
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+
+                RestRequest request = new()
+                {
+                    Method = Method.Post
+                };
+                request.AddParameter("application/json", File.ReadAllText($@"{SharedSettings.PayloadLocation}\Authorise.json"), ParameterType.RequestBody);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {File.ReadAllText($@"{SharedSettings.PayloadLocation}\Authorise.json")}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
@@ -155,6 +212,96 @@ namespace ServerSiteCommon.Services
 
                         Authorise();
                         users = GetUsers();
+                    }
+
+                    else
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch users from API");
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch users from API");
+            }
+
+            RetryCount = 0;
+            return users;
+        }
+
+        // Gets a list of the users from the API.
+        public async Task<List<UserModel>> GetUsersAsync()
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching users from API");
+
+            if (ExpiryTime < DateTime.UtcNow)
+            {
+                await AuthoriseAsync();
+            }
+
+            List<UserModel> users = new();
+
+            try
+            {
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Users:")).Replace("Users:", "");
+                string url = SharedSettings.BaseURL + authEndpoint;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+
+                RestClient client = new(url);
+                client.AddDefaultHeader("Authorization", $"Bearer {BearerToken}");
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+
+                RestRequest request = new()
+                {
+                    Method = Method.Get
+                };
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    JArray responseContent = JArray.Parse(response.Content);
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Users Returned: {responseContent.Count}");
+
+                    foreach (JObject user in responseContent)
+                    {
+                        users.Add(new UserModel()
+                        {
+                            UserId = int.Parse(user.Property("id").Value.ToString()),
+                            Username = user.Property("username").Value.ToString(),
+                            Password = user.Property("password").Value.ToString()
+                        });
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Id: {user.Property("id").Value}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Username: {user.Property("username").Value}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Password: {user.Property("password").Value}");
+                    }
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched users from API");
+                }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    if (RetryCount != 4)
+                    {
+                        RetryCount++;
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+
+                        await AuthoriseAsync();
+                        users = await GetUsersAsync();
                     }
 
                     else
