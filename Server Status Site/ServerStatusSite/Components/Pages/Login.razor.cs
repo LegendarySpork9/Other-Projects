@@ -66,7 +66,7 @@ namespace ServerStatusSite.Components.Pages
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Login Successful.");
                 Logger.ChangeIdentifier(user.Username);
                 APIService.SetLogger(Logger);
-                User.UpdateModel(APIService.GetUserSettings(user));
+                User.UpdateModel(await APIService.GetUserSettings(user));
                 Navigation.NavigateTo(ReturnUrl);
             }
 

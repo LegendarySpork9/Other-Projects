@@ -4,7 +4,6 @@ using ServerSiteCommon.Converters;
 using ServerSiteCommon.Models;
 using ServerSiteCommon.Models.API;
 using ServerSiteCommon.Models.Data;
-using System.Runtime.CompilerServices;
 
 namespace ServerSiteCommon.Services
 {
@@ -323,13 +322,13 @@ namespace ServerSiteCommon.Services
         }
 
         // Gets the user settings for the given user.
-        public UserModel GetUserSettings(UserModel user)
+        public async Task<UserModel> GetUserSettings(UserModel user)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching user settings from API");
 
             if (ExpiryTime < DateTime.UtcNow)
             {
-                Authorise();
+                await AuthoriseAsync();
             }
 
             try
@@ -352,7 +351,7 @@ namespace ServerSiteCommon.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                RestResponse response = client.Execute(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
@@ -399,8 +398,8 @@ namespace ServerSiteCommon.Services
 
                         Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
 
-                        Authorise();
-                        user = GetUserSettings(user);
+                        await AuthoriseAsync();
+                        user = await GetUserSettings(user);
                     }
 
                     else
@@ -749,13 +748,13 @@ namespace ServerSiteCommon.Services
         }
 
         // Changes the value of the given user setting.
-        public bool UpdateUserSettings(int userSettingsId, string value)
+        public async Task<bool> UpdateUserSettings(int userSettingsId, string value)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Updating user setting in API");
 
             if (ExpiryTime < DateTime.UtcNow)
             {
-                Authorise();
+                await AuthoriseAsync();
             }
 
             bool updated = false;
@@ -786,7 +785,7 @@ namespace ServerSiteCommon.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                RestResponse response = client.Execute(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
@@ -807,8 +806,8 @@ namespace ServerSiteCommon.Services
 
                         Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
 
-                        Authorise();
-                        updated = UpdateUserSettings(userSettingsId, value);
+                        await AuthoriseAsync();
+                        updated = await UpdateUserSettings(userSettingsId, value);
                     }
 
                     else
@@ -830,13 +829,13 @@ namespace ServerSiteCommon.Services
         }
 
         // Changes the information of a given user.
-        public bool UpdateUser(UserModel user)
+        public async Task<bool> UpdateUser(UserModel user)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Updating user details in API");
 
             if (ExpiryTime < DateTime.UtcNow)
             {
-                Authorise();
+                await AuthoriseAsync();
             }
 
             bool updated = false;
@@ -868,7 +867,7 @@ namespace ServerSiteCommon.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                RestResponse response = client.Execute(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
@@ -889,8 +888,8 @@ namespace ServerSiteCommon.Services
 
                         Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
 
-                        Authorise();
-                        updated = UpdateUser(user);
+                        await AuthoriseAsync();
+                        updated = await UpdateUser(user);
                     }
 
                     else
@@ -1029,6 +1028,124 @@ namespace ServerSiteCommon.Services
             return alerts;
         }
 
+        // Gets the alerts on a given page.
+        public async Task<APIAlertsModel> GetAlertsAsync(int pageNumber)
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching alerts from API");
+
+            if (ExpiryTime < DateTime.UtcNow)
+            {
+                await AuthoriseAsync();
+            }
+
+            APIAlertsModel alerts = new();
+
+            try
+            {
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:")).Replace("Alerts:", "");
+                string url = SharedSettings.BaseURL + authEndpoint + $"?PageNumber={pageNumber}";
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+
+                RestClient client = new(url);
+                client.AddDefaultHeader("Authorization", $"Bearer {BearerToken}");
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+
+                RestRequest request = new()
+                {
+                    Method = Method.Get
+                };
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    if (!response.Content.Contains("No data returned by given parameters."))
+                    {
+                        JObject responseContent = JObject.Parse(response.Content);
+                        JArray alertsContent = JArray.Parse(responseContent.Property("entries").Value.ToString());
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alerts Returned: {alertsContent.Count}");
+
+                        if (alertsContent.Count > 0)
+                        {
+                            foreach (JObject alert in alertsContent)
+                            {
+                                JObject server = JObject.Parse(alert.Property("server").Value.ToString());
+
+                                alerts.Alerts.Add(new AlertModel
+                                {
+                                    Id = int.Parse(alert.Property("alertId").Value.ToString()),
+                                    Occured = DateTime.Parse(alert.Property("alertDate").Value.ToString()),
+                                    Server = $"{server.Property("game").Value} ({server.Property("gameVersion").Value})",
+                                    Reporter = alert.Property("reporter").Value.ToString(),
+                                    Component = alert.Property("component").Value.ToString(),
+                                    ComponentStatus = alert.Property("componentStatus").Value.ToString(),
+                                    AlertStatus = alert.Property("alertStatus").Value.ToString()
+                                });
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alert.Property("alertId").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alert.Property("alertDate").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {server.Property("game").Value} ({server.Property("gameVersion").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alert.Property("reporter").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alert.Property("component").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alert.Property("componentStatus").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alert.Property("alertStatus").Value}");
+                            }
+
+                            if (int.Parse(responseContent.Property("totalPageCount").Value.ToString()) > 1)
+                            {
+                                alerts.MultiplePages = true;
+                                alerts.PageCount = int.Parse(responseContent.Property("totalPageCount").Value.ToString());
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Multiple Pages: {alerts.MultiplePages}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page Count: {alerts.PageCount}");
+                            }
+                        }
+                    }
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched alerts from API");
+                }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    if (RetryCount != 4)
+                    {
+                        RetryCount++;
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+
+                        await AuthoriseAsync();
+                        alerts = await GetAlertsAsync(pageNumber);
+                    }
+
+                    else
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch alerts from API");
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch alerts from API");
+            }
+
+            alerts.APICalled = true;
+
+            RetryCount = 0;
+            return alerts;
+        }
+
         // Gets the information of a given AlertID.
         public AlertModel GetAlert(int alertId)
         {
@@ -1123,13 +1240,13 @@ namespace ServerSiteCommon.Services
         }
 
         // Changes the status of the given alert.
-        public bool UpdateAlert(int alertId, string status)
+        public async Task<bool> UpdateAlert(int alertId, string status)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Updating alert status in API");
 
             if (ExpiryTime < DateTime.UtcNow)
             {
-                Authorise();
+                await AuthoriseAsync();
             }
 
             bool updated = false;
@@ -1160,7 +1277,7 @@ namespace ServerSiteCommon.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                RestResponse response = client.Execute(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
@@ -1181,8 +1298,8 @@ namespace ServerSiteCommon.Services
 
                         Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
 
-                        Authorise();
-                        updated = UpdateAlert(alertId, status);
+                        await AuthoriseAsync();
+                        updated = await UpdateAlert(alertId, status);
                     }
 
                     else
@@ -1270,6 +1387,93 @@ namespace ServerSiteCommon.Services
 
                         Authorise();
                         registered = RegisterAlert(alert);
+                    }
+
+                    else
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to register server alert in API");
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to register alert in API");
+            }
+
+            RetryCount = 0;
+            return registered;
+        }
+
+        // Adds a new alert to the API.
+        public async Task<bool> RegisterAlertAsync(APINewAlertsModel alert)
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, "Registering alert in API");
+
+            if (ExpiryTime < DateTime.UtcNow)
+            {
+                await AuthoriseAsync();
+            }
+
+            bool registered = false;
+
+            try
+            {
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:")).Replace("Alerts:", "");
+                string url = SharedSettings.BaseURL + authEndpoint;
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+
+                RestClient client = new(url);
+                client.AddDefaultHeader("Authorization", $"Bearer {BearerToken}");
+                client.AddDefaultHeader("Accept", "application/json");
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+
+                JObject json = JObject.Parse(File.ReadAllText($@"{SharedSettings.PayloadLocation}\RegisterAlert.json"));
+                json.Property("reporter").Value = alert.Reporter;
+                json.Property("component").Value = alert.Component;
+                json.Property("componentStatus").Value = alert.ComponentStatus;
+                json.Property("alertStatus").Value = alert.AlertStatus;
+                json.Property("hostName").Value = alert.HostName;
+                json.Property("game").Value = alert.Game;
+                json.Property("gameVersion").Value = alert.GameVersion;
+
+                RestRequest request = new()
+                {
+                    Method = Method.Post
+                };
+                request.AddParameter("application/json", json.ToString(), ParameterType.RequestBody);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {json}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Created)
+                {
+                    registered = true;
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Register Successful");
+                    Logger.LogMessage(StandardValues.LoggerValues.Info, "Registered alert in API");
+                }
+
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    if (RetryCount != 4)
+                    {
+                        RetryCount++;
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+
+                        await AuthoriseAsync();
+                        registered = await RegisterAlertAsync(alert);
                     }
 
                     else

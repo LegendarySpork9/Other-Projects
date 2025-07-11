@@ -18,6 +18,7 @@ namespace ServerStatusSite.Components.Pages
         private string Password { get; set; }
         private string DiscordName { get; set; }
         private bool DarkMode { get; set; }
+        private bool Loading { get; set; } = false;
 
         // Loads the user data of the logged in user.
         protected override void OnInitialized()
@@ -49,15 +50,18 @@ namespace ServerStatusSite.Components.Pages
         }
 
         // Updates the user data.
-        private void SaveClick()
+        private async Task SaveClick()
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting User Save");
-            
+
+            Loading = true;
+            StateHasChanged();
+
             if (!string.IsNullOrWhiteSpace(Username) && Username != User.Username)
             {
                 User.Username = Username;
                 
-                if (APIService.UpdateUser(User))
+                if (await APIService.UpdateUser(User))
                 {
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Username Updated");
                 }
@@ -67,7 +71,7 @@ namespace ServerStatusSite.Components.Pages
             {
                 User.Password = Password;
 
-                if (APIService.UpdateUser(User))
+                if (await APIService.UpdateUser(User))
                 {
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Password Updated");
                 }
@@ -79,7 +83,7 @@ namespace ServerStatusSite.Components.Pages
 
                 int userSettingsId = APIService.GetUserSettingId(User.UserId, "DiscordName");
 
-                if (APIService.UpdateUserSettings(userSettingsId, DiscordName))
+                if (await APIService.UpdateUserSettings(userSettingsId, DiscordName))
                 {
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Discord Updated");
                 }
@@ -91,13 +95,15 @@ namespace ServerStatusSite.Components.Pages
 
                 int userSettingsId = APIService.GetUserSettingId(User.UserId, "DarkMode");
 
-                if (APIService.UpdateUserSettings(userSettingsId, DarkMode.ToString()))
+                if (await APIService.UpdateUserSettings(userSettingsId, DarkMode.ToString()))
                 {
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Discord Updated");
                 }
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, "User Save Complete");
+
+            Loading = false;
         }
     }
 }

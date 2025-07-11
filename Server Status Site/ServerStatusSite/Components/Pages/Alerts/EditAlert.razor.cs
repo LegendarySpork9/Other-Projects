@@ -21,6 +21,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private UserModel User { get; set; }
         private AlertModel Alert { get; set; }
         private int AlertId { get; set; } = 0;
+        private bool Loading { get; set; } = false;
 
         // Gets the data about the given alert.
         protected override void OnInitialized()
@@ -55,14 +56,14 @@ namespace ServerStatusSite.Components.Pages.Alerts
         }
 
         // Updates the alert data then sends the user back to the alerts page. 
-        private void SaveClick()
+        private async Task SaveClick()
         {
             DiscordService _discordService = new(SharedSettings);
             _discordService.SetLogger(Logger);
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Save");
 
-            if (APIService.UpdateAlert(AlertId, Alert.AlertStatus))
+            if (await APIService.UpdateAlert(AlertId, Alert.AlertStatus))
             {
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Status Updated");
             }
@@ -71,12 +72,12 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
             if (SharedSettings.RecipientIds.Contains(','))
             {
-                _discordService.SendNotification(SharedSettings.RecipientIds.Split(',')[1], $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
+                await _discordService.SendNotificationAsync(SharedSettings.RecipientIds.Split(',')[1], $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
             }
 
             else
             {
-                _discordService.SendNotification(SharedSettings.RecipientIds, $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
+                await _discordService.SendNotificationAsync(SharedSettings.RecipientIds, $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
             }
 
             Navigation.NavigateTo("/alerts");

@@ -26,6 +26,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private string Component { get; set; }
         private string ComponentStatus { get; set; }
         private bool ShowError { get; set; } = false;
+        private bool Loading { get; set; } = false;
 
         // Loads the servers from the API.
         protected override void OnInitialized()
@@ -54,9 +55,9 @@ namespace ServerStatusSite.Components.Pages.Alerts
         }
 
         // Adds an alert to the API.
-        private void RegisterClick()
+        private async Task RegisterClick()
         {
-            APIAlertsModel alerts = APIService.GetAlerts(1);
+            APIAlertsModel alerts = await APIService.GetAlertsAsync(1);
             AlertModel alert = alerts.Alerts.Find(c => c.Server == Server && c.Component == Component && c.AlertStatus != "Resolved");
 
             if (alert == null)
@@ -80,7 +81,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
                     GameVersion = server.GameVersion
                 };
 
-                if (APIService.RegisterAlert(newAlert))
+                if (await APIService.RegisterAlertAsync(newAlert))
                 {
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
                 }
@@ -89,12 +90,12 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
                 if (SharedSettings.RecipientIds.Contains(','))
                 {
-                    _discordService.SendNotification(SharedSettings.RecipientIds.Split(',')[0], $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                    await _discordService.SendNotificationAsync(SharedSettings.RecipientIds.Split(',')[0], $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
                 }
 
                 else
                 {
-                    _discordService.SendNotification(SharedSettings.RecipientIds, $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                    await _discordService.SendNotificationAsync(SharedSettings.RecipientIds, $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
                 }
 
                 Navigation.NavigateTo("/alerts");
