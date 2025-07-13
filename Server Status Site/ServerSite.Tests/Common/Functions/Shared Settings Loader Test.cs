@@ -41,7 +41,7 @@ namespace ServerSite.Tests.Common.Functions
                 RefreshTime = 5
             };
 
-            SharedSettingsModel result = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\Automation.config")));
+            SharedSettingsModel result = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\AutomationTest.config")));
 
             result.Should().BeEquivalentTo(expectedSharedSettings);
         }
@@ -59,7 +59,7 @@ namespace ServerSite.Tests.Common.Functions
                 RefreshTime = 5
             };
 
-            SharedSettingsModel result = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\Reporter.config")));
+            SharedSettingsModel result = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\ReporterTest.config")));
 
             result.Should().BeEquivalentTo(expectedSharedSettings);
         }

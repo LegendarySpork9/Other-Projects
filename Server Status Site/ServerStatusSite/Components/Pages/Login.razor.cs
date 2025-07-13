@@ -58,7 +58,7 @@ namespace ServerStatusSite.Components.Pages
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Password: {User.Password}");
 
             await APIService.AuthoriseAsync();
-            List<UserModel> users = await APIService.GetUsersAsync();
+            List<UserModel> users = await APIService.GetUsers();
             UserModel user = users.Find(c => c.Username == User.Username && c.Password == _hasFunction.HashString(User.Password));
 
             if (user != null)

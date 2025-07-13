@@ -21,7 +21,7 @@ namespace ServerSite.Tests.Common.Services
             Logger = new();
             Logger.ChangeIdentifier("UnitTest");
         }
-
+        
         // Checks whether the SetLogger method works as expected.
         [TestMethod]
         public void TestSetLogger()
@@ -49,26 +49,26 @@ namespace ServerSite.Tests.Common.Services
         }
 
         [TestMethod]
-        public void TestUsers()
+        public async Task TestUsers()
         {
             MockAPIService.Object.SetLogger(Logger);
 
-            List<UserModel> users = MockAPIService.Object.GetUsers();
+            List<UserModel> users = await MockAPIService.Object.GetUsers();
 
             Assert.IsTrue(users.Count > 0);
         }
 
         [TestMethod]
-        public void TestUserSettings()
+        public async Task TestUserSettings()
         {
             MockAPIService.Object.SetLogger(Logger);
 
-            List<UserModel> users = MockAPIService.Object.GetUsers();
+            List<UserModel> users = await MockAPIService.Object.GetUsers();
             UserModel testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
             {
-                testUser = MockAPIService.Object.GetUserSettings(testUser);
+                testUser = await MockAPIService.Object.GetUserSettings(testUser);
 
                 Assert.IsNotNull(testUser.DiscordName);
                 Assert.IsTrue(testUser.Admin);
@@ -82,11 +82,11 @@ namespace ServerSite.Tests.Common.Services
         }
 
         [TestMethod]
-        public void TestUserSettingId()
+        public async Task TestUserSettingId()
         {
             MockAPIService.Object.SetLogger(Logger);
 
-            List<UserModel> users = MockAPIService.Object.GetUsers();
+            List<UserModel> users = await MockAPIService.Object.GetUsers();
             UserModel testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
@@ -146,18 +146,18 @@ namespace ServerSite.Tests.Common.Services
         }
 
         [TestMethod]
-        public void TestUpdateUserSetting()
+        public async Task TestUpdateUserSetting()
         {
             MockAPIService.Object.SetLogger(Logger);
 
-            List<UserModel> users = MockAPIService.Object.GetUsers();
+            List<UserModel> users = await MockAPIService.Object.GetUsers();
             UserModel testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
             {
                 DateTime testDate = DateTime.UtcNow;
                 int userSettingId = MockAPIService.Object.GetUserSettingId(testUser.UserId, "DiscordName");
-                bool updated = MockAPIService.Object.UpdateUserSettings(userSettingId, $"UnitTester {testDate}");
+                bool updated = await MockAPIService.Object.UpdateUserSettings(userSettingId, $"UnitTester {testDate}");
                 
                 Assert.IsTrue(updated);
             }
@@ -169,11 +169,11 @@ namespace ServerSite.Tests.Common.Services
         }
 
         [TestMethod]
-        public void TestUpdateUser()
+        public async Task TestUpdateUser()
         {
             MockAPIService.Object.SetLogger(Logger);
 
-            List<UserModel> users = MockAPIService.Object.GetUsers();
+            List<UserModel> users = await MockAPIService.Object.GetUsers();
             UserModel user = users.Find(c => c.Username == "UnitTestTestUser");
 
             if (user != null)
@@ -183,7 +183,7 @@ namespace ServerSite.Tests.Common.Services
                 string testDate = DateTime.UtcNow.ToString().Replace("/", "").Replace(" ", "").Replace(":", "");
                 user.Password = _mockHashFunction.Object.HashString($"Password{testDate}");
 
-                bool updated = MockAPIService.Object.UpdateUser(user);
+                bool updated = await MockAPIService.Object.UpdateUser(user);
 
                 Assert.IsTrue(updated);
             }
@@ -216,7 +216,7 @@ namespace ServerSite.Tests.Common.Services
         }
 
         [TestMethod]
-        public void TestUpdateAlert()
+        public async Task TestUpdateAlert()
         {
             MockAPIService.Object.SetLogger(Logger);
 
@@ -235,7 +235,7 @@ namespace ServerSite.Tests.Common.Services
                     alert.AlertStatus = "Reported";
                 }
 
-                bool updated = MockAPIService.Object.UpdateAlert(alert.Id, alert.AlertStatus);
+                bool updated = await MockAPIService.Object.UpdateAlert(alert.Id, alert.AlertStatus);
 
                 Assert.IsTrue(updated);
             }
@@ -247,16 +247,16 @@ namespace ServerSite.Tests.Common.Services
         }
 
         [TestMethod]
-        public void TestRegisterAlert()
+        public async Task TestRegisterAlert()
         {
             MockAPIService.Object.SetLogger(Logger);
 
-            List<UserModel> users = MockAPIService.Object.GetUsers();
+            List<UserModel> users = await MockAPIService.Object.GetUsers();
             UserModel testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
             {
-                testUser = MockAPIService.Object.GetUserSettings(testUser);
+                testUser = await MockAPIService.Object.GetUserSettings(testUser);
 
                 APINewAlertsModel alert = new()
                 {

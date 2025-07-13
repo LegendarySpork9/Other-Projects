@@ -2,6 +2,7 @@
 
 namespace ServerSite.Tests.Common.Functions
 {
+    // Checks the GetTimerInterval method output with each option.
     [TestClass]
     public class TimerFunctionTest
     {

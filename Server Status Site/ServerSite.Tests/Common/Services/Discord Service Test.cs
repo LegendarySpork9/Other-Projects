@@ -37,6 +37,7 @@ namespace ServerSite.Tests.Common.Services
             }
         }
 
+        // Checks whether the SendNotification method works as expected.
         [TestMethod]
         public void TestSendNotification()
         {
