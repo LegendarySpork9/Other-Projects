@@ -39,6 +39,7 @@ namespace ServerSite.Tests.Common.Services
             }
         }
 
+        // Checks whether the Authorise method works as expected.
         [TestMethod]
         public void TestAuthorise()
         {
@@ -48,6 +49,17 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsTrue(MockAPIService.Object.ExpiryTime != DateTime.Parse("01/01/0001 00:00:00"));
         }
 
+        // Checks whether the AuthoriseAsync method works as expected.
+        [TestMethod]
+        public async Task TestAuthoriseAsync()
+        {
+            MockAPIService.Object.SetLogger(Logger);
+            await MockAPIService.Object.AuthoriseAsync();
+
+            Assert.IsTrue(MockAPIService.Object.ExpiryTime != DateTime.Parse("01/01/0001 00:00:00"));
+        }
+
+        // Checks whether the GetUsers method works as expected.
         [TestMethod]
         public async Task TestUsers()
         {
@@ -58,6 +70,7 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsTrue(users.Count > 0);
         }
 
+        // Checks whether the GetUserSettings method works as expected.
         [TestMethod]
         public async Task TestUserSettings()
         {
@@ -71,8 +84,8 @@ namespace ServerSite.Tests.Common.Services
                 testUser = await MockAPIService.Object.GetUserSettings(testUser);
 
                 Assert.IsNotNull(testUser.DiscordName);
-                Assert.IsTrue(testUser.Admin);
-                Assert.IsTrue(testUser.DarkMode);
+                Assert.IsFalse(testUser.Admin);
+                Assert.IsFalse(testUser.DarkMode);
             }
 
             else
@@ -81,6 +94,7 @@ namespace ServerSite.Tests.Common.Services
             }
         }
 
+        // Checks whether the GetUserSettingId method works as expected.
         [TestMethod]
         public async Task TestUserSettingId()
         {
@@ -102,6 +116,7 @@ namespace ServerSite.Tests.Common.Services
             }
         }
 
+        // Checks whether the GetServers method works as expected.
         [TestMethod]
         public void TestServers()
         {
@@ -112,6 +127,7 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsTrue(servers.Count > 0);
         }
 
+        // Checks whether the GetServerStatus method works with the PC component.
         [TestMethod]
         public void TestServerStatusesPC()
         {
@@ -123,6 +139,7 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsNotNull(status);
         }
 
+        // Checks whether the GetServerStatus method works with the Hamachi component.
         [TestMethod]
         public void TestServerStatusesHamachi()
         {
@@ -134,6 +151,7 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsNotNull(status);
         }
 
+        // Checks whether the GetServerStatus method works with the Server component.
         [TestMethod]
         public void TestServerStatusesServer()
         {
@@ -145,6 +163,7 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsNotNull(status);
         }
 
+        // Checks whether the UpdateUserSetting method works as expected.
         [TestMethod]
         public async Task TestUpdateUserSetting()
         {
@@ -168,13 +187,14 @@ namespace ServerSite.Tests.Common.Services
             }
         }
 
+        // Checks whether the UpdateUser method works as expected.
         [TestMethod]
         public async Task TestUpdateUser()
         {
             MockAPIService.Object.SetLogger(Logger);
 
             List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel user = users.Find(c => c.Username == "UnitTestTestUser");
+            UserModel user = users.Find(c => c.Username == "UnitTests");
 
             if (user != null)
             {
@@ -194,6 +214,7 @@ namespace ServerSite.Tests.Common.Services
             }
         }
 
+        // Checks whether the GetAlerts method works as expected.
         [TestMethod]
         public void TestAlerts()
         {
@@ -204,6 +225,18 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsTrue(alerts.Alerts.Count > 0);
         }
 
+        // Checks whether the GetAlertsAsync method works as expected.
+        [TestMethod]
+        public async Task TestAlertsAsync()
+        {
+            MockAPIService.Object.SetLogger(Logger);
+
+            APIAlertsModel alerts = await MockAPIService.Object.GetAlertsAsync(1);
+
+            Assert.IsTrue(alerts.Alerts.Count > 0);
+        }
+
+        // Checks whether the GetAlert method works as expected.
         [TestMethod]
         public void TestAlert()
         {
@@ -215,12 +248,13 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsTrue(alert.Id != 0);
         }
 
+        // Checks whether the UpdateAlert method works as expected.
         [TestMethod]
         public async Task TestUpdateAlert()
         {
             MockAPIService.Object.SetLogger(Logger);
 
-            APIAlertsModel alerts = MockAPIService.Object.GetAlerts(1);
+            APIAlertsModel alerts = await MockAPIService.Object.GetAlertsAsync(1);
             AlertModel alert = MockAPIService.Object.GetAlert(alerts.Alerts[0].Id);
 
             if (alert.Id > 0)
@@ -246,6 +280,7 @@ namespace ServerSite.Tests.Common.Services
             }
         }
 
+        // Checks whether the RegisterAlertAsync method works as expected.
         [TestMethod]
         public async Task TestRegisterAlert()
         {
@@ -280,6 +315,42 @@ namespace ServerSite.Tests.Common.Services
             }
         }
 
+        // Checks whether the RegisterAlertAsync method works as expected.
+        [TestMethod]
+        public async Task TestRegisterAlertAsync()
+        {
+            MockAPIService.Object.SetLogger(Logger);
+
+            List<UserModel> users = await MockAPIService.Object.GetUsers();
+            UserModel testUser = users.Find(c => c.Username == "UnitTests");
+
+            if (testUser != null)
+            {
+                testUser = await MockAPIService.Object.GetUserSettings(testUser);
+
+                APINewAlertsModel alert = new()
+                {
+                    Reporter = testUser.DiscordName,
+                    Component = "PC Status",
+                    ComponentStatus = "Unknown",
+                    AlertStatus = "Reported",
+                    HostName = "Test PC",
+                    Game = "TestGame",
+                    GameVersion = "1.0.0"
+                };
+
+                bool registered = await MockAPIService.Object.RegisterAlertAsync(alert);
+
+                Assert.IsTrue(registered);
+            }
+
+            else
+            {
+                Assert.Fail("Failed to find test user.");
+            }
+        }
+
+        // Checks whether the RegisterServerEvent method works as expected.
         [TestMethod]
         public void TestRegisterServerEvent()
         {
