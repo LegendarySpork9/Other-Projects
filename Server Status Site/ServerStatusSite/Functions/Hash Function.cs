@@ -8,7 +8,7 @@ namespace ServerStatusSite.Functions
         // Converts the given string to its hashed value.
         public string HashString(string value)
         {
-            string hashString = null;
+            string hashString = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(value))
             {

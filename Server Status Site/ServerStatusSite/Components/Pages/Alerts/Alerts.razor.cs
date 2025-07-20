@@ -24,7 +24,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         [Inject]
         private UserModel User { get; set; }
         private APIAlertsModel ReportedAlerts = new();
-        private Timer RefreshTimer { get; set; }
+        private Timer RefreshTimer { get; set; } = new();
         private DateTime NextElapse;
         private int PageNumber = 1;
 
@@ -51,7 +51,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         }
 
         // Returns the CSS to change the page to dark mode.
-        private string GetStyle(string component = null)
+        private string GetStyle(string? component = null)
         {
             StyleConverter _styleConverter = new();
 
@@ -94,7 +94,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         }
 
         // Loads the alerts from the API.
-        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        private void TimerElapsed(object? sender, ElapsedEventArgs e)
         {
             NextElapse = NextElapse.AddMinutes(SharedSettings.RefreshTime);
             ReportedAlerts = APIService.GetAlerts(PageNumber);

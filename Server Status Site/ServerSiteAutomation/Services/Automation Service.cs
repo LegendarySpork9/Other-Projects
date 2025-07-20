@@ -61,7 +61,7 @@ namespace ServerSiteAutomation.Services
         }
 
         // Performs a run then restarts the timer.
-        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        private void TimerElapsed(object? sender, ElapsedEventArgs e)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
@@ -90,19 +90,19 @@ namespace ServerSiteAutomation.Services
             {
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking Status for {server.HostName} - {server.Game} ({server.GameVersion})");
 
-                APIStatusModel pcStatus = pcStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
-                APIStatusModel hamachiStatus = hamachiStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
-                APIStatusModel serverStatus = serverStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
+                APIStatusModel? pcStatus = pcStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
+                APIStatusModel? hamachiStatus = hamachiStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
+                APIStatusModel? serverStatus = serverStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
 
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current PC Status: {pcStatus.Status}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Hamachi Status: {hamachiStatus.Status}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Server Status: {serverStatus.Status}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current PC Status: {pcStatus?.Status ?? StandardValues.MissingValues.Status}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Hamachi Status: {hamachiStatus?.Status ?? StandardValues.MissingValues.Status}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Server Status: {serverStatus?.Status ?? StandardValues.MissingValues.Status}");
 
                 DateTime refreshPeriod = DateTime.UtcNow.AddMinutes(-SharedSettings.RefreshTime);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Period: {refreshPeriod}");
 
-                if (pcStatus.DateOccured < refreshPeriod)
+                if (pcStatus != null && pcStatus.DateOccured < refreshPeriod)
                 {
                     if (server.Statuses[0].Status == "Online")
                     {
@@ -131,7 +131,7 @@ namespace ServerSiteAutomation.Services
                     }
                 }
 
-                if (hamachiStatus.DateOccured < refreshPeriod)
+                if (hamachiStatus != null && hamachiStatus.DateOccured < refreshPeriod)
                 {
                     if (server.Statuses[1].Status == "Online")
                     {
@@ -160,7 +160,7 @@ namespace ServerSiteAutomation.Services
                     }
                 }
 
-                if (serverStatus.DateOccured < refreshPeriod)
+                if (serverStatus != null && serverStatus.DateOccured < refreshPeriod)
                 {
                     if (server.Statuses[2].Status == "Online")
                     {
@@ -196,12 +196,12 @@ namespace ServerSiteAutomation.Services
         }
 
         // Raises an alert if an unresolved one is not found.
-        private void AlertsHandler(List<AlertModel> alertData, ServerModel server, string component)
+        private void AlertsHandler(List<AlertModel> alerts, ServerModel server, string component)
         {
             DiscordService _discordService = new(SharedSettings);
             _discordService.SetLogger(Logger);
 
-            foreach (AlertModel alert in alertData)
+            foreach (AlertModel alert in alerts)
             {
                 if (alert.Server == $"{server.Game} ({server.GameVersion})" && alert.Component == component)
                 {

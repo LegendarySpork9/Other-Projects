@@ -82,7 +82,7 @@ namespace ServerSiteReporter.Services
         }
 
         // Performs a run then restarts the timer.
-        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        private void TimerElapsed(object? sender, ElapsedEventArgs e)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
@@ -108,9 +108,9 @@ namespace ServerSiteReporter.Services
                 string[] gameParts = game.Split('_');
                 gameParts[1] = gameParts[1].Replace("(", "").Replace(")", "");
 
-                ServerModel server = servers.Find(c => c.HostName == AppSettingsModel.HostName && c.Game == gameParts[0] && c.GameVersion == gameParts[1]);
+                ServerModel? server = servers.Find(c => c.HostName == AppSettingsModel.HostName && c.Game == gameParts[0] && c.GameVersion == gameParts[1]);
 
-                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Registering Events for {server.HostName} - {server.Game} ({server.GameVersion})");
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Registering Events for {server.HostName ?? StandardValues.MissingValues.HostName} - {server.Game ?? StandardValues.MissingValues.Game} ({server.GameVersion ?? StandardValues.MissingValues.GameVersion})");
 
                 foreach (string component in AppSettingsModel.Components)
                 {
@@ -124,9 +124,9 @@ namespace ServerSiteReporter.Services
                             Status = "Online",
                             Server = new APIRelatedServerModel
                             {
-                                HostName = server.HostName,
-                                Game = server.Game,
-                                GameVersion = server.GameVersion
+                                HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                Game = server.Game ?? StandardValues.MissingValues.Game,
+                                GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
                             }
                         };
 
@@ -150,9 +150,9 @@ namespace ServerSiteReporter.Services
                                 Status = "Online",
                                 Server = new APIRelatedServerModel
                                 {
-                                    HostName = server.HostName,
-                                    Game = server.Game,
-                                    GameVersion = server.GameVersion
+                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
                                 }
                             };
 
@@ -170,9 +170,9 @@ namespace ServerSiteReporter.Services
                                 Status = "Offline",
                                 Server = new APIRelatedServerModel
                                 {
-                                    HostName = server.HostName,
-                                    Game = server.Game,
-                                    GameVersion = server.GameVersion
+                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
                                 }
                             };
 
@@ -190,9 +190,9 @@ namespace ServerSiteReporter.Services
                                 Status = "Unknown",
                                 Server = new APIRelatedServerModel
                                 {
-                                    HostName = server.HostName,
-                                    Game = server.Game,
-                                    GameVersion = server.GameVersion
+                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
                                 }
                             };
 
@@ -213,9 +213,9 @@ namespace ServerSiteReporter.Services
                                 Status = "Online",
                                 Server = new APIRelatedServerModel
                                 {
-                                    HostName = server.HostName,
-                                    Game = server.Game,
-                                    GameVersion = server.GameVersion
+                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
                                 }
                             };
 
@@ -233,9 +233,9 @@ namespace ServerSiteReporter.Services
                                 Status = "Offline",
                                 Server = new APIRelatedServerModel
                                 {
-                                    HostName = server.HostName,
-                                    Game = server.Game,
-                                    GameVersion = server.GameVersion
+                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
                                 }
                             };
 

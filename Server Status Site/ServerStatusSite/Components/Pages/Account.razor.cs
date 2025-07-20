@@ -14,9 +14,9 @@ namespace ServerStatusSite.Components.Pages
         private APIService APIService { get; set; }
         [Inject] 
         private UserModel User { get; set; }
-        private string Username { get; set; }
-        private string Password { get; set; }
-        private string DiscordName { get; set; }
+        private string Username { get; set; } = string.Empty;
+        private string Password { get; set; } = string.Empty;
+        private string DiscordName { get; set; } = string.Empty;
         private bool DarkMode { get; set; }
         private bool Loading { get; set; } = false;
 

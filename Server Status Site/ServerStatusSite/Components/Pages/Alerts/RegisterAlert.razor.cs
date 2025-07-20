@@ -22,9 +22,9 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private UserModel User { get; set; }
         private List<ServerModel> Servers = [];
         private List<string> ServersNames = [];
-        private string Server { get; set; }
-        private string Component { get; set; }
-        private string ComponentStatus { get; set; }
+        private string Server { get; set; } = string.Empty;
+        private string Component { get; set; } = string.Empty;
+        private string ComponentStatus { get; set; } = string.Empty;
         private bool ShowError { get; set; } = false;
         private bool Loading { get; set; } = false;
 
@@ -58,7 +58,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private async Task RegisterClick()
         {
             APIAlertsModel alerts = await APIService.GetAlertsAsync(1);
-            AlertModel alert = alerts.Alerts.Find(c => c.Server == Server && c.Component == Component && c.AlertStatus != "Resolved");
+            AlertModel? alert = alerts.Alerts.Find(c => c.Server == Server && c.Component == Component && c.AlertStatus != "Resolved");
 
             if (alert == null)
             {
@@ -68,7 +68,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
                 Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Register");
 
                 string[] gameDetails = Server.Split('(');
-                ServerModel server = Servers.Find(c => c.Game == gameDetails[0].Trim() && c.GameVersion == gameDetails[1].Replace(")", ""));
+                ServerModel? server = Servers.Find(c => c.Game == gameDetails[0].Trim() && c.GameVersion == gameDetails[1].Replace(")", ""));
 
                 APINewAlertsModel newAlert = new()
                 {
@@ -76,9 +76,9 @@ namespace ServerStatusSite.Components.Pages.Alerts
                     Component = Component,
                     ComponentStatus = ComponentStatus,
                     AlertStatus = "Reported",
-                    HostName = server.HostName,
-                    Game = server.Game,
-                    GameVersion = server.GameVersion
+                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
                 };
 
                 if (await APIService.RegisterAlertAsync(newAlert))

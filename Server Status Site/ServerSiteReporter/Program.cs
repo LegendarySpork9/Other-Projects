@@ -11,6 +11,7 @@ namespace ServerSiteReporter
 {
     internal class Program
     {
+        // Configures the application at startup.
         static void Main(string[] args)
         {
             log4net.Config.XmlConfigurator.Configure();

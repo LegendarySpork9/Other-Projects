@@ -77,7 +77,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel testUser = users.Find(c => c.Username == "UnitTests");
+            UserModel? testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
             {
@@ -101,7 +101,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel testUser = users.Find(c => c.Username == "UnitTests");
+            UserModel? testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
             {
@@ -134,7 +134,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<APIStatusModel> statuses = MockAPIService.Object.GetServerStatuses("PC Status");
-            APIStatusModel status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
+            APIStatusModel? status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
 
             Assert.IsNotNull(status);
         }
@@ -146,7 +146,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<APIStatusModel> statuses = MockAPIService.Object.GetServerStatuses("Hamachi Status");
-            APIStatusModel status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
+            APIStatusModel? status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
 
             Assert.IsNotNull(status);
         }
@@ -158,7 +158,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<APIStatusModel> statuses = MockAPIService.Object.GetServerStatuses("Server Status");
-            APIStatusModel status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
+            APIStatusModel? status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
 
             Assert.IsNotNull(status);
         }
@@ -170,7 +170,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel testUser = users.Find(c => c.Username == "UnitTests");
+            UserModel? testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
             {
@@ -194,7 +194,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel user = users.Find(c => c.Username == "UnitTests");
+            UserModel? user = users.Find(c => c.Username == "UnitTests");
 
             if (user != null)
             {
@@ -287,7 +287,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel testUser = users.Find(c => c.Username == "UnitTests");
+            UserModel? testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
             {
@@ -322,7 +322,7 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel testUser = users.Find(c => c.Username == "UnitTests");
+            UserModel? testUser = users.Find(c => c.Username == "UnitTests");
 
             if (testUser != null)
             {

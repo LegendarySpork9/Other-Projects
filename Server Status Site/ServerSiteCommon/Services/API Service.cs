@@ -36,7 +36,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Authorisation:")).Replace("Authorisation:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Authorisation:"))?.Replace("Authorisation:", "") ?? StandardValues.MissingValues.AuthEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint;
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -64,13 +64,13 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JObject responseContent = JObject.Parse(response.Content);
-                    BearerToken = responseContent.Property("token").Value.ToString();
+                    JObject responseContent = JObject.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
+                    BearerToken = responseContent.Property("token")?.Value.ToString() ?? StandardValues.MissingValues.BearerToken;
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {BearerToken}");
 
-                    JObject infoContent = JObject.Parse(responseContent.Property("info").Value.ToString());
-                    ExpiryTime = DateTime.Parse(infoContent.Property("expires").Value.ToString());
+                    JObject infoContent = JObject.Parse(responseContent.Property("info")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
+                    ExpiryTime = DateTime.Parse(infoContent.Property("expires")?.Value.ToString() ?? StandardValues.MissingValues.DT);
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Expiry Time: {ExpiryTime}");
                 }
@@ -92,7 +92,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Authorisation:")).Replace("Authorisation:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Authorisation:"))?.Replace("Authorisation:", "") ?? StandardValues.MissingValues.AuthEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint;
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -120,13 +120,13 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JObject responseContent = JObject.Parse(response.Content);
-                    BearerToken = responseContent.Property("token").Value.ToString();
+                    JObject responseContent = JObject.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
+                    BearerToken = responseContent.Property("token")?.Value.ToString() ?? StandardValues.MissingValues.BearerToken;
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {BearerToken}");
 
-                    JObject infoContent = JObject.Parse(responseContent.Property("info").Value.ToString());
-                    ExpiryTime = DateTime.Parse(infoContent.Property("expires").Value.ToString());
+                    JObject infoContent = JObject.Parse(responseContent.Property("info")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
+                    ExpiryTime = DateTime.Parse(infoContent.Property("expires")?.Value.ToString() ?? StandardValues.MissingValues.DT);
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Expiry Time: {ExpiryTime}");
                 }
@@ -155,7 +155,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Users:")).Replace("Users:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Users:"))?.Replace("Users:", "") ?? StandardValues.MissingValues.UserEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint;
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -180,7 +180,7 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JArray responseContent = JArray.Parse(response.Content);
+                    JArray responseContent = JArray.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Users Returned: {responseContent.Count}");
 
@@ -188,14 +188,14 @@ namespace ServerSiteCommon.Services
                     {
                         users.Add(new UserModel()
                         {
-                            UserId = int.Parse(user.Property("id").Value.ToString()),
-                            Username = user.Property("username").Value.ToString(),
-                            Password = user.Property("password").Value.ToString()
+                            UserId = int.Parse(user.Property("id")?.Value.ToString() ?? StandardValues.MissingValues.Integer),
+                            Username = user.Property("username")?.Value.ToString() ?? StandardValues.MissingValues.Username,
+                            Password = user.Property("password")?.Value.ToString() ?? StandardValues.MissingValues.Password
                         });
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Id: {user.Property("id").Value}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Username: {user.Property("username").Value}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Password: {user.Property("password").Value}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Id: {users[^1].UserId}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Username: {users[^1].Username}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Password: {users[^1].Password}");
                     }
 
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched users from API");
@@ -243,7 +243,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Settings:")).Replace("Settings:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Settings:"))?.Replace("Settings:", "") ?? StandardValues.MissingValues.SettingsEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + @$"/{user.UserId}?application=Server Status Site";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -268,32 +268,32 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JArray responseContent = JArray.Parse(response.Content);
-                    JArray settingsContent = JArray.Parse(JObject.Parse(responseContent[0].ToString()).Property("settings").Value.ToString());
+                    JArray responseContent = JArray.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
+                    JArray settingsContent = JArray.Parse(JObject.Parse(responseContent[0].ToString()).Property("settings")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Settings Returned: {settingsContent.Count}");
 
                     foreach (JObject setting in settingsContent)
                     {
-                        if (setting.Property("name").Value.ToString() == "DiscordName")
+                        if (setting.Property("name")?.Value.ToString() == "DiscordName")
                         {
-                            user.DiscordName = setting.Property("value").Value.ToString();
+                            user.DiscordName = setting.Property("value")?.Value.ToString() ?? StandardValues.MissingValues.SettingStringValue;
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Discord: {setting.Property("value").Value}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Discord: {user.DiscordName}");
                         }
 
-                        if (setting.Property("name").Value.ToString() == "IsAdmin")
+                        if (setting.Property("name")?.Value.ToString() == "IsAdmin")
                         {
-                            user.Admin = bool.Parse(setting.Property("value").Value.ToString());
+                            user.Admin = bool.Parse(setting.Property("value")?.Value.ToString() ?? StandardValues.MissingValues.SettingBoolValue);
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Admin: {setting.Property("value").Value}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Admin: {user.Admin}");
                         }
 
-                        if (setting.Property("name").Value.ToString() == "DarkMode")
+                        if (setting.Property("name")?.Value.ToString() == "DarkMode")
                         {
-                            user.DarkMode = bool.Parse(setting.Property("value").Value.ToString());
+                            user.DarkMode = bool.Parse(setting.Property("value")?.Value.ToString() ?? StandardValues.MissingValues.SettingBoolValue);
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Dark Mode: {setting.Property("value").Value}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Dark Mode: {user.DarkMode}");
                         }
                     }
 
@@ -344,7 +344,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Settings:")).Replace("Settings:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Settings:"))?.Replace("Settings:", "") ?? StandardValues.MissingValues.SettingsEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + @$"/{userId}?application=Server Status Site";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -369,16 +369,16 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JArray responseContent = JArray.Parse(response.Content);
-                    JArray settingsContent = JArray.Parse(JObject.Parse(responseContent[0].ToString()).Property("settings").Value.ToString());
+                    JArray responseContent = JArray.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
+                    JArray settingsContent = JArray.Parse(JObject.Parse(responseContent[0].ToString()).Property("settings")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Settings Returned: {settingsContent.Count}");
 
                     foreach (JObject setting in settingsContent)
                     {
-                        if (setting.Property("name").Value.ToString() == settingName)
+                        if (setting.Property("name")?.Value.ToString() == settingName)
                         {
-                            userSettingId = int.Parse(setting.Property("id").Value.ToString());
+                            userSettingId = int.Parse(setting.Property("id")?.Value.ToString() ?? StandardValues.MissingValues.Integer);
 
                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Setting Id: {userSettingId}");
                         }
@@ -433,7 +433,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Servers:")).Replace("Servers:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Servers:"))?.Replace("Servers:", "") ?? StandardValues.MissingValues.ServerEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + "?IsActive=true";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -458,7 +458,7 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    if (!response.Content.Contains("No data returned by given parameters."))
+                    if (!string.IsNullOrWhiteSpace(response.Content) && !response.Content.Contains("No data returned by given parameters."))
                     {
                         JArray responseContent = JArray.Parse(response.Content);
 
@@ -470,14 +470,14 @@ namespace ServerSiteCommon.Services
 
                         foreach (JObject server in responseContent)
                         {
-                            string hostName = server.Property("hostName").Value.ToString();
-                            string game = server.Property("game").Value.ToString();
-                            string gameVersion = server.Property("gameVersion").Value.ToString();
-                            string ipAddress = server.Property("ipAddress").Value.ToString();
+                            string hostName = server.Property("hostName")?.Value.ToString() ?? StandardValues.MissingValues.HostName;
+                            string game = server.Property("game")?.Value.ToString() ?? StandardValues.MissingValues.Game;
+                            string gameVersion = server.Property("gameVersion")?.Value.ToString() ?? StandardValues.MissingValues.GameVersion;
+                            string ipAddress = server.Property("ipAddress")?.Value.ToString() ?? StandardValues.MissingValues.IpAddress;
 
-                            APIStatusModel pcStatus = pcStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
-                            APIStatusModel hamachiStatus = hamachiStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
-                            APIStatusModel serverStatus = serverStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
+                            APIStatusModel? pcStatus = pcStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
+                            APIStatusModel? hamachiStatus = hamachiStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
+                            APIStatusModel? serverStatus = serverStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
 
                             if (pcStatus != null && hamachiStatus != null && serverStatus != null)
                             {
@@ -505,14 +505,14 @@ namespace ServerSiteCommon.Services
                                     HostName = hostName,
                                     Game = game,
                                     GameVersion = gameVersion,
-                                    IPAddress = server.Property("ipAddress").Value.ToString(),
+                                    IPAddress = ipAddress,
                                     Statuses = statuses
                                 });
 
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {hostName}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game: {game}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {gameVersion}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.Property("ipAddress").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {ipAddress}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status: {statuses[0].Status}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status Class: {statuses[0].StatusClass}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hamachi Status: {statuses[1].Status}");
@@ -570,7 +570,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Statuses:")).Replace("Statuses:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Statuses:"))?.Replace("Statuses:", "") ?? StandardValues.MissingValues.StatusEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + $"?Component={component}";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -595,33 +595,33 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JArray responseContent = JArray.Parse(response.Content);
+                    JArray responseContent = JArray.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Statuses Returned: {responseContent.Count}");
 
                     foreach (JObject status in responseContent)
                     {
-                        JObject server = JObject.Parse(status.Property("server").Value.ToString());
+                        JObject server = JObject.Parse(status.Property("server")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
 
                         statuses.Add(new APIStatusModel()
                         {
-                            Component = status.Property("component").Value.ToString(),
-                            Status = status.Property("status").Value.ToString(),
-                            DateOccured = DateTime.Parse(status.Property("dateOccured").Value.ToString()),
+                            Component = status.Property("component")?.Value.ToString() ?? StandardValues.MissingValues.Component,
+                            Status = status.Property("status")?.Value.ToString() ?? StandardValues.MissingValues.Status,
+                            DateOccured = DateTime.Parse(status.Property("dateOccured")?.Value.ToString() ?? StandardValues.MissingValues.DT),
                             Server = new APIRelatedServerModel()
                             {
-                                HostName = server.Property("hostName").Value.ToString(),
-                                Game = server.Property("game").Value.ToString(),
-                                GameVersion = server.Property("gameVersion").Value.ToString()
+                                HostName = server.Property("hostName")?.Value.ToString() ?? StandardValues.MissingValues.HostName,
+                                Game = server.Property("game")?.Value.ToString() ?? StandardValues.MissingValues.Game,
+                                GameVersion = server.Property("gameVersion")?.Value.ToString() ?? StandardValues.MissingValues.GameVersion
                             }
                         });
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {status.Property("component").Value}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Status: {status.Property("status").Value}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {status.Property("dateOccured").Value}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {server.Property("hostName").Value}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game: {server.Property("game").Value}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {server.Property("gameVersion").Value}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {statuses[^1].Component}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Status: {statuses[^1].Status}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {statuses[^1].DateOccured}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {statuses[^1].Server.HostName}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game: {statuses[^1].Server.Game}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {statuses[^1].Server.GameVersion}");
                     }
 
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched server statuses from API");
@@ -671,7 +671,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Settings:")).Replace("Settings:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Settings:"))?.Replace("Settings:", "") ?? StandardValues.MissingValues.SettingsEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + @$"/{userSettingsId}";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -752,7 +752,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Users:")).Replace("Users:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Users:"))?.Replace("Users:", "") ?? StandardValues.MissingValues.UserEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + @$"/{user.UserId}";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -834,7 +834,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:")).Replace("Alerts:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:"))?.Replace("Alerts:", "") ?? StandardValues.MissingValues.AlertEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + $"?PageNumber={pageNumber}";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -859,10 +859,10 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    if (!response.Content.Contains("No data returned by given parameters."))
+                    if (!string.IsNullOrWhiteSpace(response.Content) && !response.Content.Contains("No data returned by given parameters."))
                     {
                         JObject responseContent = JObject.Parse(response.Content);
-                        JArray alertsContent = JArray.Parse(responseContent.Property("entries").Value.ToString());
+                        JArray alertsContent = JArray.Parse(responseContent.Property("entries")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
 
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alerts Returned: {alertsContent.Count}");
 
@@ -870,32 +870,32 @@ namespace ServerSiteCommon.Services
                         {
                             foreach (JObject alert in alertsContent)
                             {
-                                JObject server = JObject.Parse(alert.Property("server").Value.ToString());
+                                JObject server = JObject.Parse(alert.Property("server")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
 
                                 alerts.Alerts.Add(new AlertModel
                                 {
-                                    Id = int.Parse(alert.Property("alertId").Value.ToString()),
-                                    Occured = DateTime.Parse(alert.Property("alertDate").Value.ToString()),
-                                    Server = $"{server.Property("game").Value} ({server.Property("gameVersion").Value})",
-                                    Reporter = alert.Property("reporter").Value.ToString(),
-                                    Component = alert.Property("component").Value.ToString(),
-                                    ComponentStatus = alert.Property("componentStatus").Value.ToString(),
-                                    AlertStatus = alert.Property("alertStatus").Value.ToString()
+                                    Id = int.Parse(alert.Property("alertId")?.Value.ToString() ?? StandardValues.MissingValues.Integer),
+                                    Occured = DateTime.Parse(alert.Property("alertDate")?.Value.ToString() ?? StandardValues.MissingValues.DT),
+                                    Server = $"{server.Property("game")?.Value ?? StandardValues.MissingValues.Game} ({server.Property("gameVersion")?.Value ?? StandardValues.MissingValues.GameVersion})",
+                                    Reporter = alert.Property("reporter")?.Value.ToString() ?? StandardValues.MissingValues.Reporter,
+                                    Component = alert.Property("component")?.Value.ToString() ?? StandardValues.MissingValues.Component,
+                                    ComponentStatus = alert.Property("componentStatus")?.Value.ToString() ?? StandardValues.MissingValues.Status,
+                                    AlertStatus = alert.Property("alertStatus")?.Value.ToString() ?? StandardValues.MissingValues.AlertStatus
                                 });
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alert.Property("alertId").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alert.Property("alertDate").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {server.Property("game").Value} ({server.Property("gameVersion").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alert.Property("reporter").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alert.Property("component").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alert.Property("componentStatus").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alert.Property("alertStatus").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alerts.Alerts[^1].Id}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alerts.Alerts[^1].Occured}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {alerts.Alerts[^1].Server}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alerts.Alerts[^1].Reporter}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alerts.Alerts[^1].Component}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alerts.Alerts[^1].ComponentStatus}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alerts.Alerts[^1].AlertStatus}");
                             }
 
-                            if (int.Parse(responseContent.Property("totalPageCount").Value.ToString()) > 1)
+                            if (int.Parse(responseContent.Property("totalPageCount")?.Value.ToString() ?? StandardValues.MissingValues.Integer) > 1)
                             {
                                 alerts.MultiplePages = true;
-                                alerts.PageCount = int.Parse(responseContent.Property("totalPageCount").Value.ToString());
+                                alerts.PageCount = int.Parse(responseContent.Property("totalPageCount")?.Value.ToString() ?? StandardValues.MissingValues.Integer);
 
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Multiple Pages: {alerts.MultiplePages}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page Count: {alerts.PageCount}");
@@ -952,7 +952,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:")).Replace("Alerts:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:"))?.Replace("Alerts:", "") ?? StandardValues.MissingValues.AlertEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + $"?PageNumber={pageNumber}";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -977,10 +977,10 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    if (!response.Content.Contains("No data returned by given parameters."))
+                    if (!string.IsNullOrWhiteSpace(response.Content) && !response.Content.Contains("No data returned by given parameters."))
                     {
                         JObject responseContent = JObject.Parse(response.Content);
-                        JArray alertsContent = JArray.Parse(responseContent.Property("entries").Value.ToString());
+                        JArray alertsContent = JArray.Parse(responseContent.Property("entries")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
 
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alerts Returned: {alertsContent.Count}");
 
@@ -988,32 +988,32 @@ namespace ServerSiteCommon.Services
                         {
                             foreach (JObject alert in alertsContent)
                             {
-                                JObject server = JObject.Parse(alert.Property("server").Value.ToString());
+                                JObject server = JObject.Parse(alert.Property("server")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
 
                                 alerts.Alerts.Add(new AlertModel
                                 {
-                                    Id = int.Parse(alert.Property("alertId").Value.ToString()),
-                                    Occured = DateTime.Parse(alert.Property("alertDate").Value.ToString()),
-                                    Server = $"{server.Property("game").Value} ({server.Property("gameVersion").Value})",
-                                    Reporter = alert.Property("reporter").Value.ToString(),
-                                    Component = alert.Property("component").Value.ToString(),
-                                    ComponentStatus = alert.Property("componentStatus").Value.ToString(),
-                                    AlertStatus = alert.Property("alertStatus").Value.ToString()
+                                    Id = int.Parse(alert.Property("alertId")?.Value.ToString() ?? StandardValues.MissingValues.Integer),
+                                    Occured = DateTime.Parse(alert.Property("alertDate")?.Value.ToString() ?? StandardValues.MissingValues.DT),
+                                    Server = $"{server.Property("game")?.Value ?? StandardValues.MissingValues.Game} ({server.Property("gameVersion")?.Value ?? StandardValues.MissingValues.GameVersion})",
+                                    Reporter = alert.Property("reporter")?.Value.ToString() ?? StandardValues.MissingValues.Reporter,
+                                    Component = alert.Property("component")?.Value.ToString() ?? StandardValues.MissingValues.Component,
+                                    ComponentStatus = alert.Property("componentStatus")?.Value.ToString() ?? StandardValues.MissingValues.Status,
+                                    AlertStatus = alert.Property("alertStatus")?.Value.ToString() ?? StandardValues.MissingValues.AlertStatus
                                 });
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alert.Property("alertId").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alert.Property("alertDate").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {server.Property("game").Value} ({server.Property("gameVersion").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alert.Property("reporter").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alert.Property("component").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alert.Property("componentStatus").Value}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alert.Property("alertStatus").Value}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alerts.Alerts[^1].Id}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alerts.Alerts[^1].Occured}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {alerts.Alerts[^1].Server}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alerts.Alerts[^1].Reporter}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alerts.Alerts[^1].Component}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alerts.Alerts[^1].ComponentStatus}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alerts.Alerts[^1].AlertStatus}");
                             }
 
-                            if (int.Parse(responseContent.Property("totalPageCount").Value.ToString()) > 1)
+                            if (int.Parse(responseContent.Property("totalPageCount")?.Value.ToString() ?? StandardValues.MissingValues.Integer) > 1)
                             {
                                 alerts.MultiplePages = true;
-                                alerts.PageCount = int.Parse(responseContent.Property("totalPageCount").Value.ToString());
+                                alerts.PageCount = int.Parse(responseContent.Property("totalPageCount")?.Value.ToString() ?? StandardValues.MissingValues.Integer);
 
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Multiple Pages: {alerts.MultiplePages}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page Count: {alerts.PageCount}");
@@ -1070,7 +1070,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:")).Replace("Alerts:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:"))?.Replace("Alerts:", "") ?? StandardValues.MissingValues.AlertEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + @$"/{alertId}";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -1095,27 +1095,27 @@ namespace ServerSiteCommon.Services
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    JObject responseContent = JObject.Parse(response.Content);
-                    JObject server = JObject.Parse(responseContent.Property("server").Value.ToString());
+                    JObject responseContent = JObject.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
+                    JObject server = JObject.Parse(responseContent.Property("server")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
 
                     alert = new AlertModel
                     {
-                        Id = int.Parse(responseContent.Property("alertId").Value.ToString()),
-                        Occured = DateTime.Parse(responseContent.Property("alertDate").Value.ToString()),
-                        Server = $"{server.Property("game").Value} ({server.Property("gameVersion").Value})",
-                        Reporter = responseContent.Property("reporter").Value.ToString(),
-                        Component = responseContent.Property("component").Value.ToString(),
-                        ComponentStatus = responseContent.Property("componentStatus").Value.ToString(),
-                        AlertStatus = responseContent.Property("alertStatus").Value.ToString()
+                        Id = int.Parse(responseContent.Property("alertId")?.Value.ToString() ?? StandardValues.MissingValues.Integer),
+                        Occured = DateTime.Parse(responseContent.Property("alertDate")?.Value.ToString() ?? StandardValues.MissingValues.DT),
+                        Server = $"{server.Property("game")?.Value ?? StandardValues.MissingValues.Game} ({server.Property("gameVersion")?.Value ?? StandardValues.MissingValues.GameVersion})",
+                        Reporter = responseContent.Property("reporter")?.Value.ToString() ?? StandardValues.MissingValues.Reporter,
+                        Component = responseContent.Property("component")?.Value.ToString() ?? StandardValues.MissingValues.Component,
+                        ComponentStatus = responseContent.Property("componentStatus")?.Value.ToString() ?? StandardValues.MissingValues.Status,
+                        AlertStatus = responseContent.Property("alertStatus")?.Value.ToString() ?? StandardValues.MissingValues.AlertStatus
                     };
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {responseContent.Property("alertId").Value}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {responseContent.Property("alertDate").Value}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {server.Property("game").Value} ({server.Property("gameVersion").Value}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {responseContent.Property("reporter").Value}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {responseContent.Property("component").Value}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {responseContent.Property("componentStatus").Value}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {responseContent.Property("alertStatus").Value}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alert.Id}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alert.Occured}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {alert.Server}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alert.Reporter}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alert.Component}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alert.ComponentStatus}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alert.AlertStatus}");
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched alert from API");
                 }
 
@@ -1163,7 +1163,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:")).Replace("Alerts:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:"))?.Replace("Alerts:", "") ?? StandardValues.MissingValues.AlertEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint + @$"/{alertId}";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -1244,7 +1244,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:")).Replace("Alerts:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:"))?.Replace("Alerts:", "") ?? StandardValues.MissingValues.AlertEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint;
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -1331,7 +1331,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:")).Replace("Alerts:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Alerts:"))?.Replace("Alerts:", "") ?? StandardValues.MissingValues.AlertEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint;
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
@@ -1418,7 +1418,7 @@ namespace ServerSiteCommon.Services
 
             try
             {
-                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Statuses:")).Replace("Statuses:", "");
+                string authEndpoint = Array.Find(Endpoints, e => e.StartsWith("Statuses:"))?.Replace("Statuses:", "") ?? StandardValues.MissingValues.StatusEndpoint;
                 string url = SharedSettings.BaseURL + authEndpoint;
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");

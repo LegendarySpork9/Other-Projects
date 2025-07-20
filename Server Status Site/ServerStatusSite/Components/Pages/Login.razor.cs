@@ -36,7 +36,7 @@ namespace ServerStatusSite.Components.Pages
 
                 if (queryParams.TryGetValue("returnUrl", out var returnUrl))
                 {
-                    ReturnUrl = returnUrl;
+                    ReturnUrl = returnUrl.ToString() ?? "/";
 
                     Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Return Url: {ReturnUrl}");
                 }
@@ -59,7 +59,7 @@ namespace ServerStatusSite.Components.Pages
 
             await APIService.AuthoriseAsync();
             List<UserModel> users = await APIService.GetUsers();
-            UserModel user = users.Find(c => c.Username == User.Username && c.Password == _hasFunction.HashString(User.Password));
+            UserModel? user = users.Find(c => c.Username == User.Username && c.Password == _hasFunction.HashString(User.Password));
 
             if (user != null)
             {

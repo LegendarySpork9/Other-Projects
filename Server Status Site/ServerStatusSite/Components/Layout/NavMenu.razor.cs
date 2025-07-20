@@ -16,7 +16,7 @@ namespace ServerStatusSite.Components.Layout
         }
 
         // Returns the CSS to change the menu to dark mode.
-        private string GetStyle(string component = null)
+        private string GetStyle(string? component = null)
         {
             StyleConverter _styleConverter = new();
 

@@ -19,7 +19,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private NavigationManager Navigation { get; set; }
         [Inject]
         private UserModel User { get; set; }
-        private AlertModel Alert { get; set; }
+        private AlertModel Alert { get; set; } = new();
         private int AlertId { get; set; } = 0;
         private bool Loading { get; set; } = false;
 
@@ -34,7 +34,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
 
             if (queryParams.TryGetValue("alertId", out var alertId))
             {
-                AlertId = int.Parse(alertId);
+                AlertId = int.Parse(alertId.ToString() ?? "0");
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {AlertId}");
             }

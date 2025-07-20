@@ -9,6 +9,7 @@ namespace ServerStatusSite
 {
     public class Program
     {
+        // Configures the application at startup.
         public static void Main(string[] args)
         {
             log4net.Config.XmlConfigurator.Configure(new FileInfo(Path.Combine(AppContext.BaseDirectory, "log4net.config")));

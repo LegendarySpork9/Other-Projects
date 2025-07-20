@@ -21,7 +21,7 @@ namespace ServerStatusSite.Components.Pages
         [Inject]
         private UserModel User { get; set; }
         private List<ServerModel> Servers = [];
-        private Timer RefreshTimer { get; set; }
+        private Timer RefreshTimer { get; set; } = new();
         private DateTime NextElapse;
 
         // Configures the timer and loads the servers from the API.
@@ -55,7 +55,7 @@ namespace ServerStatusSite.Components.Pages
         }
 
         // Loads the servers from the API.
-        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        private void TimerElapsed(object? sender, ElapsedEventArgs e)
         {
             NextElapse = NextElapse.AddMinutes(SharedSettings.RefreshTime);
             Servers = APIService.GetServers();
