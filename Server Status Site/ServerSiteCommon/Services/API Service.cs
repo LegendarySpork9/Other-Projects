@@ -465,8 +465,8 @@ namespace ServerSiteCommon.Services
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Servers Returned: {responseContent.Count}");
 
                         List<APIStatusModel> pcStatuses = GetServerStatuses("PC Status");
-                        List<APIStatusModel> hamachiStatuses = GetServerStatuses("Hamachi Status");
                         List<APIStatusModel> serverStatuses = GetServerStatuses("Server Status");
+                        List<APIStatusModel> connectionStatuses = GetServerStatuses("Hamachi Status");
 
                         foreach (JObject server in responseContent)
                         {
@@ -474,12 +474,13 @@ namespace ServerSiteCommon.Services
                             string game = server.Property("game")?.Value.ToString() ?? StandardValues.MissingValues.Game;
                             string gameVersion = server.Property("gameVersion")?.Value.ToString() ?? StandardValues.MissingValues.GameVersion;
                             string ipAddress = server.Property("ipAddress")?.Value.ToString() ?? StandardValues.MissingValues.IpAddress;
+                            int port = int.Parse(server.Property("port")?.Value.ToString() ?? StandardValues.MissingValues.Port);
 
                             APIStatusModel? pcStatus = pcStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
-                            APIStatusModel? hamachiStatus = hamachiStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
                             APIStatusModel? serverStatus = serverStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
+                            APIStatusModel? connectionStatus = connectionStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
 
-                            if (pcStatus != null && hamachiStatus != null && serverStatus != null)
+                            if (pcStatus != null && serverStatus != null && connectionStatus != null)
                             {
                                 List<StatusModel> statuses = new()
                                 {
@@ -490,13 +491,13 @@ namespace ServerSiteCommon.Services
                                     },
                                     new StatusModel()
                                     {
-                                        Status = hamachiStatus.Status,
-                                        StatusClass = _apiConverter.GetStatusClass(hamachiStatus.Status)
+                                        Status = serverStatus.Status,
+                                        StatusClass = _apiConverter.GetStatusClass(serverStatus.Status)
                                     },
                                     new StatusModel()
                                     {
-                                        Status = serverStatus.Status,
-                                        StatusClass = _apiConverter.GetStatusClass(serverStatus.Status)
+                                        Status = connectionStatus.Status,
+                                        StatusClass = _apiConverter.GetStatusClass(connectionStatus.Status)
                                     }
                                 };
 
@@ -506,6 +507,7 @@ namespace ServerSiteCommon.Services
                                     Game = game,
                                     GameVersion = gameVersion,
                                     IPAddress = ipAddress,
+                                    Port = port,
                                     Statuses = statuses
                                 });
 
@@ -515,10 +517,10 @@ namespace ServerSiteCommon.Services
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {ipAddress}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status: {statuses[0].Status}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status Class: {statuses[0].StatusClass}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hamachi Status: {statuses[1].Status}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hamachi Status Class: {statuses[1].StatusClass}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status: {statuses[2].Status}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status Class: {statuses[2].StatusClass}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status: {statuses[1].Status}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status Class: {statuses[1].StatusClass}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Connection Status: {statuses[2].Status}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Connection Status Class: {statuses[2].StatusClass}");
                             }
                         }
                     }

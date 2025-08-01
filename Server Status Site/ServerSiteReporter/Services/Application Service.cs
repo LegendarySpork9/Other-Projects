@@ -5,8 +5,10 @@ using ServerSiteCommon.Models.API;
 using ServerSiteCommon.Models.Data;
 using ServerSiteCommon.Services;
 using ServerSiteReporter.Models;
-using System.Net.NetworkInformation;
+using System.Net.Http;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Timers;
 using Timer = System.Timers.Timer;
@@ -136,73 +138,6 @@ namespace ServerSiteReporter.Services
                         }
                     }
 
-                    if (component == "Hamachi")
-                    {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.IPAddress}");
-
-                        string pingStatus = PingAddress(server.IPAddress);
-
-                        if (pingStatus == "Success")
-                        {
-                            APIStatusModel newStatus = new()
-                            {
-                                Component = "Hamachi Status",
-                                Status = "Online",
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                    Game = server.Game ?? StandardValues.MissingValues.Game,
-                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                                }
-                            };
-
-                            if (APIService.RegisterServerEvent(newStatus))
-                            {
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
-                            }
-                        }
-
-                        else if (pingStatus == "Failed")
-                        {
-                            APIStatusModel newStatus = new()
-                            {
-                                Component = "Hamachi Status",
-                                Status = "Offline",
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                    Game = server.Game ?? StandardValues.MissingValues.Game,
-                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                                }
-                            };
-
-                            if (APIService.RegisterServerEvent(newStatus))
-                            {
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
-                            }
-                        }
-
-                        else
-                        {
-                            APIStatusModel newStatus = new()
-                            {
-                                Component = "Hamachi Status",
-                                Status = "Unknown",
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                    Game = server.Game ?? StandardValues.MissingValues.Game,
-                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                                }
-                            };
-
-                            if (APIService.RegisterServerEvent(newStatus))
-                            {
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
-                            }
-                        }
-                    }
-
                     if (component == "Server")
                     {
                         if (ServerRunning($"{server.Game} ({server.GameVersion})"))
@@ -245,6 +180,73 @@ namespace ServerSiteReporter.Services
                             }
                         }
                     }
+
+                    if (component == "Connection")
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.IPAddress}");
+
+                        string pingStatus = PingAddress(server.IPAddress, server.Port);
+
+                        if (pingStatus == "Success")
+                        {
+                            APIStatusModel newStatus = new()
+                            {
+                                Component = "Connection Status",
+                                Status = "Online",
+                                Server = new APIRelatedServerModel
+                                {
+                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
+                                }
+                            };
+
+                            if (APIService.RegisterServerEvent(newStatus))
+                            {
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            }
+                        }
+
+                        else if (pingStatus == "Failed")
+                        {
+                            APIStatusModel newStatus = new()
+                            {
+                                Component = "Connection Status",
+                                Status = "Offline",
+                                Server = new APIRelatedServerModel
+                                {
+                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
+                                }
+                            };
+
+                            if (APIService.RegisterServerEvent(newStatus))
+                            {
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            }
+                        }
+
+                        else
+                        {
+                            APIStatusModel newStatus = new()
+                            {
+                                Component = "Connection Status",
+                                Status = "Unknown",
+                                Server = new APIRelatedServerModel
+                                {
+                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
+                                    Game = server.Game ?? StandardValues.MissingValues.Game,
+                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
+                                }
+                            };
+
+                            if (APIService.RegisterServerEvent(newStatus))
+                            {
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            }
+                        }
+                    }
                 }
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Registered Events for {server.HostName} - {server.Game} ({server.GameVersion})");
@@ -254,29 +256,33 @@ namespace ServerSiteReporter.Services
         }
 
         // Tries to ping a given IP address.
-        private string PingAddress(string ipAddress)
+        private string PingAddress(string ipAddress, int port)
         {
             string response = string.Empty;
 
             try
             {
-                Ping pingSender = new();
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Ping Sender");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Pinging Address");
-
-                PingReply reply = pingSender.Send(ipAddress);
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reply Status: {reply.Status}");
-
-                if (reply.Status == IPStatus.Success)
+                using (TcpClient client = new())
                 {
-                    response = "Success";
-                }
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured TCP Client");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Pinging Address");
 
-                else
-                {
-                    response = "Failed";
+                    IAsyncResult result = client.BeginConnect(ipAddress, port, null, null);
+                    bool success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Connection Status: {success}");
+
+                    if (success)
+                    {
+                        response = "Success";
+                    }
+
+                    else
+                    {
+                        response = "Failed";
+                    }
+
+                    client.EndConnect(result);
                 }
             }
 

@@ -21,6 +21,7 @@
             public const string Game = "GameNotFound";
             public const string GameVersion = "GameVersionNotFound";
             public const string IpAddress = "127.0.0.1";
+            public const string Port = "443";
 
             public const string ResponseContent = "\"{\\\"information\\\":\\\"ResponseContentNotFound\\\"}\"";
             public const string RelatedContent = "\"{\\\"information\\\":\\\"RelatedContentNotFound\\\"}\"";

@@ -139,18 +139,6 @@ namespace ServerSite.Tests.Common.Services
             Assert.IsNotNull(status);
         }
 
-        // Checks whether the GetServerStatus method works with the Hamachi component.
-        [TestMethod]
-        public void TestServerStatusesHamachi()
-        {
-            MockAPIService.Object.SetLogger(Logger);
-
-            List<APIStatusModel> statuses = MockAPIService.Object.GetServerStatuses("Hamachi Status");
-            APIStatusModel? status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
-
-            Assert.IsNotNull(status);
-        }
-
         // Checks whether the GetServerStatus method works with the Server component.
         [TestMethod]
         public void TestServerStatusesServer()
@@ -158,6 +146,18 @@ namespace ServerSite.Tests.Common.Services
             MockAPIService.Object.SetLogger(Logger);
 
             List<APIStatusModel> statuses = MockAPIService.Object.GetServerStatuses("Server Status");
+            APIStatusModel? status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
+
+            Assert.IsNotNull(status);
+        }
+
+        // Checks whether the GetServerStatus method works with the Connection component.
+        [TestMethod]
+        public void TestServerStatusesConnection()
+        {
+            MockAPIService.Object.SetLogger(Logger);
+
+            List<APIStatusModel> statuses = MockAPIService.Object.GetServerStatuses("Connection Status");
             APIStatusModel? status = statuses.Find(c => c.Server.HostName == "Test PC" && c.Server.Game == "TestGame" && c.Server.GameVersion == "1.0.0");
 
             Assert.IsNotNull(status);

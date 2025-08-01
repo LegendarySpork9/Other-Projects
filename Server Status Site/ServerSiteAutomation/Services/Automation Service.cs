@@ -82,8 +82,8 @@ namespace ServerSiteAutomation.Services
 
             List<ServerModel> servers = APIService.GetServers();
             List<APIStatusModel> pcStatuses = APIService.GetServerStatuses("PC Status");
-            List<APIStatusModel> hamachiStatuses = APIService.GetServerStatuses("Hamachi Status");
             List<APIStatusModel> serverStatuses = APIService.GetServerStatuses("Server Status");
+            List<APIStatusModel> connectionStatuses = APIService.GetServerStatuses("Connection Status");
             APIAlertsModel alerts = APIService.GetAlerts(1);
 
             foreach (ServerModel server in servers)
@@ -91,11 +91,11 @@ namespace ServerSiteAutomation.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking Status for {server.HostName} - {server.Game} ({server.GameVersion})");
 
                 APIStatusModel? pcStatus = pcStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
-                APIStatusModel? hamachiStatus = hamachiStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
                 APIStatusModel? serverStatus = serverStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
+                APIStatusModel? connectionStatus = connectionStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current PC Status: {pcStatus?.Status ?? StandardValues.MissingValues.Status}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Hamachi Status: {hamachiStatus?.Status ?? StandardValues.MissingValues.Status}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Connection Status: {connectionStatus?.Status ?? StandardValues.MissingValues.Status}");
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Server Status: {serverStatus?.Status ?? StandardValues.MissingValues.Status}");
 
                 DateTime refreshPeriod = DateTime.UtcNow.AddMinutes(-SharedSettings.RefreshTime);
@@ -131,20 +131,20 @@ namespace ServerSiteAutomation.Services
                     }
                 }
 
-                if (hamachiStatus != null && hamachiStatus.DateOccured < refreshPeriod)
+                if (serverStatus != null && serverStatus.DateOccured < refreshPeriod)
                 {
                     if (server.Statuses[1].Status == "Online")
                     {
                         server.Statuses[1].Status = "Unknown";
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Hamachi Status to Unknown");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Server Status to Unknown");
                     }
 
-                    AlertsHandler(alerts.Alerts, server, hamachiStatus.Component);
+                    AlertsHandler(alerts.Alerts, server, serverStatus.Component);
 
                     APIStatusModel newStatus = new()
                     {
-                        Component = hamachiStatus.Component,
+                        Component = serverStatus.Component,
                         Status = server.Statuses[1].Status,
                         Server = new APIRelatedServerModel
                         {
@@ -160,20 +160,20 @@ namespace ServerSiteAutomation.Services
                     }
                 }
 
-                if (serverStatus != null && serverStatus.DateOccured < refreshPeriod)
+                if (connectionStatus != null && connectionStatus.DateOccured < refreshPeriod)
                 {
                     if (server.Statuses[2].Status == "Online")
                     {
                         server.Statuses[2].Status = "Unknown";
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Server Status to Unknown");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Connection Status to Unknown");
                     }
 
-                    AlertsHandler(alerts.Alerts, server, serverStatus.Component);
+                    AlertsHandler(alerts.Alerts, server, connectionStatus.Component);
 
                     APIStatusModel newStatus = new()
                     {
-                        Component = serverStatus.Component,
+                        Component = connectionStatus.Component,
                         Status = server.Statuses[2].Status,
                         Server = new APIRelatedServerModel
                         {
