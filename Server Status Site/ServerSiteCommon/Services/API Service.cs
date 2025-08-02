@@ -466,7 +466,7 @@ namespace ServerSiteCommon.Services
 
                         List<APIStatusModel> pcStatuses = GetServerStatuses("PC Status");
                         List<APIStatusModel> serverStatuses = GetServerStatuses("Server Status");
-                        List<APIStatusModel> connectionStatuses = GetServerStatuses("Hamachi Status");
+                        List<APIStatusModel> connectionStatuses = GetServerStatuses("Connection Status");
 
                         foreach (JObject server in responseContent)
                         {
