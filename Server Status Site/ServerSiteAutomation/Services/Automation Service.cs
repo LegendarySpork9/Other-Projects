@@ -102,90 +102,99 @@ namespace ServerSiteAutomation.Services
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Period: {refreshPeriod}");
 
-                if (pcStatus != null && pcStatus.DateOccured < refreshPeriod)
+                if (pcStatus != null && (pcStatus.DateOccured < refreshPeriod || server.Statuses[0].Status != "Online"))
                 {
-                    if (server.Statuses[0].Status == "Online")
+                    if (server.Statuses[0].Status == "Online" || pcStatus.DateOccured < refreshPeriod)
                     {
                         server.Statuses[0].Status = "Unknown";
 
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated PC Status to Unknown");
                     }
 
-                    AlertsHandler(alerts.Alerts, server, pcStatus.Component);
+                    AlertsHandler(alerts.Alerts, server, pcStatus.Component, server.Statuses[0].Status);
 
-                    APIStatusModel newStatus = new()
+                    if (pcStatus.DateOccured < refreshPeriod)
                     {
-                        Component = pcStatus.Component,
-                        Status = server.Statuses[0].Status,
-                        Server = new APIRelatedServerModel
+                        APIStatusModel newStatus = new()
                         {
-                            HostName = server.HostName,
-                            Game = server.Game,
-                            GameVersion = server.GameVersion
+                            Component = pcStatus.Component,
+                            Status = server.Statuses[0].Status,
+                            Server = new APIRelatedServerModel
+                            {
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
+                            }
+                        };
+
+                        if (APIService.RegisterServerEvent(newStatus))
+                        {
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
                         }
-                    };
-                    
-                    if (APIService.RegisterServerEvent(newStatus))
-                    {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
                     }
                 }
 
-                if (serverStatus != null && serverStatus.DateOccured < refreshPeriod)
+                if (serverStatus != null && (serverStatus.DateOccured < refreshPeriod || server.Statuses[1].Status != "Online"))
                 {
-                    if (server.Statuses[1].Status == "Online")
+                    if (server.Statuses[1].Status == "Online" || serverStatus.DateOccured < refreshPeriod)
                     {
                         server.Statuses[1].Status = "Unknown";
 
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Server Status to Unknown");
                     }
 
-                    AlertsHandler(alerts.Alerts, server, serverStatus.Component);
+                    AlertsHandler(alerts.Alerts, server, serverStatus.Component, server.Statuses[1].Status);
 
-                    APIStatusModel newStatus = new()
+                    if (serverStatus.DateOccured < refreshPeriod)
                     {
-                        Component = serverStatus.Component,
-                        Status = server.Statuses[1].Status,
-                        Server = new APIRelatedServerModel
+                        APIStatusModel newStatus = new()
                         {
-                            HostName = server.HostName,
-                            Game = server.Game,
-                            GameVersion = server.GameVersion
-                        }
-                    };
+                            Component = serverStatus.Component,
+                            Status = server.Statuses[1].Status,
+                            Server = new APIRelatedServerModel
+                            {
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
+                            }
+                        };
 
-                    if (APIService.RegisterServerEvent(newStatus))
-                    {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                        if (APIService.RegisterServerEvent(newStatus))
+                        {
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                        }
                     }
                 }
 
-                if (connectionStatus != null && connectionStatus.DateOccured < refreshPeriod)
+                if (connectionStatus != null && (connectionStatus.DateOccured < refreshPeriod || server.Statuses[2].Status != "Online"))
                 {
-                    if (server.Statuses[2].Status == "Online")
+                    if (server.Statuses[2].Status == "Online" || connectionStatus.DateOccured < refreshPeriod)
                     {
                         server.Statuses[2].Status = "Unknown";
 
                         Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Connection Status to Unknown");
                     }
 
-                    AlertsHandler(alerts.Alerts, server, connectionStatus.Component);
+                    AlertsHandler(alerts.Alerts, server, connectionStatus.Component, server.Statuses[2].Status);
 
-                    APIStatusModel newStatus = new()
+                    if (connectionStatus.DateOccured < refreshPeriod)
                     {
-                        Component = connectionStatus.Component,
-                        Status = server.Statuses[2].Status,
-                        Server = new APIRelatedServerModel
+                        APIStatusModel newStatus = new()
                         {
-                            HostName = server.HostName,
-                            Game = server.Game,
-                            GameVersion = server.GameVersion
-                        }
-                    };
+                            Component = connectionStatus.Component,
+                            Status = server.Statuses[2].Status,
+                            Server = new APIRelatedServerModel
+                            {
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
+                            }
+                        };
 
-                    if (APIService.RegisterServerEvent(newStatus))
-                    {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                        if (APIService.RegisterServerEvent(newStatus))
+                        {
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                        }
                     }
                 }
 
@@ -196,7 +205,7 @@ namespace ServerSiteAutomation.Services
         }
 
         // Raises an alert if an unresolved one is not found.
-        private void AlertsHandler(List<AlertModel> alerts, ServerModel server, string component)
+        private void AlertsHandler(List<AlertModel> alerts, ServerModel server, string component, string status)
         {
             DiscordService _discordService = new(SharedSettings);
             _discordService.SetLogger(Logger);
@@ -211,7 +220,7 @@ namespace ServerSiteAutomation.Services
                         {
                             Reporter = "Automation",
                             Component = component,
-                            ComponentStatus = "Unknown",
+                            ComponentStatus = status,
                             AlertStatus = "Reported",
                             HostName = server.HostName,
                             Game = server.Game,
@@ -223,7 +232,7 @@ namespace ServerSiteAutomation.Services
                             Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
                         }
 
-                        _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: Unknown");
+                        _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: {status}");
                     }
 
                     else
