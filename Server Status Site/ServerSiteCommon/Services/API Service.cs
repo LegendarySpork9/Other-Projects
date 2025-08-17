@@ -483,7 +483,7 @@ namespace ServerSiteCommon.Services
 
                             string? time = null;
 
-                            if (downtime != JObject.Parse(StandardValues.MissingValues.RelatedContent))
+                            if (downtime.ToString() != StandardValues.MissingValues.RelatedContent)
                             {
                                 time = downtime.Property("time")?.Value.ToString();
                             }
