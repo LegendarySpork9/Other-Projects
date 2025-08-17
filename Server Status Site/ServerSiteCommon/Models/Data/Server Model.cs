@@ -6,8 +6,8 @@
         public string HostName { get; set; }
         public string Game { get; set; }
         public string GameVersion { get; set; }
-        public string IPAddress { get; set; }
-        public int Port { get; set; }
+        public ConnectionModel Connection { get; set; }
+        public DowntimeModel? Downtime { get; set; }
         public List<StatusModel> Statuses { get; set; }
     }
 }

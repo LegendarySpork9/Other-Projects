@@ -5,10 +5,8 @@ using ServerSiteCommon.Models.API;
 using ServerSiteCommon.Models.Data;
 using ServerSiteCommon.Services;
 using ServerSiteReporter.Models;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Timers;
 using Timer = System.Timers.Timer;
@@ -183,9 +181,9 @@ namespace ServerSiteReporter.Services
 
                     if (component == "Connection")
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.IPAddress}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {server.Connection.IPAddress}");
 
-                        string pingStatus = PingAddress(server.IPAddress, server.Port);
+                        string pingStatus = PingAddress(server.Connection.IPAddress, server.Connection.Port);
 
                         if (pingStatus == "Success")
                         {

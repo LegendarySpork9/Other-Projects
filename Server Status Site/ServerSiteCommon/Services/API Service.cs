@@ -473,8 +473,20 @@ namespace ServerSiteCommon.Services
                             string hostName = server.Property("hostName")?.Value.ToString() ?? StandardValues.MissingValues.HostName;
                             string game = server.Property("game")?.Value.ToString() ?? StandardValues.MissingValues.Game;
                             string gameVersion = server.Property("gameVersion")?.Value.ToString() ?? StandardValues.MissingValues.GameVersion;
-                            string ipAddress = server.Property("ipAddress")?.Value.ToString() ?? StandardValues.MissingValues.IpAddress;
-                            int port = int.Parse(server.Property("port")?.Value.ToString() ?? StandardValues.MissingValues.Port);
+
+                            JObject connection = JObject.Parse(server.Property("connection")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
+
+                            string ipAddress = connection.Property("ipAddress")?.Value.ToString() ?? StandardValues.MissingValues.IpAddress;
+                            int port = int.Parse(connection.Property("port")?.Value.ToString() ?? StandardValues.MissingValues.Port);
+
+                            JObject downtime = JObject.Parse(server.Property("downtime")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
+
+                            string? time = null;
+
+                            if (downtime != JObject.Parse(StandardValues.MissingValues.RelatedContent))
+                            {
+                                time = downtime.Property("time")?.Value.ToString();
+                            }
 
                             APIStatusModel? pcStatus = pcStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
                             APIStatusModel? serverStatus = serverStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
@@ -482,6 +494,16 @@ namespace ServerSiteCommon.Services
 
                             if (pcStatus != null && serverStatus != null && connectionStatus != null)
                             {
+                                DowntimeModel? dt = null;
+
+                                if (!string.IsNullOrWhiteSpace(time))
+                                {
+                                    dt = new DowntimeModel()
+                                    {
+                                        Time = time
+                                    };
+                                }
+
                                 List<StatusModel> statuses = new()
                                 {
                                     new StatusModel()
@@ -506,8 +528,12 @@ namespace ServerSiteCommon.Services
                                     HostName = hostName,
                                     Game = game,
                                     GameVersion = gameVersion,
-                                    IPAddress = ipAddress,
-                                    Port = port,
+                                    Connection = new ConnectionModel()
+                                    {
+                                        IPAddress = ipAddress,
+                                        Port = port
+                                    },
+                                    Downtime = dt,
                                     Statuses = statuses
                                 });
 
@@ -515,6 +541,7 @@ namespace ServerSiteCommon.Services
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game: {game}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {gameVersion}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {ipAddress}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Downtime: {time}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status: {statuses[0].Status}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status Class: {statuses[0].StatusClass}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status: {statuses[1].Status}");
