@@ -60,7 +60,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = client.Execute(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -116,7 +116,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -176,7 +176,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -201,7 +201,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched users from API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -264,7 +264,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -300,7 +300,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched user settings from API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -365,7 +365,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = client.Execute(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -387,7 +387,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched user setting id from API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -454,7 +454,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = client.Execute(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -555,7 +555,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched servers from API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -620,7 +620,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = client.Execute(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -656,7 +656,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched server statuses from API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -727,7 +727,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -737,7 +737,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Updated user setting in API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -809,7 +809,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -819,7 +819,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Updated user details in API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -884,7 +884,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = client.Execute(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -935,7 +935,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched alerts from API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -1002,7 +1002,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -1053,7 +1053,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched alerts from API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -1120,7 +1120,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = client.Execute(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -1148,7 +1148,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched alert from API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -1219,7 +1219,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -1229,7 +1229,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Updated alert status in API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -1306,7 +1306,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = client.Execute(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Created)
                 {
@@ -1316,7 +1316,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Registered alert in API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -1393,7 +1393,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = await client.ExecuteAsync(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Created)
                 {
@@ -1403,7 +1403,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Registered alert in API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
@@ -1478,7 +1478,7 @@ namespace ServerSiteCommon.Services
                 RestResponse response = client.Execute(request);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Created)
                 {
@@ -1488,7 +1488,7 @@ namespace ServerSiteCommon.Services
                     Logger.LogMessage(StandardValues.LoggerValues.Info, "Registered server event in API");
                 }
 
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
                 {
                     if (RetryCount != 4)
                     {
