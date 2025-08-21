@@ -31,6 +31,9 @@ namespace GitHubScraper
 
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
 
+            GitHubService _gitHubService = new GitHubService();
+            _gitHubService.GetIssues("Hunter-Industries-API");
+
             Console.ReadLine();
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
         }
