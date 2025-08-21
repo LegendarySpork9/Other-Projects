@@ -16,6 +16,7 @@
         {
             public const string Owner = "GitHub";
             public const string Repositories = "docs";
+            public const string BearerToken = "MissingToken";
         }
     }
 }
