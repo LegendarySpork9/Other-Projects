@@ -14,10 +14,44 @@ namespace GitHubScraper
 
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Owner: {AppSettingsModel.Owner}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Repositories: {AppSettingsModel.Repositories.Length}");
 
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.BearerToken) || AppSettingsModel.BearerToken == StandardValues.MissingValues.BearerToken)
+            if (string.IsNullOrWhiteSpace(AppSettingsModel.Owner))
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid owner not found. Please provide one in the app settings with the tag \"Owner\"");
+                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+                Environment.Exit(0);
+            }
+
+            else
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Owner: {AppSettingsModel.Owner}");
+            }
+
+            if (string.IsNullOrWhiteSpace(AppSettingsModel.Repositories))
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid repositories not found. Please provide one in the app settings with the tag \"Repositories\"");
+                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+                Environment.Exit(0);
+            }
+
+            else
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Repositories: {AppSettingsModel.Repositories.Length}");
+            }
+
+            if (string.IsNullOrWhiteSpace(AppSettingsModel.Workflows))
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid workflows not found. Please provide one in the app settings with the tag \"Workflows\"");
+                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+                Environment.Exit(0);
+            }
+
+            else
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Repositories: {AppSettingsModel.Repositories.Length}");
+            }
+
+            if (string.IsNullOrWhiteSpace(AppSettingsModel.BearerToken))
             {
                 _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid authentication token not found. Please provide one in the app settings with the tag \"BearerToken\"");
                 _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");

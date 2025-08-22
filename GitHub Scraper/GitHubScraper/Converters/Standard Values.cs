@@ -10,14 +10,5 @@
             public const string Info = "Info";
             public const string Warning = "Warn";
         }
-
-        // Standard Missing Values.
-        public static class MissingValues
-        {
-            public const string Owner = "GitHub";
-            public const string Repositories = "docs";
-            public const string Workflows = "Commit.yml";
-            public const string BearerToken = "MissingToken";
-        }
     }
 }
