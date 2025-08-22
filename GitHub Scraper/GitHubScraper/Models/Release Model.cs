@@ -6,7 +6,7 @@ namespace GitHubScraper.Models
     internal class ReleaseModel
     {
         public string? Repository { get; set; }
-        public required int Id { get; set; }
+        public required long Id { get; set; }
         public required string Name { get; set; }
         public required UserModel Author { get; set; }
         public required string Body { get; set; }

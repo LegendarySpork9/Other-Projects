@@ -33,6 +33,10 @@ namespace GitHubScraper
 
             GitHubService _gitHubService = new GitHubService();
             _gitHubService.GetIssues("Hunter-Industries-API");
+            _gitHubService.GetCommits("Hunter-Industries-API");
+            _gitHubService.GetPullRequests("Hunter-Industries-API");
+            _gitHubService.GetWorkflowRuns("Hunter-Industries-API", "Pull Request.yml");
+            _gitHubService.GetReleases("Hunter-Industries-API");
 
             Console.ReadLine();
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
