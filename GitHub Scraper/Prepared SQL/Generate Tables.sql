@@ -66,6 +66,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[IssueAggregate](
 	[IssueAggregateId] [int] IDENTITY(1,1) NOT NULL,
+	[RepositoryId] [int] NOT NULL,
 	[Date] [datetime] NOT NULL,
 	[Created] [int] NOT NULL,
 	[Solved] [int] NOT NULL,
@@ -151,6 +152,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[RunHistory](
 	[RunHistoryId] [int] IDENTITY(1,1) NOT NULL,
+	[RepositoryId] [int] NOT NULL,
 	[RunDate] [datetime] NOT NULL,
 	[Issues] [int] NOT NULL,
 	[Commits] [int] NOT NULL,
@@ -285,6 +287,11 @@ REFERENCES [dbo].[User] ([UserId])
 GO
 ALTER TABLE [dbo].[Issue] CHECK CONSTRAINT [FK_Issue_User]
 GO
+ALTER TABLE [dbo].[IssueAggregate]  WITH CHECK ADD  CONSTRAINT [FK_IssueAggregate_Repository] FOREIGN KEY([RepositoryId])
+REFERENCES [dbo].[Repository] ([RepositoryId])
+GO
+ALTER TABLE [dbo].[IssueAggregate] CHECK CONSTRAINT [FK_IssueAggregate_Repository]
+GO
 ALTER TABLE [dbo].[PullRequest]  WITH CHECK ADD  CONSTRAINT [FK_PullRequest_Repository] FOREIGN KEY([RepositoryId])
 REFERENCES [dbo].[Repository] ([RepositoryId])
 GO
@@ -314,6 +321,11 @@ ALTER TABLE [dbo].[Release]  WITH CHECK ADD  CONSTRAINT [FK_Release_User] FOREIG
 REFERENCES [dbo].[User] ([UserId])
 GO
 ALTER TABLE [dbo].[Release] CHECK CONSTRAINT [FK_Release_User]
+GO
+ALTER TABLE [dbo].[RunHistory]  WITH CHECK ADD  CONSTRAINT [FK_RunHistory_Repository] FOREIGN KEY([RepositoryId])
+REFERENCES [dbo].[Repository] ([RepositoryId])
+GO
+ALTER TABLE [dbo].[RunHistory] CHECK CONSTRAINT [FK_RunHistory_Repository]
 GO
 ALTER TABLE [dbo].[WorkflowRun]  WITH CHECK ADD  CONSTRAINT [FK_WorkflowRun_Event] FOREIGN KEY([EventId])
 REFERENCES [dbo].[Event] ([EventId])
