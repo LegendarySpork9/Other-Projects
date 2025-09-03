@@ -6,6 +6,7 @@ namespace GitHubScraper.Models
     internal class PullRequestModel
     {
         public string? Repository { get; set; }
+        public required long Id { get; set; }
         public required int Number { get; set; }
         public required string Title { get; set; }
         public required UserModel Assignee { get; set; }

@@ -63,6 +63,30 @@ namespace GitHubScraper
                 _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {AppSettingsModel.BearerToken}");
             }
 
+            if (string.IsNullOrWhiteSpace(AppSettingsModel.ConnectionString))
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid connection string not found. Please provide one in the app settings with the tag \"SQLConnectionString\"");
+                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+                Environment.Exit(0);
+            }
+
+            else
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Connection String: {AppSettingsModel.ConnectionString}");
+            }
+
+            if (string.IsNullOrWhiteSpace(AppSettingsModel.SQLFiles))
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid sql files not found. Please provide one in the app settings with the tag \"SQLFiles\"");
+                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+                Environment.Exit(0);
+            }
+
+            else
+            {
+                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"SQL Files: {AppSettingsModel.SQLFiles}");
+            }
+
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
 
             GitHubService _gitHubService = new GitHubService();

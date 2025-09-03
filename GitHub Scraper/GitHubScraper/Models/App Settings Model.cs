@@ -9,5 +9,7 @@ namespace GitHubScraper.Models
         public static string? Repositories { get; set; } = ConfigurationManager.AppSettings["Repositories"];
         public static string? Workflows { get; set; } = ConfigurationManager.AppSettings["Workflows"];
         public static string? BearerToken { get; set; } = ConfigurationManager.AppSettings["BearerToken"];
+        public static string? ConnectionString { get; set; } = ConfigurationManager.AppSettings["SQLConnectionString"];
+        public static string? SQLFiles { get; set; } = ConfigurationManager.AppSettings["SQLFiles"];
     }
 }
