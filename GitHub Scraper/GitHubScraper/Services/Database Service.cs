@@ -5,7 +5,7 @@ namespace GitHubScraper.Services
 {
     internal class DatabaseService
     {
-        LoggerService Logger = new();
+        private readonly LoggerService Logger = new();
 
         // Gets the last time the application was run for the given repository.
         public DateTime GetLastRunDate(string repository)

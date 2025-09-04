@@ -1,6 +1,4 @@
-﻿using GitHubScraper.Models.Related;
-
-namespace GitHubScraper.Models
+﻿namespace GitHubScraper.Models.Related
 {
     // Stores information about the workflow run.
     internal class WorkflowRunModel
@@ -15,5 +13,6 @@ namespace GitHubScraper.Models
         public required string Status { get; set; }
         public required string Conclusion { get; set; }
         public required DateTime Created_At { get; set; }
+        public required DateTime Updated_At { get; set; }
     }
 }

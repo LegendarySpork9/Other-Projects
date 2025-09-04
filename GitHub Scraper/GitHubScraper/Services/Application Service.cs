@@ -1,5 +1,6 @@
 ﻿using GitHubScraper.Converters;
 using GitHubScraper.Models;
+using GitHubScraper.Models.Related;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -105,6 +106,27 @@ namespace GitHubScraper.Services
 
                 DateTime lastRunDate = _databaseService.GetLastRunDate(repository);
 
+                List<IssueModel> issues = _gitHubService.GetIssues(repository, lastRunDate);
+                List<CommitModel> commits = _gitHubService.GetCommits(repository, lastRunDate);
+                List<PullRequestModel> pullRequests = _gitHubService.GetPullRequests(repository, lastRunDate);
+                List<WorkflowModel> workflows = [];
+
+                foreach (string workflow in AppSettingsModel.Workflows.Split(','))
+                {
+                    List<WorkflowRunModel>? workflowRuns = _gitHubService.GetWorkflowRuns(repository, workflow, lastRunDate);
+
+                    if (workflowRuns != null)
+                    {
+                        workflows.Add(new()
+                        {
+                            Name = workflow,
+                            WorkflowRuns = workflowRuns
+                        });
+                    }
+                }
+
+
+
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Ran Scraper for {repository}");
             }
 
@@ -118,10 +140,10 @@ namespace GitHubScraper.Services
 
 
 
-            _gitHubService.GetIssues("Hunter-Industries-API");
-            _gitHubService.GetCommits("Hunter-Industries-API");
-            _gitHubService.GetPullRequests("Hunter-Industries-API");
-            _gitHubService.GetWorkflowRuns("Hunter-Industries-API", "Pull Request.yml");
+            
+            
+            
+            
             _gitHubService.GetReleases("Hunter-Industries-API");
         }
     }
