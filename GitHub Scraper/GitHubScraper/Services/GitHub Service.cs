@@ -274,6 +274,11 @@ namespace GitHubScraper.Services
 
                                     pullRequests.Add(pullRequest);
                                 }
+
+                                else
+                                {
+                                    break;
+                                }
                             }
 
                             page++;
@@ -409,11 +414,13 @@ namespace GitHubScraper.Services
         }
 
         // Returns a list of the releases for the repository.
-        public List<ReleaseModel> GetReleases(string repository)
+        public List<ReleaseModel> GetReleases(string repository, DateTime lastRunDate)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching releases from GitHub for {repository} repository");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching releases from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
             List<ReleaseModel> releases = [];
+
+            int page = 1;
 
             try
             {
@@ -426,38 +433,55 @@ namespace GitHubScraper.Services
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
 
-                RestRequest request = new()
+                while (true)
                 {
-                    Method = Method.Get
-                };
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
-
-                RestResponse response = client.Execute(request);
-
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
-
-                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
-                {
-                    releases = JsonConvert.DeserializeObject<List<ReleaseModel>>(response.Content) ?? [];
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Releases Returned: {releases.Count}");
-
-                    if (releases.Count > 0)
+                    RestRequest request = new()
                     {
-                        foreach (ReleaseModel release in releases)
+                        Method = Method.Get
+                    };
+                    request.AddParameter("page", page);
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page: {page}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                    RestResponse response = client.Execute(request);
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                    {
+                        List<ReleaseModel> apiReleases = JsonConvert.DeserializeObject<List<ReleaseModel>>(response.Content) ?? [];
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Releases Returned: {apiReleases.Count}");
+
+                        if (apiReleases.Count > 0)
                         {
-                            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for release {release.Id}");
+                            foreach (ReleaseModel release in apiReleases)
+                            {
+                                if (release.Updated_At >= lastRunDate)
+                                {
+                                    Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for release {release.Id}");
 
-                            release.Repository = repository;
+                                    release.Repository = repository;
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
+                                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
 
-                            release.NumberOfAssets = release.Assets.Count;
+                                    release.NumberOfAssets = release.Assets.Count;
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for release {release.Id}");
+                                    Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for release {release.Id}");
+
+                                    releases.Add(release);
+                                }
+                            }
+
+                            page++;
+                        }
+
+                        else
+                        {
+                            break;
                         }
                     }
                 }
@@ -469,7 +493,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {releases} release(s) from GitHub for {repository} repository");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {releases} release(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
             return releases;
         }
     }

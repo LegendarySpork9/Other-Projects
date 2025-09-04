@@ -1,12 +1,6 @@
 ﻿using GitHubScraper.Converters;
 using GitHubScraper.Models;
 using GitHubScraper.Models.Related;
-using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GitHubScraper.Services
 {
@@ -125,26 +119,10 @@ namespace GitHubScraper.Services
                     }
                 }
 
-
+                List<ReleaseModel> releases = _gitHubService.GetReleases(repository, lastRunDate);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Ran Scraper for {repository}");
             }
-
-            
-
-
-
-
-
-
-
-
-
-            
-            
-            
-            
-            _gitHubService.GetReleases("Hunter-Industries-API");
         }
     }
 }

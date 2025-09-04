@@ -1,6 +1,7 @@
 ﻿using GitHubScraper.Converters;
 using GitHubScraper.Models;
 using Microsoft.Data.SqlClient;
+
 namespace GitHubScraper.Services
 {
     internal class DatabaseService

@@ -13,6 +13,7 @@ namespace GitHubScraper.Models
         public int NumberOfAssets { get; set; } = 0;
         public required bool Draft { get; set; }
         public required DateTime Created_At { get; set; }
+        public required DateTime Updated_At { get; set; }
         public DateTime? Published_At { get; set; }
         public required List<AssetModel> Assets { get; set; } = [];
     }

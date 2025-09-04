@@ -1,5 +1,6 @@
 USE [GitHub]
 GO
+
 /****** Object:  Table [dbo].[Commit]    Script Date: 29/08/2025 09:07:59 ******/
 SET ANSI_NULLS ON
 GO
