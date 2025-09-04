@@ -11,90 +11,21 @@ namespace GitHubScraper
             log4net.Config.XmlConfigurator.Configure();
 
             LoggerService _loggerService = new();
+            ApplicationService _applicationService = new();
 
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
 
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.Owner))
+            if (!_applicationService.Setup())
             {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid owner not found. Please provide one in the app settings with the tag \"Owner\"");
                 _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
                 Environment.Exit(0);
-            }
-
-            else
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Owner: {AppSettingsModel.Owner}");
-            }
-
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.Repositories))
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid repositories not found. Please provide one in the app settings with the tag \"Repositories\"");
-                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
-                Environment.Exit(0);
-            }
-
-            else
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Repositories: {AppSettingsModel.Repositories.Length}");
-            }
-
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.Workflows))
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid workflows not found. Please provide one in the app settings with the tag \"Workflows\"");
-                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
-                Environment.Exit(0);
-            }
-
-            else
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Repositories: {AppSettingsModel.Repositories.Length}");
-            }
-
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.BearerToken))
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid authentication token not found. Please provide one in the app settings with the tag \"BearerToken\"");
-                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
-                Environment.Exit(0);
-            }
-
-            else
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {AppSettingsModel.BearerToken}");
-            }
-
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.ConnectionString))
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid connection string not found. Please provide one in the app settings with the tag \"SQLConnectionString\"");
-                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
-                Environment.Exit(0);
-            }
-
-            else
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Connection String: {AppSettingsModel.ConnectionString}");
-            }
-
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.SQLFiles))
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Warning, "Valid sql files not found. Please provide one in the app settings with the tag \"SQLFiles\"");
-                _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
-                Environment.Exit(0);
-            }
-
-            else
-            {
-                _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"SQL Files: {AppSettingsModel.SQLFiles}");
             }
 
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
+            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Running Application");
 
-            GitHubService _gitHubService = new GitHubService();
-            _gitHubService.GetIssues("Hunter-Industries-API");
-            _gitHubService.GetCommits("Hunter-Industries-API");
-            _gitHubService.GetPullRequests("Hunter-Industries-API");
-            _gitHubService.GetWorkflowRuns("Hunter-Industries-API", "Pull Request.yml");
-            _gitHubService.GetReleases("Hunter-Industries-API");
+            _applicationService.Run();
 
             Console.ReadLine();
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");

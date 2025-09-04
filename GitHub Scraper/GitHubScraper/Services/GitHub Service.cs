@@ -13,7 +13,7 @@ namespace GitHubScraper.Services
         private LoggerService Logger = new();
 
         // Returns a lits of the issues for the repository.
-        public List<IssueModel> GetIssues(string repository)
+        public List<IssueModel> GetIssues(string repository, DateTime lastRunDate)
         {
             GitHubConverter _gitHubConverter = new();
 
@@ -23,7 +23,17 @@ namespace GitHubScraper.Services
 
             try
             {
-                string url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/issues?state=all&sort=updated&per_page=100";
+                string url;
+
+                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00"))
+                {
+                    url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/issues?state=all&sort=updated&per_page=100";
+                }
+
+                else
+                {
+                    url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/issues?state=all&sort=updated&since={lastRunDate:yyyy-MM-ddTHH:mm:ssZ}&per_page=100";
+                }
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
 
@@ -85,7 +95,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched issues from GitHub for {repository} repository");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {issues.Count} issue(s) from GitHub for {repository} repository");
             return issues;
         }
 
@@ -147,7 +157,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched commits from GitHub for {repository} repository");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {commits} commit(s) from GitHub for {repository} repository");
             return commits;
         }
 
@@ -224,7 +234,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched pull requests from GitHub for {repository} repository");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {pullRequests} pull request(s) from GitHub for {repository} repository");
             return pullRequests;
         }
 
@@ -301,7 +311,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched workflow runs from GitHub for {workflow} workflow in {repository} repository");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {workflowRuns} workflow run(s) from GitHub for {workflow} workflow in {repository} repository");
             return workflowRuns;
         }
 
@@ -366,7 +376,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched releases from GitHub for {repository} repository");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {releases} release(s) from GitHub for {repository} repository");
             return releases;
         }
     }
