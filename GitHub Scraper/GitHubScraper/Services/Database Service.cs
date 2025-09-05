@@ -54,5 +54,11 @@ namespace GitHubScraper.Services
 
             return lastRunDate;
         }
+
+        // Outputs the issues to the database.
+        public void OutputIssues(string repository, List<IssueModel> issues)
+        {
+
+        }
     }
 }

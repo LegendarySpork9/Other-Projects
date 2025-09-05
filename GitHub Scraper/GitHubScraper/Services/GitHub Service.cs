@@ -248,6 +248,8 @@ namespace GitHubScraper.Services
 
                         if (apiPullRequests.Count > 0)
                         {
+                            bool nextPage = true;
+
                             foreach (PullRequestModel pullRequest in apiPullRequests)
                             {
                                 if (pullRequest.Updated_At >= lastRunDate)
@@ -277,11 +279,20 @@ namespace GitHubScraper.Services
 
                                 else
                                 {
+                                    nextPage = false;
                                     break;
                                 }
                             }
 
-                            page++;
+                            if (nextPage)
+                            {
+                                page++;
+                            }
+
+                            else
+                            {
+                                break;
+                            }
                         }
 
                         else
@@ -314,7 +325,7 @@ namespace GitHubScraper.Services
 
             try
             {
-                string url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/actions/workflows/{workflow}/runs?per_page=100";
+                string url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/actions/workflows/{workflow}/runs?created=>{DateTime.UtcNow:yyyy-MM-ddT00:00:00Z}&per_page=100";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
 

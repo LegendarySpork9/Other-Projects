@@ -1,5 +1,4 @@
 ﻿using GitHubScraper.Converters;
-using GitHubScraper.Models;
 using GitHubScraper.Services;
 
 namespace GitHubScraper
