@@ -9,7 +9,7 @@ namespace GitHubScraper.Models
         public required long Id { get; set; }
         public required int Number { get; set; }
         public required string Title { get; set; }
-        public required UserModel Assignee { get; set; }
+        public UserModel? Assignee { get; set; }
         public string? Type { get; set; }
         public required string State { get; set; }
         public required DateTime Created_At { get; set; }

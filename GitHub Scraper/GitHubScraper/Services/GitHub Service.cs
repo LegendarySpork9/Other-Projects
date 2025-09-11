@@ -20,6 +20,7 @@ namespace GitHubScraper.Services
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching issues from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
             List<IssueModel> issues = [];
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
             string url;
             int page = 1;
@@ -88,6 +89,9 @@ namespace GitHubScraper.Services
                                     }
                                 }
 
+                                issue.State = textInfo.ToTitleCase(issue.State);
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Status: {issue.State}");
                                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for issue {issue.Number}");
 
                                 issues.Add(issue);
@@ -209,6 +213,7 @@ namespace GitHubScraper.Services
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching pull requests from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
             List<PullRequestModel> pullRequests = [];
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
             int page = 1;
 
@@ -272,6 +277,9 @@ namespace GitHubScraper.Services
                                         }
                                     }
 
+                                    pullRequest.State = textInfo.ToTitleCase(pullRequest.State);
+
+                                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"State: {pullRequest.State}");
                                     Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for pull request {pullRequest.Number}");
 
                                     pullRequests.Add(pullRequest);
@@ -316,16 +324,25 @@ namespace GitHubScraper.Services
         // Returns a list of the workflow runs for the repository and workflow.
         public List<WorkflowRunModel>? GetWorkflowRuns(string repository, string workflow, DateTime lastRunDate)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching workflow runs from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching workflow runs from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy 00:00:00}");
 
             List<WorkflowRunModel>? workflowRuns = [];
             TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
+            string url;
             int page = 1;
 
             try
             {
-                string url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/actions/workflows/{workflow}/runs?created=>{DateTime.UtcNow:yyyy-MM-ddT00:00:00Z}&per_page=100";
+                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00"))
+                {
+                    url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/actions/workflows/{workflow}/runs?created=>1970-01-01T00:00:00Z&per_page=100";
+                }
+
+                else
+                {
+                    url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/actions/workflows/{workflow}/runs?created=>{DateTime.UtcNow:yyyy-MM-ddT00:00:00Z}&per_page=100";
+                }
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
 
@@ -381,6 +398,10 @@ namespace GitHubScraper.Services
                                         workflowRun.Conclusion = textInfo.ToTitleCase(workflowRun.Conclusion);
 
                                         Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Conclusion: {workflowRun.Conclusion}");
+
+                                        workflowRun.Event = textInfo.ToTitleCase(workflowRun.Event.Replace("_", " "));
+
+                                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Event: {workflowRun.Event}");
                                         Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for workflow run {workflowRun.Run_Number}");
 
                                         workflowRuns.Add(workflowRun);
@@ -420,7 +441,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {workflowRuns} workflow run(s) from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {workflowRuns} workflow run(s) from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy 00:00:00}");
             return workflowRuns;
         }
 
