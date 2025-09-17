@@ -6,8 +6,7 @@ namespace GitHubScraper.Models
     internal class CommitModel
     {
         public string? Repository { get; set; }
-        public required UserModel Author { get; set; }
-        public required UserModel Committer { get; set; }
-        public required string Message { get; set; }
+        public string? Sha { get; set; }
+        public required RelatedCommitModel Commit { get; set; }
     }
 }

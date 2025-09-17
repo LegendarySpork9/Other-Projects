@@ -174,12 +174,12 @@ namespace GitHubScraper.Services
                         {
                             foreach (CommitModel commit in apiCommits)
                             {
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, "Filling blanks for commit");
+                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for commit {commit.Sha}");
 
                                 commit.Repository = repository;
 
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, "Filled blanks for commit");
+                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for commit {commit.Sha}");
 
                                 commits.Add(commit);
                             }

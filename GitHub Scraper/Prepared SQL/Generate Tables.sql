@@ -11,6 +11,7 @@ CREATE TABLE [dbo].[Commit](
 	[RepositoryId] [int] NOT NULL,
 	[AuthorId] [int] NOT NULL,
 	[CommitterId] [int] NOT NULL,
+	[GitHubCommitId] [varchar](50) NOT NULL,
 	[Message] [varchar](max) NOT NULL,
  CONSTRAINT [PK_Commit] PRIMARY KEY CLUSTERED 
 (

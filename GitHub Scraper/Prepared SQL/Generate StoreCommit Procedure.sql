@@ -17,6 +17,7 @@ CREATE PROCEDURE [dbo].[StoreCommit]
     @repository varchar(50),
     @author varchar(50),
     @committer varchar(50),
+	@sha varchar(50),
     @message varchar(max)
 AS
 BEGIN
@@ -54,8 +55,8 @@ BEGIN
 	where Username = @committer
 
     -- insert the commit
-    insert into [Commit] (RepositoryId, AuthorId, CommitterId, [Message])
-    values (@repositoryId, @authorId, @committerId, @message);
+    insert into [Commit] (RepositoryId, AuthorId, CommitterId, GitHubCommitId, [Message])
+    values (@repositoryId, @authorId, @committerId, @sha, @message);
 
 END
 GO

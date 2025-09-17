@@ -1,14 +1,15 @@
 DECLARE	@returnValue int
 
-EXEC	@returnValue = [dbo].[StoreIssue]
+EXEC	@returnValue = [dbo].[StorePullRequest]
 		@repository,
-		@issueId,
+		@pullRequestId,
 		@number,
 		@title,
 		@assignee,
 		@type,
 		@status,
 		@dateCreated,
-		@dateSolved
+		@dateSolved,
+		@dateMerged
 
 SELECT	'Return Value' = @returnValue
