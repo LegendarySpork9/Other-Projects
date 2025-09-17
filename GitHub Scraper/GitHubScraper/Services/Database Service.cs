@@ -1,5 +1,6 @@
 ﻿using GitHubScraper.Converters;
 using GitHubScraper.Models;
+using GitHubScraper.Models.Related;
 using Microsoft.Data.SqlClient;
 
 namespace GitHubScraper.Services
@@ -284,6 +285,163 @@ namespace GitHubScraper.Services
 
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / pullRequests.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / pullRequests.Count) * 100}%) output errored");
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {pullRequests.Count} pull request(s) for repository {repository}");
+        }
+
+        // Outputs the workflow runs to the database.
+        public void OutputWorkflowRuns(string repository, WorkflowModel workflow)
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {workflow.WorkflowRuns.Count} workflow run(s) for {workflow.Name} workflow in repository {repository}");
+
+            List<WorkflowRunModel> successful = [];
+            List<WorkflowRunModel> errored = [];
+
+            try
+            {
+                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                {
+                    connection.Open();
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
+
+                    foreach (WorkflowRunModel workflowRun in workflow.WorkflowRuns)
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting workflow run {workflowRun.Run_Number}");
+
+                        try
+                        {
+                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\OutputWorkflowRun.sql"), connection))
+                            {
+                                int result = -1;
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+
+                                command.Parameters.Add(new SqlParameter("@repository", workflowRun.RepositoryName));
+                                command.Parameters.Add(new SqlParameter("@workflow", workflow.Name));
+                                command.Parameters.Add(new SqlParameter("@workflowRunId", workflowRun.Id));
+                                command.Parameters.Add(new SqlParameter("@runNumber", workflowRun.Run_Number));
+                                command.Parameters.Add(new SqlParameter("@actor", workflowRun.Actor.Login));
+                                command.Parameters.Add(new SqlParameter("@displayTitle", workflowRun.Display_Title));
+                                command.Parameters.Add(new SqlParameter("@event", workflowRun.Event));
+                                command.Parameters.Add(new SqlParameter("@status", workflowRun.Status));
+                                command.Parameters.Add(new SqlParameter("@conclusion", workflowRun.Conclusion));
+                                command.Parameters.Add(new SqlParameter("@dateCreated", workflowRun.Created_At));
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+
+                                using (SqlDataReader dataReader = command.ExecuteReader())
+                                {
+                                    while (dataReader.Read())
+                                    {
+                                        result = dataReader.GetInt32(0);
+                                    }
+                                }
+
+                                if (result == 0)
+                                {
+                                    successful.Add(workflowRun);
+                                }
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted workflow run {workflowRun.Run_Number}");
+                            }
+                        }
+
+                        catch (Exception ex)
+                        {
+                            errored.Add(workflowRun);
+
+                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output workflow run {workflowRun.Run_Number}. Error Message: {ex.Message}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                        }
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output the workflow run(s) for {workflow.Name} workflow in repository {repository}. Error Message: {ex.Message}");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+            }
+
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / workflow.WorkflowRuns.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / workflow.WorkflowRuns.Count) * 100}%) output errored");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {workflow.WorkflowRuns.Count} workflow run(s) for {workflow.Name} workflow in repository {repository}");
+        }
+
+        // Outputs the releases to the database.
+        public void OutputReleases(string repository, List<ReleaseModel> releases)
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {releases.Count} release(s) for repository {repository}");
+
+            List<ReleaseModel> successful = [];
+            List<ReleaseModel> errored = [];
+
+            try
+            {
+                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                {
+                    connection.Open();
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
+
+                    foreach (ReleaseModel release in releases)
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting release {release.Id}");
+
+                        try
+                        {
+                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\OutputRelease.sql"), connection))
+                            {
+                                int result = -1;
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+
+                                command.Parameters.Add(new SqlParameter("@repository", release.Repository));
+                                command.Parameters.Add(new SqlParameter("@releaseId", release.Id));
+                                command.Parameters.Add(new SqlParameter("@name", release.Name));
+                                command.Parameters.Add(new SqlParameter("@author", release.Author.Login));
+                                command.Parameters.Add(new SqlParameter("@draft", release.Draft));
+                                command.Parameters.Add(new SqlParameter("@assets", release.Assets.Count));
+                                command.Parameters.Add(new SqlParameter("@body", release.Body));
+                                command.Parameters.Add(new SqlParameter("@dateCreated", release.Created_At));
+                                command.Parameters.Add(new SqlParameter("@datePublished", release.Published_At));
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+
+                                using (SqlDataReader dataReader = command.ExecuteReader())
+                                {
+                                    while (dataReader.Read())
+                                    {
+                                        result = dataReader.GetInt32(0);
+                                    }
+                                }
+
+                                if (result == 0)
+                                {
+                                    successful.Add(release);
+                                }
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted release {release.Id}");
+                            }
+                        }
+
+                        catch (Exception ex)
+                        {
+                            errored.Add(release);
+
+                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output release {issue.Number}. Error Message: {ex.Message}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                        }
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output the release(s) for repository {repository}. Error Message: {ex.Message}");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+            }
+
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / releases.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / releases.Count) * 100}%) output errored");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {releases.Count} release(s) for repository {repository}");
         }
     }
 }

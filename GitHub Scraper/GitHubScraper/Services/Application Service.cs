@@ -121,6 +121,17 @@ namespace GitHubScraper.Services
 
                 List<ReleaseModel> releases = _gitHubService.GetReleases(repository, lastRunDate);
 
+                _databaseService.OutputIssues(repository, issues);
+                _databaseService.OutputCommits(repository, commits);
+                _databaseService.OutputPullRequests(repository, pullRequests);
+                
+                foreach (WorkflowModel workflow in workflows)
+                {
+                    _databaseService.OutputWorkflowRuns(repository, workflow);
+                }
+
+                _databaseService.OutputReleases(repository, releases);
+
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Ran Scraper for {repository}");
             }
         }
