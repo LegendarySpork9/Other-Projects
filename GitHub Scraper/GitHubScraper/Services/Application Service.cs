@@ -1,4 +1,5 @@
 ﻿using GitHubScraper.Converters;
+using GitHubScraper.Functions;
 using GitHubScraper.Models;
 using GitHubScraper.Models.Related;
 
@@ -93,6 +94,7 @@ namespace GitHubScraper.Services
         {
             DatabaseService _databaseService = new();
             GitHubService _gitHubService = new();
+            DatabaseFunction _databaseFunction = new();
 
             foreach (string repository in AppSettingsModel.Repositories.Split(','))
             {
@@ -131,6 +133,10 @@ namespace GitHubScraper.Services
                 }
 
                 _databaseService.OutputReleases(repository, releases);
+
+                List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates(repository, issues);
+
+                _databaseService.LogIssueAggregates(repository, issueAggregates);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Ran Scraper for {repository}");
             }

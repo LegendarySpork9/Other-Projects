@@ -443,5 +443,70 @@ namespace GitHubScraper.Services
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / releases.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / releases.Count) * 100}%) output errored");
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {releases.Count} release(s) for repository {repository}");
         }
+
+        // Updates or inserts the issue aggregate record.
+        public void LogIssueAggregates(string repository, List<IssueAggregateModel> issueAggregates)
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging {issueAggregates.Count} issue aggregate(s) for repository {repository}");
+
+            List<IssueAggregateModel> successful = [];
+            List<IssueAggregateModel> errored = [];
+
+            try
+            {
+                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                {
+                    connection.Open();
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
+
+                    foreach (IssueAggregateModel issueAggregate in issueAggregates)
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging issue aggregate for {issueAggregate.Date}");
+
+                        try
+                        {
+                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\LogIssueAggregate.sql"), connection))
+                            {
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+
+                                command.Parameters.Add(new SqlParameter("@repository", repository));
+                                command.Parameters.Add(new SqlParameter("@date", issueAggregate.Date));
+                                command.Parameters.Add(new SqlParameter("@created", issueAggregate.Created));
+                                command.Parameters.Add(new SqlParameter("@solved", issueAggregate.Solved));
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+
+                                int rowsAffected = command.ExecuteNonQuery();
+
+                                if (rowsAffected == 1)
+                                {
+                                    successful.Add(issueAggregate);
+                                }
+
+                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged issue aggregate for {issueAggregate.Date}");
+                            }
+                        }
+
+                        catch (Exception ex)
+                        {
+                            errored.Add(issueAggregate);
+
+                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log issue aggregate for {issueAggregate.Date}. Error Message: {ex.Message}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                        }
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log the issue aggregates(s) for repository {repository}. Error Message: {ex.Message}");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+            }
+
+            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issueAggregates.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issueAggregates.Count) * 100}%) output errored");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged {issueAggregates.Count} issue aggregate(s) for repository {repository}");
+        }
     }
 }
