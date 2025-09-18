@@ -137,6 +137,7 @@ namespace GitHubScraper.Services
                 List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates(repository, issues);
 
                 _databaseService.LogIssueAggregates(repository, issueAggregates);
+                _databaseService.LogRun(repository, issues.Count, commits.Count, pullRequests.Count, workflows.Count, releases.Count);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Ran Scraper for {repository}");
             }

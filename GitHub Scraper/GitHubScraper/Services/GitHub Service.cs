@@ -115,7 +115,7 @@ namespace GitHubScraper.Services
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {issues.Count} issue(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
-            return issues;
+            return [.. issues.OrderBy(i => i.Id)];
         }
 
         // Returns a list of the commits for the repository.
@@ -202,7 +202,7 @@ namespace GitHubScraper.Services
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {commits} commit(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
-            return commits;
+            return [.. commits.OrderBy(c => c.Commit.Committer.Date)];
         }
 
         // Returns a list of the pull requests for the repository.
@@ -318,7 +318,7 @@ namespace GitHubScraper.Services
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {pullRequests} pull request(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
-            return pullRequests;
+            return [.. pullRequests.OrderBy(pr => pr.Id)];
         }
 
         // Returns a list of the workflow runs for the repository and workflow.
@@ -442,6 +442,12 @@ namespace GitHubScraper.Services
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {workflowRuns} workflow run(s) from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy 00:00:00}");
+
+            if (workflowRuns != null)
+            {
+                workflowRuns = [.. workflowRuns.OrderBy(wr => wr.Id)];
+            }
+
             return workflowRuns;
         }
 
@@ -526,7 +532,7 @@ namespace GitHubScraper.Services
             }
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {releases} release(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
-            return releases;
+            return [.. releases.OrderBy(r => r.Id)];
         }
     }
 }

@@ -26,11 +26,12 @@ namespace GitHubScraper.Services
 
                     using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\GetLastRunDate.sql"), connection))
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
 
                         command.Parameters.Add(new SqlParameter("@repository", repository));
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
 
                         using (SqlDataReader dataReader = command.ExecuteReader())
                         {
@@ -41,10 +42,10 @@ namespace GitHubScraper.Services
 
                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Last Run Date: {lastRunDate}");
                         }
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained the last run date for repository {repository}");
                     }
                 }
-
-                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained the last run date for repository {repository}");
             }
 
             catch (Exception ex)
@@ -82,19 +83,20 @@ namespace GitHubScraper.Services
                             {
                                 int result = -1;
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
 
                                 command.Parameters.Add(new SqlParameter("@repository", issue.Repository));
                                 command.Parameters.Add(new SqlParameter("@issueId", issue.Id));
                                 command.Parameters.Add(new SqlParameter("@number", issue.Number));
                                 command.Parameters.Add(new SqlParameter("@title", issue.Title));
                                 command.Parameters.Add(new SqlParameter("@assignee", issue.Assignee?.Login ?? "Unassigned"));
-                                command.Parameters.Add(new SqlParameter("@type", issue.Type));
+                                command.Parameters.Add(new SqlParameter("@type", issue.Type ?? "Undefined"));
                                 command.Parameters.Add(new SqlParameter("@status", issue.State));
                                 command.Parameters.Add(new SqlParameter("@dateCreated", issue.Created_At));
-                                command.Parameters.Add(new SqlParameter("@dateSolved", issue.Closed_At));
+                                command.Parameters.Add(new SqlParameter("@dateSolved", issue.Closed_At ?? DateTime.Parse("01/01/1900 00:00:00")));
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
 
                                 using (SqlDataReader dataReader = command.ExecuteReader())
                                 {
@@ -160,7 +162,7 @@ namespace GitHubScraper.Services
                             {
                                 int result = -1;
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
 
                                 command.Parameters.Add(new SqlParameter("@repository", commit.Repository));
                                 command.Parameters.Add(new SqlParameter("@author", commit.Commit.Author.Name));
@@ -168,7 +170,8 @@ namespace GitHubScraper.Services
                                 command.Parameters.Add(new SqlParameter("@sha", commit.Sha));
                                 command.Parameters.Add(new SqlParameter("@message", commit.Commit.Message));
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
 
                                 using (SqlDataReader dataReader = command.ExecuteReader())
                                 {
@@ -234,7 +237,7 @@ namespace GitHubScraper.Services
                             {
                                 int result = -1;
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
 
                                 command.Parameters.Add(new SqlParameter("@repository", pullRequest.Repository));
                                 command.Parameters.Add(new SqlParameter("@pullRequestId", pullRequest.Id));
@@ -247,7 +250,8 @@ namespace GitHubScraper.Services
                                 command.Parameters.Add(new SqlParameter("@dateSolved", pullRequest.Closed_At));
                                 command.Parameters.Add(new SqlParameter("@dateMerged", pullRequest.Merged_At));
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
 
                                 using (SqlDataReader dataReader = command.ExecuteReader())
                                 {
@@ -313,7 +317,7 @@ namespace GitHubScraper.Services
                             {
                                 int result = -1;
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
 
                                 command.Parameters.Add(new SqlParameter("@repository", workflowRun.RepositoryName));
                                 command.Parameters.Add(new SqlParameter("@workflow", workflow.Name));
@@ -326,7 +330,8 @@ namespace GitHubScraper.Services
                                 command.Parameters.Add(new SqlParameter("@conclusion", workflowRun.Conclusion));
                                 command.Parameters.Add(new SqlParameter("@dateCreated", workflowRun.Created_At));
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
 
                                 using (SqlDataReader dataReader = command.ExecuteReader())
                                 {
@@ -392,7 +397,7 @@ namespace GitHubScraper.Services
                             {
                                 int result = -1;
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
 
                                 command.Parameters.Add(new SqlParameter("@repository", release.Repository));
                                 command.Parameters.Add(new SqlParameter("@releaseId", release.Id));
@@ -404,7 +409,8 @@ namespace GitHubScraper.Services
                                 command.Parameters.Add(new SqlParameter("@dateCreated", release.Created_At));
                                 command.Parameters.Add(new SqlParameter("@datePublished", release.Published_At));
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
 
                                 using (SqlDataReader dataReader = command.ExecuteReader())
                                 {
@@ -427,7 +433,7 @@ namespace GitHubScraper.Services
                         {
                             errored.Add(release);
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output release {issue.Number}. Error Message: {ex.Message}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output release {release.Id}. Error Message: {ex.Message}");
                             Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
                         }
                     }
@@ -444,7 +450,7 @@ namespace GitHubScraper.Services
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {releases.Count} release(s) for repository {repository}");
         }
 
-        // Updates or inserts the issue aggregate record.
+        // Updates or inserts the issue aggregate record in the database.
         public void LogIssueAggregates(string repository, List<IssueAggregateModel> issueAggregates)
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging {issueAggregates.Count} issue aggregate(s) for repository {repository}");
@@ -468,14 +474,15 @@ namespace GitHubScraper.Services
                         {
                             using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\LogIssueAggregate.sql"), connection))
                             {
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Command Loaded");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
 
                                 command.Parameters.Add(new SqlParameter("@repository", repository));
                                 command.Parameters.Add(new SqlParameter("@date", issueAggregate.Date));
                                 command.Parameters.Add(new SqlParameter("@created", issueAggregate.Created));
                                 command.Parameters.Add(new SqlParameter("@solved", issueAggregate.Solved));
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
 
                                 int rowsAffected = command.ExecuteNonQuery();
 
@@ -507,6 +514,61 @@ namespace GitHubScraper.Services
 
             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issueAggregates.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issueAggregates.Count) * 100}%) output errored");
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged {issueAggregates.Count} issue aggregate(s) for repository {repository}");
+        }
+
+        // Logs the run to the database.
+        public void LogRun(string repository, int issues, int commits, int pullRequests, int workflowRuns, int releases)
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging run for repository {repository}");
+
+            try
+            {
+                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                {
+                    connection.Open();
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
+
+                    using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\LogRun.sql"), connection))
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
+
+                        command.Parameters.Add(new SqlParameter("@repository", repository));
+                        command.Parameters.Add(new SqlParameter("@issues", issues));
+                        command.Parameters.Add(new SqlParameter("@commits", commits));
+                        command.Parameters.Add(new SqlParameter("@pullRequests", pullRequests));
+                        command.Parameters.Add(new SqlParameter("@workflowRuns", workflowRuns));
+                        command.Parameters.Add(new SqlParameter("@releases", releases));
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
+
+                        int rowsAffected = command.ExecuteNonQuery();
+
+                        if (rowsAffected == 1)
+                        {
+                            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged run for repository {repository}");
+                        }
+
+                        else
+                        {
+                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"An unknown error occured logging run for repository {repository}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"issues: {issues}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"commits: {commits}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"pullRequests: {pullRequests}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"workflowRuns: {workflowRuns}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"releases: {releases}");
+                        }
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log run for repository {repository}. Error Message: {ex.Message}");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+            }
         }
     }
 }
