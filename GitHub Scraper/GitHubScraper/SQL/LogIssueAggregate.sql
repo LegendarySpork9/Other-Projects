@@ -8,7 +8,7 @@ if exists (
 )
 begin
 	
-	update IssueAggregate set Created = @created, Solved = @solved
+	update IssueAggregate set Created = Created + @created, Solved = Solved + @solved
 	where RepositoryId = (
 		select RepositoryId from Repository with (nolock)
 		where [Name] = @repository

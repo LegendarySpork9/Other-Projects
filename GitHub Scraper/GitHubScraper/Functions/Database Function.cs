@@ -61,48 +61,62 @@ namespace GitHubScraper.Functions
             }
 
             issueAggregates = [.. issueAggregates.OrderBy(ia => ia.Date)];
-            DateTime previousdate = issueAggregates[0].Date;
 
-            for (int index = 1;  index < issueAggregates.Count; index++)
+            if (issueAggregates.Count > 0)
             {
-                int days = (issueAggregates[index].Date - previousdate).Days;
+                DateTime previousdate = issueAggregates[0].Date;
 
-                if (days != 1)
+                for (int index = 1; index < issueAggregates.Count; index++)
                 {
-                    issueAggregates.Insert(index, new()
-                    {
-                        Date = previousdate.AddDays(1),
-                        Created = 0,
-                        Solved = 0
-                    });
+                    int days = (issueAggregates[index].Date - previousdate).Days;
 
-                    index -= 1;
+                    if (days != 1)
+                    {
+                        issueAggregates.Insert(index, new()
+                        {
+                            Date = previousdate.AddDays(1),
+                            Created = 0,
+                            Solved = 0
+                        });
+
+                        index -= 1;
+                    }
+
+                    else
+                    {
+                        previousdate = issueAggregates[index].Date;
+                    }
                 }
 
-                else
+                while (true)
                 {
-                    previousdate = issueAggregates[index].Date;
+                    if (previousdate != DateTime.UtcNow.Date)
+                    {
+                        issueAggregates.Add(new()
+                        {
+                            Date = previousdate.AddDays(1),
+                            Created = 0,
+                            Solved = 0
+                        });
+
+                        previousdate = previousdate.AddDays(1);
+                    }
+
+                    else
+                    {
+                        break;
+                    }
                 }
             }
 
-            while (true)
+            else
             {
-                if (previousdate != DateTime.UtcNow.Date)
+                issueAggregates.Add(new()
                 {
-                    issueAggregates.Add(new()
-                    {
-                        Date = previousdate.AddDays(1),
-                        Created = 0,
-                        Solved = 0
-                    });
-
-                    previousdate = previousdate.AddDays(1);
-                }
-
-                else
-                {
-                    break;
-                }
+                    Date = DateTime.UtcNow.Date,
+                    Created = 0,
+                    Solved = 0
+                });
             }
 
             _logger.LogMessage(StandardValues.LoggerValues.Debug, $"{issueAggregates.Count} aggregate(s) created");

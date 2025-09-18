@@ -132,7 +132,11 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issues.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issues.Count) * 100}%) output errored");
+            if (issues.Count > 0)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issues.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issues.Count) * 100}%) output errored");
+            }
+            
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {issues.Count} issue(s) for repository {repository}");
         }
 
@@ -207,7 +211,11 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / commits.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / commits.Count) * 100}%) output errored");
+            if (commits.Count > 0)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / commits.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / commits.Count) * 100}%) output errored");
+            }
+
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {commits.Count} commit(s) for repository {repository}");
         }
 
@@ -287,7 +295,11 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / pullRequests.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / pullRequests.Count) * 100}%) output errored");
+            if (pullRequests.Count > 0)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / pullRequests.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / pullRequests.Count) * 100}%) output errored");
+            }
+
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {pullRequests.Count} pull request(s) for repository {repository}");
         }
 
@@ -367,7 +379,11 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / workflow.WorkflowRuns.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / workflow.WorkflowRuns.Count) * 100}%) output errored");
+            if (workflow.WorkflowRuns.Count > 0)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / workflow.WorkflowRuns.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / workflow.WorkflowRuns.Count) * 100}%) output errored");
+            }
+
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {workflow.WorkflowRuns.Count} workflow run(s) for {workflow.Name} workflow in repository {repository}");
         }
 
@@ -446,7 +462,11 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / releases.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / releases.Count) * 100}%) output errored");
+            if (releases.Count > 0)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / releases.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / releases.Count) * 100}%) output errored");
+            }
+
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {releases.Count} release(s) for repository {repository}");
         }
 
@@ -512,7 +532,11 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issueAggregates.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issueAggregates.Count) * 100}%) output errored");
+            if (issueAggregates.Count > 0)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issueAggregates.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issueAggregates.Count) * 100}%) output errored");
+            }
+
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged {issueAggregates.Count} issue aggregate(s) for repository {repository}");
         }
 
