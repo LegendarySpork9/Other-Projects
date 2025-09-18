@@ -17,12 +17,31 @@ namespace GitHubScraper.Functions
 
             foreach (IssueModel issue in issues)
             {
+                DateTime createdDate = DateTime.Parse(issue.Created_At.ToString("dd/MM/yyyy"));
+
+                int index = issueAggregates.FindIndex(ia => ia.Date == createdDate);
+
+                if (index != -1)
+                {
+                    issueAggregates[index].Created += 1;
+                }
+
+                else
+                {
+                    issueAggregates.Add(new()
+                    {
+                        Date = createdDate,
+                        Created = 1,
+                        Solved = 0
+                    });
+                }
+
                 if (issue.Closed_At != null)
                 {
                     DateTime date = (DateTime)issue.Closed_At;
                     DateTime closedDate = DateTime.Parse(date.ToString("dd/MM/yyyy"));
 
-                    int index = issueAggregates.FindIndex(ia => ia.Date == closedDate);
+                    index = issueAggregates.FindIndex(ia => ia.Date == closedDate);
 
                     if (index != -1)
                     {
@@ -39,30 +58,54 @@ namespace GitHubScraper.Functions
                         });
                     }
                 }
+            }
+
+            issueAggregates = [.. issueAggregates.OrderBy(ia => ia.Date)];
+            DateTime previousdate = issueAggregates[0].Date;
+
+            for (int index = 1;  index < issueAggregates.Count; index++)
+            {
+                int days = (issueAggregates[index].Date - previousdate).Days;
+
+                if (days != 1)
+                {
+                    issueAggregates.Insert(index, new()
+                    {
+                        Date = previousdate.AddDays(1),
+                        Created = 0,
+                        Solved = 0
+                    });
+
+                    index -= 1;
+                }
 
                 else
                 {
-                    DateTime createdDate = DateTime.Parse(issue.Created_At.ToString("dd/MM/yyyy"));
-
-                    int index = issueAggregates.FindIndex(ia => ia.Date == createdDate);
-
-                    if (index != -1)
-                    {
-                        issueAggregates[index].Created += 1;
-                    }
-
-                    else
-                    {
-                        issueAggregates.Add(new()
-                        {
-                            Date = createdDate,
-                            Created = 1,
-                            Solved = 0
-                        });
-                    }
+                    previousdate = issueAggregates[index].Date;
                 }
             }
 
+            while (true)
+            {
+                if (previousdate != DateTime.UtcNow.Date)
+                {
+                    issueAggregates.Add(new()
+                    {
+                        Date = previousdate.AddDays(1),
+                        Created = 0,
+                        Solved = 0
+                    });
+
+                    previousdate = previousdate.AddDays(1);
+                }
+
+                else
+                {
+                    break;
+                }
+            }
+
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"{issueAggregates.Count} aggregate(s) created");
             _logger.LogMessage(StandardValues.LoggerValues.Info, $"Created aggregates for repository {repository}");
             return issueAggregates;
         }
