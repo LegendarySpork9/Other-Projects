@@ -26,7 +26,7 @@ namespace GitHubScraper
 
             _applicationService.Run();
 
-            Console.ReadLine();
+            Console.ReadKey();
             _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
         }
     }

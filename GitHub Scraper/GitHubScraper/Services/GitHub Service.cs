@@ -71,30 +71,38 @@ namespace GitHubScraper.Services
                         {
                             foreach (IssueModel issue in apiIssues)
                             {
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for issue {issue.Number}");
-
-                                issue.Repository = repository;
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
-
-                                foreach (LabelModel label in issue.Labels)
+                                if (issue.Pull_Request == null)
                                 {
-                                    if (_gitHubConverter.IsType(label.Name))
+                                    Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for issue {issue.Number}");
+
+                                    issue.Repository = repository;
+
+                                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
+
+                                    foreach (LabelModel label in issue.Labels)
                                     {
-                                        issue.Type = _gitHubConverter.GetType(label.Name);
+                                        if (_gitHubConverter.IsType(label.Name))
+                                        {
+                                            issue.Type = _gitHubConverter.GetType(label.Name);
 
-                                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Type: {issue.Type}");
+                                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Type: {issue.Type}");
 
-                                        break;
+                                            break;
+                                        }
                                     }
+
+                                    issue.State = textInfo.ToTitleCase(issue.State);
+
+                                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Status: {issue.State}");
+                                    Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for issue {issue.Number}");
+
+                                    issues.Add(issue);
                                 }
 
-                                issue.State = textInfo.ToTitleCase(issue.State);
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Status: {issue.State}");
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for issue {issue.Number}");
-
-                                issues.Add(issue);
+                                else
+                                {
+                                    Logger.LogMessage(StandardValues.LoggerValues.Info, $"Issue {issue.Number} is a pull request, ignoring in favour of pull request endpoint data");
+                                }
                             }
 
                             page++;
@@ -201,7 +209,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {commits} commit(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {commits.Count} commit(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
             return [.. commits.OrderBy(c => c.Commit.Committer.Date)];
         }
 
@@ -317,7 +325,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {pullRequests} pull request(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {pullRequests.Count} pull request(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
             return [.. pullRequests.OrderBy(pr => pr.Id)];
         }
 
@@ -441,11 +449,15 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {workflowRuns} workflow run(s) from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy 00:00:00}");
-
             if (workflowRuns != null)
             {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {workflowRuns.Count} workflow run(s) from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy 00:00:00}");
                 workflowRuns = [.. workflowRuns.OrderBy(wr => wr.Id)];
+            }
+
+            else
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched 0 workflow run(s) from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy 00:00:00}");
             }
 
             return workflowRuns;
@@ -531,7 +543,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {releases} release(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {releases.Count} release(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
             return [.. releases.OrderBy(r => r.Id)];
         }
     }

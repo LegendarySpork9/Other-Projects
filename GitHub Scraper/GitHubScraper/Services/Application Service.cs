@@ -106,6 +106,7 @@ namespace GitHubScraper.Services
                 List<CommitModel> commits = _gitHubService.GetCommits(repository, lastRunDate);
                 List<PullRequestModel> pullRequests = _gitHubService.GetPullRequests(repository, lastRunDate);
                 List<WorkflowModel> workflows = [];
+                int totalWorkflowRuns = 0;
 
                 foreach (string workflow in AppSettingsModel.Workflows.Split(','))
                 {
@@ -118,6 +119,8 @@ namespace GitHubScraper.Services
                             Name = workflow,
                             WorkflowRuns = workflowRuns
                         });
+
+                        totalWorkflowRuns += workflowRuns.Count;
                     }
                 }
 
@@ -137,7 +140,7 @@ namespace GitHubScraper.Services
                 List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates(repository, issues);
 
                 _databaseService.LogIssueAggregates(repository, issueAggregates);
-                _databaseService.LogRun(repository, issues.Count, commits.Count, pullRequests.Count, workflows.Count, releases.Count);
+                _databaseService.LogRun(repository, issues.Count, commits.Count, pullRequests.Count, totalWorkflowRuns, releases.Count);
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Ran Scraper for {repository}");
             }
