@@ -1,6 +1,6 @@
 ﻿namespace GitHubScraper.Converters
 {
-    internal class GitHubConverter
+    public class GitHubConverter
     {
         // Returns whether the label is an issue type.
         public bool IsType(string label)
