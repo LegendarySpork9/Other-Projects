@@ -1,7 +1,7 @@
 ﻿namespace GitHubScraper.Models
 {
     // Stores the issue counts.
-    internal class IssueAggregateModel
+    public class IssueAggregateModel
     {
         public DateTime Date { get; set; }
         public int Created { get; set; }

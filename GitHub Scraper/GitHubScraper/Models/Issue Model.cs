@@ -3,7 +3,7 @@
 namespace GitHubScraper.Models
 {
     // Stores information about the issue.
-    internal class IssueModel
+    public class IssueModel
     {
         public string? Repository { get; set; }
         public required long Id { get; set; }

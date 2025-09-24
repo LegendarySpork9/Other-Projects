@@ -4,7 +4,7 @@ using GitHubScraper.Services;
 
 namespace GitHubScraper.Functions
 {
-    internal class DatabaseFunction
+    public class DatabaseFunction
     {
         // Creates the issue aggregates.
         public List<IssueAggregateModel> CreateAggregates(string repository, List<IssueModel> issues)

@@ -1,7 +1,7 @@
 ﻿namespace GitHubScraper.Models.Related
 {
     // Stores information about the user.
-    internal class UserModel
+    public class UserModel
     {
         public string? Login { get; set; }
         public string? Name { get; set; }
