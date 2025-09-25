@@ -16,10 +16,11 @@
     <PackageReference Include="log4net" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="System.Management" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ServerSiteCommon\ServerSiteCommon.csproj" />
+    <ProjectReference Include="..\ServerStatusCommon\ServerStatusCommon.csproj" />
   </ItemGroup>
 
 </Project>
