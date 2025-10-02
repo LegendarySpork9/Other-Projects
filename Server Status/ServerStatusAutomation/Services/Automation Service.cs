@@ -116,105 +116,105 @@ namespace ServerSiteAutomation.Services
 
                 if (pcStatus != null && (pcStatus.DateOccured < refreshPeriod || server.Statuses[0].Status != "Online"))
                 {
-                    if (downtime != null && (pcStatus.DateOccured < downtime || pcStatus.DateOccured > downtime.Value.AddMinutes(10)))
+                    if (server.Statuses[0].Status != "Unknown" && (server.Statuses[0].Status == "Online" || pcStatus.DateOccured < refreshPeriod))
                     {
-                        if (server.Statuses[0].Status == "Online" || pcStatus.DateOccured < refreshPeriod)
-                        {
-                            server.Statuses[0].Status = "Unknown";
+                        server.Statuses[0].Status = "Unknown";
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated PC Status to Unknown");
-                        }
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated PC Status to Unknown");
+                    }
 
+                    if (downtime == null || (pcStatus.DateOccured < downtime || pcStatus.DateOccured > downtime.Value.AddMinutes(10)))
+                    {
                         AlertsHandler(alerts.Alerts, server, pcStatus.Component, server.Statuses[0].Status);
+                    }
 
-                        if (pcStatus.DateOccured < refreshPeriod)
+                    if (pcStatus.DateOccured < refreshPeriod)
+                    {
+                        APIStatusModel newStatus = new()
                         {
-                            APIStatusModel newStatus = new()
+                            Component = pcStatus.Component,
+                            Status = server.Statuses[0].Status,
+                            Server = new APIRelatedServerModel
                             {
-                                Component = pcStatus.Component,
-                                Status = server.Statuses[0].Status,
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName,
-                                    Game = server.Game,
-                                    GameVersion = server.GameVersion
-                                }
-                            };
-
-                            if (APIService.RegisterServerEvent(newStatus))
-                            {
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
                             }
+                        };
+
+                        if (APIService.RegisterServerEvent(newStatus))
+                        {
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
                         }
                     }
                 }
 
                 if (serverStatus != null && (serverStatus.DateOccured < refreshPeriod || server.Statuses[1].Status != "Online"))
                 {
-                    if (downtime != null && (serverStatus.DateOccured < downtime || serverStatus.DateOccured > downtime.Value.AddMinutes(10)))
+                    if (server.Statuses[1].Status != "Unknown" && (server.Statuses[1].Status == "Online" || serverStatus.DateOccured < refreshPeriod))
                     {
-                        if (server.Statuses[1].Status == "Online" || serverStatus.DateOccured < refreshPeriod)
-                        {
-                            server.Statuses[1].Status = "Unknown";
+                        server.Statuses[1].Status = "Unknown";
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Server Status to Unknown");
-                        }
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Server Status to Unknown");
+                    }
 
+                    if (downtime == null || (serverStatus.DateOccured < downtime || serverStatus.DateOccured > downtime.Value.AddMinutes(10)))
+                    {
                         AlertsHandler(alerts.Alerts, server, serverStatus.Component, server.Statuses[1].Status);
+                    }
 
-                        if (serverStatus.DateOccured < refreshPeriod)
+                    if (serverStatus.DateOccured < refreshPeriod)
+                    {
+                        APIStatusModel newStatus = new()
                         {
-                            APIStatusModel newStatus = new()
+                            Component = serverStatus.Component,
+                            Status = server.Statuses[1].Status,
+                            Server = new APIRelatedServerModel
                             {
-                                Component = serverStatus.Component,
-                                Status = server.Statuses[1].Status,
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName,
-                                    Game = server.Game,
-                                    GameVersion = server.GameVersion
-                                }
-                            };
-
-                            if (APIService.RegisterServerEvent(newStatus))
-                            {
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
                             }
+                        };
+
+                        if (APIService.RegisterServerEvent(newStatus))
+                        {
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
                         }
                     }
                 }
 
                 if (connectionStatus != null && (connectionStatus.DateOccured < refreshPeriod || server.Statuses[2].Status != "Online"))
                 {
-                    if (downtime != null && (connectionStatus.DateOccured < downtime || connectionStatus.DateOccured > downtime.Value.AddMinutes(10)))
+                    if (server.Statuses[2].Status != "Unknown" && (server.Statuses[2].Status == "Online" || connectionStatus.DateOccured < refreshPeriod))
                     {
-                        if (server.Statuses[2].Status == "Online" || connectionStatus.DateOccured < refreshPeriod)
-                        {
-                            server.Statuses[2].Status = "Unknown";
+                        server.Statuses[2].Status = "Unknown";
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Connection Status to Unknown");
-                        }
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Connection Status to Unknown");
+                    }
 
+                    if (downtime == null || (connectionStatus.DateOccured < downtime || connectionStatus.DateOccured > downtime.Value.AddMinutes(10)))
+                    {
                         AlertsHandler(alerts.Alerts, server, connectionStatus.Component, server.Statuses[2].Status);
+                    }
 
-                        if (connectionStatus.DateOccured < refreshPeriod)
+                    if (connectionStatus.DateOccured < refreshPeriod)
+                    {
+                        APIStatusModel newStatus = new()
                         {
-                            APIStatusModel newStatus = new()
+                            Component = connectionStatus.Component,
+                            Status = server.Statuses[2].Status,
+                            Server = new APIRelatedServerModel
                             {
-                                Component = connectionStatus.Component,
-                                Status = server.Statuses[2].Status,
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName,
-                                    Game = server.Game,
-                                    GameVersion = server.GameVersion
-                                }
-                            };
-
-                            if (APIService.RegisterServerEvent(newStatus))
-                            {
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
                             }
+                        };
+
+                        if (APIService.RegisterServerEvent(newStatus))
+                        {
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
                         }
                     }
                 }
@@ -231,10 +231,14 @@ namespace ServerSiteAutomation.Services
             DiscordService _discordService = new(SharedSettings);
             _discordService.SetLogger(Logger);
 
+            bool alertFound = false;
+
             foreach (AlertModel alert in alerts)
             {
                 if (alert.Server == $"{server.Game} ({server.GameVersion})" && alert.Component == component)
                 {
+                    alertFound = true;
+
                     if (alert.AlertStatus == "Resolved")
                     {
                         APINewAlertsModel newAlert = new()
@@ -263,6 +267,29 @@ namespace ServerSiteAutomation.Services
 
                     break;
                 }
+            }
+
+            if (!alertFound)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Debug, "No Alerts Found in API");
+
+                APINewAlertsModel newAlert = new()
+                {
+                    Reporter = "Automation",
+                    Component = component,
+                    ComponentStatus = status,
+                    AlertStatus = "Reported",
+                    HostName = server.HostName,
+                    Game = server.Game,
+                    GameVersion = server.GameVersion
+                };
+
+                if (APIService.RegisterAlert(newAlert))
+                {
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
+                }
+
+                _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: {status}");
             }
         }
     }
