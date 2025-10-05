@@ -1,0 +1,53 @@
+﻿@page "/registeralert"
+
+<PageTitle>Register Alert</PageTitle>
+
+<div class="container">
+    <div class="@GetStyle("Form")" style="display: grid; grid-template-columns: 150px 1fr; row-gap: 1rem;">
+        <label>Reporter:</label>
+        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="User.DiscordName" />
+
+        <label>Server:</label>
+        <select style="@GetStyle("Input");width: 201px" @bind="Server">
+            <option value="" disabled selected>Select an option</option>
+            @foreach (string server in ServersNames)
+            {
+                <option value="@server">@server</option>
+            }
+        </select>
+
+        <label>Component:</label>
+        <select style="@GetStyle("Input");width: 201px" @bind="Component">
+            <option value="" disabled selected>Select an option</option>
+            <option value="PC Status">PC</option>
+            <option value="Server Status">Server</option>
+            <option value="Connection Status">Connection</option>
+        </select>
+
+        <label>Component Status:</label>
+        <select style="@GetStyle("Input");width: 201px" @bind="ComponentStatus">
+            <option value="" disabled selected>Select an option</option>
+            <option value="Offline">Offline</option>
+            <option value="Unknown">Unknown</option>
+        </select>
+
+        @if (ShowError)
+        {
+            <center style="grid-column: span 2;">
+                <label class="register-fail">There is already an alert registered for the given details.</label>
+            </center>
+        }
+
+        <center style="grid-column: span 2;">
+            @if (Loading)
+            {
+                <div class="spinner-border text-primary" role="status"></div>
+            }
+
+            else
+            {
+                <button class="btn btn-primary" @onclick="RegisterClick">Register</button>
+            }
+        </center>
+    </div>
+</div>
