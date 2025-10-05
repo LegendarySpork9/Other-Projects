@@ -6,10 +6,25 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <Title>Server Status Automation</Title>
+    <Authors>Hunter Industries</Authors>
+    <Product>Server Status Automation</Product>
+    <Description>Used to check for missed events or offline statuses so automated alerts can be raised in the API if issues are detected.</Description>
+    <Copyright>Copyright ©  2025</Copyright>
+    <PackageIcon>favicon.ico</PackageIcon>
+    <RepositoryUrl>https://github.com/LegendarySpork9/Other-Projects/tree/main/Server%20Status</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\ServerStatusCommon\Content\favicon.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

@@ -4,7 +4,21 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Content\favicon.ico</ApplicationIcon>
+    <Title>Server Status Site</Title>
+    <Version>1.0.0</Version>
+    <Authors>Hunter Industries</Authors>
+    <Product>Server Status Site</Product>
+    <Description>A monitoring site where you can view the status of servers you host locally. This should be use in conjunction with the automation and reporter companion apps.</Description>
+    <Copyright>Copyright ©  2025</Copyright>
+    <PackageIcon>favicon.ico</PackageIcon>
+    <RepositoryUrl>https://github.com/LegendarySpork9/Other-Projects/tree/main/Server%20Status</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Content\favicon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="log4net" Version="3.1.0" />
