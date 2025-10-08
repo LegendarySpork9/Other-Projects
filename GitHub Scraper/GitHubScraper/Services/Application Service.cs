@@ -5,7 +5,7 @@ using GitHubScraper.Models.Related;
 
 namespace GitHubScraper.Services
 {
-    internal class ApplicationService
+    public class ApplicationService
     {
         LoggerService Logger = new();
 

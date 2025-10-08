@@ -3,7 +3,7 @@
 namespace GitHubScraper.Models
 {
     // Stores the settings used by the application.
-    internal static class AppSettingsModel
+    public static class AppSettingsModel
     {
         public static string? Owner { get; set; } = ConfigurationManager.AppSettings["Owner"];
         public static string? Repositories { get; set; } = ConfigurationManager.AppSettings["Repositories"];
