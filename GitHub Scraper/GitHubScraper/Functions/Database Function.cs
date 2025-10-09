@@ -1,7 +1,6 @@
 ﻿using GitHubScraper.Converters;
 using GitHubScraper.Models;
 using GitHubScraper.Services;
-using System.Globalization;
 
 namespace GitHubScraper.Functions
 {
@@ -18,7 +17,7 @@ namespace GitHubScraper.Functions
 
             foreach (IssueModel issue in issues)
             {
-                DateTime createdDate = DateTime.ParseExact(issue.Created_At.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime createdDate = issue.Created_At.Date.ToUniversalTime();
 
                 int index = issueAggregates.FindIndex(ia => ia.Date == createdDate);
 
@@ -40,7 +39,7 @@ namespace GitHubScraper.Functions
                 if (issue.Closed_At != null)
                 {
                     DateTime date = (DateTime)issue.Closed_At;
-                    DateTime closedDate = DateTime.ParseExact(date.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    DateTime closedDate = date.Date.ToUniversalTime();
 
                     index = issueAggregates.FindIndex(ia => ia.Date == closedDate);
 

@@ -12,7 +12,7 @@ namespace GitHubScraper.Services
         // Gets the last time the application was run for the given repository.
         public DateTime GetLastRunDate(string repository)
         {
-            DateTime lastRunDate = DateTime.Parse("01/01/1900");
+            DateTime lastRunDate = DateTime.Parse("01/01/1900").ToUniversalTime();
 
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the last run date for repository {repository}");
 
@@ -37,7 +37,7 @@ namespace GitHubScraper.Services
                         {
                             while (dataReader.Read())
                             {
-                                lastRunDate = dataReader.GetDateTime(0);
+                                lastRunDate = dataReader.GetDateTime(0).ToUniversalTime();
                             }
 
                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Last Run Date: {lastRunDate}");
@@ -93,7 +93,7 @@ namespace GitHubScraper.Services
                                 command.Parameters.Add(new SqlParameter("@type", issue.Type ?? "Undefined"));
                                 command.Parameters.Add(new SqlParameter("@status", issue.State));
                                 command.Parameters.Add(new SqlParameter("@dateCreated", issue.Created_At));
-                                command.Parameters.Add(new SqlParameter("@dateSolved", issue.Closed_At ?? DateTime.Parse("01/01/1900 00:00:00")));
+                                command.Parameters.Add(new SqlParameter("@dateSolved", issue.Closed_At ?? DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime()));
 
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
@@ -255,8 +255,8 @@ namespace GitHubScraper.Services
                                 command.Parameters.Add(new SqlParameter("@type", pullRequest.Type ?? "Undefined"));
                                 command.Parameters.Add(new SqlParameter("@status", pullRequest.State));
                                 command.Parameters.Add(new SqlParameter("@dateCreated", pullRequest.Created_At));
-                                command.Parameters.Add(new SqlParameter("@dateSolved", pullRequest.Closed_At ?? DateTime.Parse("01/01/1900 00:00:00")));
-                                command.Parameters.Add(new SqlParameter("@dateMerged", pullRequest.Merged_At ?? DateTime.Parse("01/01/1900 00:00:00")));
+                                command.Parameters.Add(new SqlParameter("@dateSolved", pullRequest.Closed_At ?? DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime()));
+                                command.Parameters.Add(new SqlParameter("@dateMerged", pullRequest.Merged_At ?? DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime()));
 
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
@@ -423,7 +423,7 @@ namespace GitHubScraper.Services
                                 command.Parameters.Add(new SqlParameter("@assets", release.Assets.Count));
                                 command.Parameters.Add(new SqlParameter("@body", release.Body));
                                 command.Parameters.Add(new SqlParameter("@dateCreated", release.Created_At));
-                                command.Parameters.Add(new SqlParameter("@datePublished", release.Published_At ?? DateTime.Parse("01/01/1900 00:00:00")));
+                                command.Parameters.Add(new SqlParameter("@datePublished", release.Published_At ?? DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime()));
 
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
                                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");

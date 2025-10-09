@@ -27,7 +27,7 @@ namespace GitHubScraper.Services
 
             try
             {
-                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00"))
+                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00").ToUniversalTime())
                 {
                     url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/issues?state=all&sort=updated&per_page=100";
                 }
@@ -138,7 +138,7 @@ namespace GitHubScraper.Services
 
             try
             {
-                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00"))
+                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00").ToUniversalTime())
                 {
                     url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/commits?per_page=100";
                 }
@@ -342,7 +342,7 @@ namespace GitHubScraper.Services
 
             try
             {
-                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00"))
+                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00").ToUniversalTime())
                 {
                     url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/actions/workflows/{workflow}/runs?created=>1970-01-01T00:00:00Z&per_page=100";
                 }
