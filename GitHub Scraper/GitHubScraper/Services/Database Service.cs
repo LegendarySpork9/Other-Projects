@@ -12,9 +12,9 @@ namespace GitHubScraper.Services
         // Gets the last time the application was run for the given repository.
         public DateTime GetLastRunDate(string repository)
         {
-            DateTime lastRunDate = DateTime.Parse("01/01/1900").ToUniversalTime();
-
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the last run date for repository {repository}");
+
+            DateTime lastRunDate = DateTime.Parse("01/01/1900").ToUniversalTime();
 
             try
             {
@@ -40,7 +40,7 @@ namespace GitHubScraper.Services
                                 lastRunDate = dataReader.GetDateTime(0).ToUniversalTime();
                             }
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Last Run Date: {lastRunDate}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Last Run Date: {lastRunDate:dd/MM/yyyy HH:mm:ss}");
                         }
 
                         Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained the last run date for repository {repository}");
@@ -55,6 +55,63 @@ namespace GitHubScraper.Services
             }
 
             return lastRunDate;
+        }
+
+        // Gets the existing issues for the given repository.
+        public List<IssueModel> GetIssues(string repository)
+        {
+            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the existing issues for repository {repository}");
+
+            List<IssueModel> existingIssues = [];
+
+            try
+            {
+                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                {
+                    connection.Open();
+
+                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
+
+                    using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\GetIssues.sql"), connection))
+                    {
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
+
+                        command.Parameters.Add(new SqlParameter("@repository", repository));
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
+                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
+
+                        using (SqlDataReader dataReader = command.ExecuteReader())
+                        {
+                            while (dataReader.Read())
+                            {
+                                existingIssues.Add(new()
+                                {
+                                    Id = dataReader.GetInt64(0),
+                                    Number = 0,
+                                    Title = "UnLoaded",
+                                    State = "UnLoaded",
+                                    Created_At = dataReader.GetDateTime(1),
+                                    Closed_At = dataReader.GetDateTime(2),
+                                    Labels = []
+                                });
+                            }
+
+                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{existingIssues.Count} existsing issue(s)");
+                        }
+
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained the existing issues for repository {repository}");
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to obtain the existing issues for repository {repository}. Error Message: {ex.Message}");
+                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+            }
+
+            return existingIssues;
         }
 
         // Outputs the issues to the database.
@@ -488,7 +545,7 @@ namespace GitHubScraper.Services
 
                     foreach (IssueAggregateModel issueAggregate in issueAggregates)
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging issue aggregate for {issueAggregate.Date}");
+                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}");
 
                         try
                         {
@@ -511,7 +568,7 @@ namespace GitHubScraper.Services
                                     successful.Add(issueAggregate);
                                 }
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged issue aggregate for {issueAggregate.Date}");
+                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}");
                             }
                         }
 
@@ -519,7 +576,7 @@ namespace GitHubScraper.Services
                         {
                             errored.Add(issueAggregate);
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log issue aggregate for {issueAggregate.Date}. Error Message: {ex.Message}");
+                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}. Error Message: {ex.Message}");
                             Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
                         }
                     }

@@ -101,6 +101,7 @@ namespace GitHubScraper.Services
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Running Scraper for {repository}");
 
                 DateTime lastRunDate = _databaseService.GetLastRunDate(repository);
+                List<IssueModel> existingIssues = _databaseService.GetIssues(repository);
 
                 List<IssueModel> issues = _gitHubService.GetIssues(repository, lastRunDate);
                 List<CommitModel> commits = _gitHubService.GetCommits(repository, lastRunDate);
@@ -137,7 +138,7 @@ namespace GitHubScraper.Services
 
                 _databaseService.OutputReleases(repository, releases);
 
-                List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates(repository, issues);
+                List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates(repository, issues, existingIssues);
 
                 _databaseService.LogIssueAggregates(repository, issueAggregates);
                 _databaseService.LogRun(repository, issues.Count, commits.Count, pullRequests.Count, totalWorkflowRuns, releases.Count);

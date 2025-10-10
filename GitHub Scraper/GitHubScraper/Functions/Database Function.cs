@@ -7,7 +7,7 @@ namespace GitHubScraper.Functions
     public class DatabaseFunction
     {
         // Creates the issue aggregates.
-        public List<IssueAggregateModel> CreateAggregates(string repository, List<IssueModel> issues)
+        public List<IssueAggregateModel> CreateAggregates(string repository, List<IssueModel> issues, List<IssueModel> existingIssues)
         {
             LoggerService _logger = new();
 
@@ -15,28 +15,36 @@ namespace GitHubScraper.Functions
 
             List<IssueAggregateModel> issueAggregates = [];
 
+            issues = FilterIssues(repository, issues, existingIssues);
+
             foreach (IssueModel issue in issues)
             {
+                IssueModel? existingIssue = existingIssues.Find(c => c.Id == issue.Id);
+
                 DateTime createdDate = issue.Created_At.Date.ToUniversalTime();
+                int index = -1;
 
-                int index = issueAggregates.FindIndex(ia => ia.Date == createdDate);
-
-                if (index != -1)
+                if (existingIssue == null || issue.Created_At != existingIssue.Created_At)
                 {
-                    issueAggregates[index].Created += 1;
-                }
+                    index = issueAggregates.FindIndex(ia => ia.Date == createdDate);
 
-                else
-                {
-                    issueAggregates.Add(new()
+                    if (index != -1)
                     {
-                        Date = createdDate,
-                        Created = 1,
-                        Solved = 0
-                    });
+                        issueAggregates[index].Created += 1;
+                    }
+
+                    else
+                    {
+                        issueAggregates.Add(new()
+                        {
+                            Date = createdDate,
+                            Created = 1,
+                            Solved = 0
+                        });
+                    }
                 }
 
-                if (issue.Closed_At != null)
+                if (issue.Closed_At != null && (existingIssue == null || issue.Closed_At != existingIssue.Closed_At))
                 {
                     DateTime date = (DateTime)issue.Closed_At;
                     DateTime closedDate = date.Date.ToUniversalTime();
@@ -122,6 +130,38 @@ namespace GitHubScraper.Functions
             _logger.LogMessage(StandardValues.LoggerValues.Debug, $"{issueAggregates.Count} aggregate(s) created");
             _logger.LogMessage(StandardValues.LoggerValues.Info, $"Created aggregates for repository {repository}");
             return issueAggregates;
+        }
+
+        // Filters out existing issues from the given list of issues.
+        private List<IssueModel> FilterIssues(string repository, List<IssueModel> issues, List<IssueModel> existingIssues)
+        {
+            LoggerService _logger = new();
+
+            _logger.LogMessage(StandardValues.LoggerValues.Info, $"Filtering issues for repository {repository}");
+
+            List<IssueModel> removedIssues = [];
+
+            foreach (IssueModel issue in issues)
+            {
+                IssueModel? existingIssue = existingIssues.Find(c => c.Id == issue.Id);
+
+                if (existingIssue != null)
+                {
+                    if (issue.Created_At == existingIssue.Created_At && issue.Closed_At == existingIssue.Closed_At)
+                    {
+                        removedIssues.Add(issue);
+                    }
+                }
+            }
+
+            foreach (IssueModel issue in removedIssues)
+            {
+                issues.Remove(issue);
+            }
+
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"{removedIssues.Count} issue(s) removed");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, $"Filtered issues for repository {repository}");
+            return issues;
         }
     }
 }

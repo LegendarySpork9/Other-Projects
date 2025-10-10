@@ -54,9 +54,25 @@ BEGIN
 	select @committerId = UserId from [User] with (nolock)
 	where Username = @committer
 
-    -- insert the commit
-    insert into [Commit] (RepositoryId, AuthorId, CommitterId, GitHubCommitId, [Message])
-    values (@repositoryId, @authorId, @committerId, @sha, @message);
+	/* Updates a record if one is found or inserts one if it isn't */
+	merge [Commit] as [target]
+	using (
+		select
+			@repositoryId as RepositoryId,
+            @sha as GitHubCommitId,
+            @authorId as AuthorId,
+            @committerId as CommitterId,
+            @message as [Message]
+	) as [source]
+	on [target].GitHubCommitId = [source].GitHubCommitId
+	when matched then
+		update set
+			AuthorId = [source].AuthorId,
+			CommitterId = [source].CommitterId,
+			[Message] = [source].[Message]
+	when not matched then
+		insert (RepositoryId, AuthorId, CommitterId, GitHubCommitId, [Message])
+        values ([source].RepositoryId, [source].AuthorId, [source].CommitterId, [source].GitHubCommitId, [source].[Message]);
 
 END
 GO
