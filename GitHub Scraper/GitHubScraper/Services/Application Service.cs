@@ -40,9 +40,7 @@ namespace GitHubScraper.Services
 
             if (string.IsNullOrWhiteSpace(AppSettingsModel.Workflows))
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, "Valid workflows not found. Please provide one in the app settings with the tag \"Workflows\"");
-
-                configured = false;
+                Logger.LogMessage(StandardValues.LoggerValues.Warning, "Valid workflows not found. Please provide them in the app settings with the tag \"Workflows\" if required");
             }
 
             else

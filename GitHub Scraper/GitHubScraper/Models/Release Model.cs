@@ -3,7 +3,7 @@
 namespace GitHubScraper.Models
 {
     // Stores information about the release.
-    internal class ReleaseModel
+    public class ReleaseModel
     {
         public string? Repository { get; set; }
         public required long Id { get; set; }

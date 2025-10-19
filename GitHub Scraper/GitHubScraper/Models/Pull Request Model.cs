@@ -3,7 +3,7 @@
 namespace GitHubScraper.Models
 {
     // Stores information about the pull request.
-    internal class PullRequestModel
+    public class PullRequestModel
     {
         public string? Repository { get; set; }
         public required long Id { get; set; }

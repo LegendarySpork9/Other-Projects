@@ -3,7 +3,7 @@
 namespace GitHubScraper.Models
 {
     // Stores information about the commit.
-    internal class CommitModel
+    public class CommitModel
     {
         public string? Repository { get; set; }
         public string? Sha { get; set; }

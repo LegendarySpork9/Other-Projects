@@ -8,7 +8,7 @@ using System.Globalization;
 
 namespace GitHubScraper.Services
 {
-    internal class GitHubService
+    public class GitHubService
     {
         private readonly LoggerService Logger = new();
 

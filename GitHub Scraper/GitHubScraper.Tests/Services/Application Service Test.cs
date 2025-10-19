@@ -8,6 +8,7 @@ namespace GitHubScraper.Tests.Services
     [TestClass]
     public class ApplicationServiceTest
     {
+        // Checks whether the configuration passes with all configuration values provided.
         [TestMethod]
         public void TestSetupPass()
         {
@@ -23,6 +24,22 @@ namespace GitHubScraper.Tests.Services
             Assert.IsTrue(_mockApplicationService.Object.Setup());
         }
 
+        // Checks whether the configuration passes with all configuration values provided except the workflows.
+        [TestMethod]
+        public void TestSetupPassNoWorkflow()
+        {
+            Mock<ApplicationService> _mockApplicationService = new();
+
+            AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
+            AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"];
+            AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
+            AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
+            AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
+
+            Assert.IsTrue(_mockApplicationService.Object.Setup());
+        }
+
+        // Checks whether the configuration fails when all the configuration values are missing.
         [TestMethod]
         public void TestSetupAllFail()
         {
@@ -30,7 +47,6 @@ namespace GitHubScraper.Tests.Services
 
             AppSettingsModel.Owner = null;
             AppSettingsModel.Repositories = null;
-            AppSettingsModel.Workflows = null;
             AppSettingsModel.BearerToken = null;
             AppSettingsModel.ConnectionString = null;
             AppSettingsModel.SQLFiles = null;
@@ -38,6 +54,7 @@ namespace GitHubScraper.Tests.Services
             Assert.IsFalse(_mockApplicationService.Object.Setup());
         }
 
+        // Checks whether the configuration fails when the owner configuration value is missing.
         [TestMethod]
         public void TestSetupOwnerFail()
         {
@@ -53,6 +70,7 @@ namespace GitHubScraper.Tests.Services
             Assert.IsFalse(_mockApplicationService.Object.Setup());
         }
 
+        // Checks whether the configuration fails when the repository configuration value is missing.
         [TestMethod]
         public void TestSetupRepositoryFail()
         {
@@ -68,21 +86,7 @@ namespace GitHubScraper.Tests.Services
             Assert.IsFalse(_mockApplicationService.Object.Setup());
         }
 
-        [TestMethod]
-        public void TestSetupWorkflowFail()
-        {
-            Mock<ApplicationService> _mockApplicationService = new();
-
-            AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
-            AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"];
-            AppSettingsModel.Workflows = null;
-            AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
-            AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
-            AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
-
-            Assert.IsFalse(_mockApplicationService.Object.Setup());
-        }
-
+        // Checks whether the configuration fails when the token configuration value is missing.
         [TestMethod]
         public void TestSetupTokenFail()
         {
@@ -98,6 +102,7 @@ namespace GitHubScraper.Tests.Services
             Assert.IsFalse(_mockApplicationService.Object.Setup());
         }
 
+        // Checks whether the configuration fails when the connection string configuration value is missing.
         [TestMethod]
         public void TestSetupConnectionStringFail()
         {
@@ -113,6 +118,7 @@ namespace GitHubScraper.Tests.Services
             Assert.IsFalse(_mockApplicationService.Object.Setup());
         }
 
+        // Checks whether the configuration fails when the SQL files configuration value is missing.
         [TestMethod]
         public void TestSetupSQLFail()
         {

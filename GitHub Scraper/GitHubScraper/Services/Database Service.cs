@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 
 namespace GitHubScraper.Services
 {
-    internal class DatabaseService
+    public class DatabaseService
     {
         private readonly LoggerService Logger = new();
 

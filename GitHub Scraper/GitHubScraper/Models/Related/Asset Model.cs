@@ -1,7 +1,7 @@
 ﻿namespace GitHubScraper.Models.Related
 {
     // Stores information about the asset.
-    internal class AssetModel
+    public class AssetModel
     {
         public int Id { get; set; }
     }

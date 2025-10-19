@@ -1,7 +1,7 @@
 ﻿namespace GitHubScraper.Models.Related
 {
     // Stores information about the workflow run.
-    internal class WorkflowRunModel
+    public class WorkflowRunModel
     {
         public string? RepositoryName { get; set; }
         public required long Id { get; set; }
