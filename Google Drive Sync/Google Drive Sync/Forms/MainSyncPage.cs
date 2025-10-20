@@ -91,6 +91,23 @@ namespace GoogleDriveSync
                     DGVFileInformation.Rows[DGVFileInformation.Rows.Count - 1].Cells[6].ReadOnly = true;
                     DGVFileInformation.Rows[DGVFileInformation.Rows.Count - 1].Cells[7].ReadOnly = true;
                 }
+
+                else
+                {
+                    if (file.Changes[0].OldValue == "Not Uploaded")
+                    {
+                        DataGridViewComboBoxCell dropDown = DGVFileInformation.Rows[DGVFileInformation.Rows.Count - 1].Cells[6] as DataGridViewComboBoxCell;
+
+                        dropDown.Items.Remove("Down Stream");
+                    }
+
+                    else if (file.Changes[0].OldValue == "Not Downloaded")
+                    {
+                        DataGridViewComboBoxCell dropDown = DGVFileInformation.Rows[DGVFileInformation.Rows.Count - 1].Cells[6] as DataGridViewComboBoxCell;
+
+                        dropDown.Items.Remove("Up Stream");
+                    }
+                }
             }
 
             TablePopulated = true;
@@ -323,7 +340,9 @@ namespace GoogleDriveSync
 
             foreach (DataGridViewRow row in DGVFileInformation.Rows)
             {
-                if (bool.Parse(row.Cells[5].Value.ToString()))
+                DataGridViewComboBoxCell dropDown = row.Cells[6] as DataGridViewComboBoxCell;
+
+                if (bool.Parse(row.Cells[5].Value.ToString()) && dropDown.Items.Contains("Up Stream"))
                 {
                     row.Cells[6].Value = "Up Stream";
                     row.Cells[7].Value = true;
@@ -338,7 +357,9 @@ namespace GoogleDriveSync
 
             foreach (DataGridViewRow row in DGVFileInformation.Rows)
             {
-                if (bool.Parse(row.Cells[5].Value.ToString()))
+                DataGridViewComboBoxCell dropDown = row.Cells[6] as DataGridViewComboBoxCell;
+
+                if (bool.Parse(row.Cells[5].Value.ToString()) && dropDown.Items.Contains("Down Stream"))
                 {
                     row.Cells[6].Value = "Down Stream";
                     row.Cells[7].Value = true;
