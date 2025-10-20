@@ -485,9 +485,11 @@
             this.Controls.Add(this.DGVFileInformation);
             this.Controls.Add(this.TBCDocumentChanges);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(1265, 535);
             this.MinimumSize = new System.Drawing.Size(1265, 535);
             this.Name = "MainSyncPage";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Google Drive Sync";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Exit);
             ((System.ComponentModel.ISupportInitialize)(this.DGVFileInformation)).EndInit();
