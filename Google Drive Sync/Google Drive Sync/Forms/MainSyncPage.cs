@@ -1,8 +1,10 @@
 ﻿using GoogleDriveSync.Converters;
+using GoogleDriveSync.Functions;
 using GoogleDriveSync.Models;
 using GoogleDriveSync.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -392,6 +394,9 @@ namespace GoogleDriveSync
         {
             TMAutoSync.Stop();
 
+            FileFunction _fileFunction = new FileFunction();
+            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+
             PRBLoading.Value = 0;
             PBLoading.Image = Properties.Resources.LoadingSpinner;
             bool hasErrored = false;
@@ -408,18 +413,25 @@ namespace GoogleDriveSync
 
             foreach (FileModel file in Files)
             {
-                if (file.Changes.Count > 0)
+                if ((file.Id.Contains(",") && !_fileFunction.IsFileLocked(new FileInfo(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right")))) || (file.Id.Contains(":\\") && !_fileFunction.IsFileLocked(new FileInfo(file.Id))))
                 {
-                    ChangeModel modifiedChange = file.Changes.Find(c => c.Field == "Modified");
-
-                    if (modifiedChange.Stream == "Up")
+                    if (file.Changes.Count > 0)
                     {
-                        downloadFiles.Add(file);
-                    }
+                        ChangeModel modifiedChange = file.Changes.Find(c => c.Field == "Last Modified");
+                        ChangeModel pathChange = file.Changes.Find(c => c.Field == "Path");
 
-                    else
-                    {
-                        uploadFiles.Add(file);
+                        if (pathChange == null && modifiedChange != null)
+                        {
+                            if (modifiedChange.Stream == "Up")
+                            {
+                                downloadFiles.Add(file);
+                            }
+
+                            else
+                            {
+                                uploadFiles.Add(file);
+                            }
+                        }
                     }
                 }
             }

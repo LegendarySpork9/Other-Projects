@@ -3,6 +3,7 @@ using GoogleDriveSync.Models;
 using GoogleDriveSync.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace GoogleDriveSync.Functions
 {
@@ -48,7 +49,7 @@ namespace GoogleDriveSync.Functions
 
                             changes.Add(new ChangeModel
                             {
-                                Field = "Modified",
+                                Field = "Last Modified",
                                 OldValue = localFile.LastModified.ToString(),
                                 NewValue = googleFile.LastModified.ToString(),
                                 Stream = "Up"
@@ -61,7 +62,7 @@ namespace GoogleDriveSync.Functions
 
                             changes.Add(new ChangeModel
                             {
-                                Field = "Modified",
+                                Field = "Last Modified",
                                 OldValue = googleFile.LastModified.ToString(),
                                 NewValue = localFile.LastModified.ToString(),
                                 Stream = "Down"
@@ -183,6 +184,27 @@ namespace GoogleDriveSync.Functions
             _logger.LogMessage(StandardValues.LoggerValues.Info, $"Found {differences} change(s) between Google Drive and the Local Drive");
 
             return files;
+        }
+
+        // Checks if the file is in use.
+        public bool IsFileLocked(FileInfo file)
+        {
+            bool locked = false;
+
+            try
+            {
+                using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    stream.Close();
+                }
+            }
+
+            catch (Exception ex)
+            {
+                locked = true;
+            }
+
+            return locked;
         }
     }
 }
