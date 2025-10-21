@@ -22,7 +22,7 @@ namespace GoogleDriveSync.Services
         private readonly string FolderId;
         private readonly string FolderName;
         private bool HasErrored = false;
-        private List<KeyValuePair<string, string>> Folders = new List<KeyValuePair<string, string>>();
+        private List<KeyValuePair<string, string>> FolderStore = new List<KeyValuePair<string, string>>();
 
         // Sets the class's global variables.
         public GoogleAPIService(string folderId)
@@ -73,7 +73,7 @@ namespace GoogleDriveSync.Services
 
                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {folderName}");
 
-                            Folders.Add(new KeyValuePair<string, string>(folderId, folderName));
+                            FolderStore.Add(new KeyValuePair<string, string>(folderId, folderName));
                         }
                     }
                 }
@@ -143,6 +143,8 @@ namespace GoogleDriveSync.Services
         {
             Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file(s) under folder {FolderName ?? FolderId}");
 
+            FolderStore = new List<KeyValuePair<string, string>>();
+
             List<FileModel> googleDrive = new List<FileModel>();
             (string[] folderIds, string[] folderNames) = GetFolders(FolderId);
 
@@ -187,7 +189,7 @@ namespace GoogleDriveSync.Services
 
                 FilesResource.ListRequest request = service.Files.List();
                 request.Q = $"'{folderId}' in parents and mimeType = 'application/vnd.google-apps.folder'";
-                request.Fields = "files(id, name)";
+                request.Fields = "files(id, name, parents)";
 
                 Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Search Query");
                 Logger.LogMessage(StandardValues.LoggerValues.Info, "Sending Request");
@@ -209,7 +211,7 @@ namespace GoogleDriveSync.Services
                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Id: {folder.Id}");
                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {folder.Name}");
 
-                            Folders.Add(new KeyValuePair<string, string>(folder.Id, folder.Name));
+                            FolderStore.Add(new KeyValuePair<string, string>(folder.Id, $"{folder.Name} ({folder.Parents[0].ToString()})"));
                         }
                     }
                 }
@@ -325,7 +327,7 @@ namespace GoogleDriveSync.Services
         }
 
         // Creates a folder under the specified folder.
-        private void CreateFolder(string folderName, string parent)
+        private string CreateFolder(string folderName, string parent)
         {
             LoggerFunction _loggerFunction = new LoggerFunction();
 
@@ -371,30 +373,45 @@ namespace GoogleDriveSync.Services
 
             if (!string.IsNullOrWhiteSpace(folder.Id))
             {
-                Folders.Add(new KeyValuePair<string, string>(folder.Id, folderName));
+                FolderStore.Add(new KeyValuePair<string, string>(folder.Id, $"{folderName} ({parent})"));
 
                 Logger.LogMessage(StandardValues.LoggerValues.Info, $"Created {folderName} in Google Drive");
             }
+
+            return folder.Id;
         }
 
         // Checks if the required folders exist.
-        private void CheckFolders(string[] folders)
+        private string CheckFolders(string[] folders)
         {
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
 
-            for (int x = 0; x < folders.Length; x++)
+            string parent = AppSettingsModel.DriveFolder;
+
+            for (int x = 1; x < folders.Length; x++)
             {
-                string folderId = Folders.Find(c => c.Value == folders[x]).Key;
+                string folderStoreValue = $"{folders[x]} ({parent})";
+                string folderId = FolderStore.Find(c => c.Value == folderStoreValue).Key;
 
                 if (string.IsNullOrWhiteSpace(folderId))
                 {
                     Logger.LogMessage(StandardValues.LoggerValues.Warning, $"{folders[x]} folder not found in Google Drive");
 
-                    string parent = Folders.Find(c => c.Value == folders[x - 1]).Key;
+                    string newFolderId = CreateFolder(folders[x], parent);
 
-                    CreateFolder(folders[x], parent);
+                    if (x != (folders.Length - 1))
+                    {
+                        parent = newFolderId;
+                    }
+                }
+
+                else if (x != (folders.Length - 1))
+                {
+                    parent = folderId;
                 }
             }
+
+            return parent;
         }
 
         // Uploads a new file.
@@ -408,7 +425,8 @@ namespace GoogleDriveSync.Services
 
             IUploadProgress requestStatus = null;
 
-            CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
+            string parent = CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
+            string folderStoreValue = $"{_googleDriveFunction.RemoveStringCharacters(file.Path, new char[] { '\\' }, "Right")} ({parent})";
 
             try
             {
@@ -423,7 +441,7 @@ namespace GoogleDriveSync.Services
                 Google.Apis.Drive.v3.Data.File fileMetaData = new Google.Apis.Drive.v3.Data.File
                 {
                     Name = $"{file.Name}.{file.Type}",
-                    Parents = new List<string> { Folders.Find(c => c.Value == _googleDriveFunction.RemoveStringCharacters(file.Path, new char[] { '\\' }, "Right")).Key },
+                    Parents = new List<string> { FolderStore.Find(c => c.Value == folderStoreValue).Key },
                     CreatedTime = file.Created,
                     ModifiedTime = file.LastModified
                 };
@@ -541,7 +559,8 @@ namespace GoogleDriveSync.Services
 
             IUploadProgress requestStatus = null;
 
-            CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
+            string parent = CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
+            string folderStoreValue = $"{_googleDriveFunction.RemoveStringCharacters(file.Path, new char[] { ',', '\\' }, "Right")} ({parent})";
 
             try
             {
@@ -566,7 +585,7 @@ namespace GoogleDriveSync.Services
 
                 FilesResource.UpdateMediaUpload moveRequest = service.Files.Update(fileMetaData, _googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Left"), fileStream, _googleDriveConverter.GetMimeType($".{file.Type}"));
                 moveRequest.RemoveParents = _googleDriveFunction.RemoveStringCharacters(file.PathIds, new char[] { '\\' }, "Right");
-                moveRequest.AddParents = Folders.Find(c => c.Value == _googleDriveFunction.RemoveStringCharacters(file.Path, new char[] { ',', '\\' }, "Right")).Key;
+                moveRequest.AddParents = FolderStore.Find(c => c.Value == folderStoreValue).Key;
                 moveRequest.Fields = "id, name, parents";
                 requestStatus = moveRequest.Upload();
 
