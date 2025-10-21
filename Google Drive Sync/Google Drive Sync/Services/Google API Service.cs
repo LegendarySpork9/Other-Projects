@@ -441,7 +441,7 @@ namespace GoogleDriveSync.Services
                 Google.Apis.Drive.v3.Data.File fileMetaData = new Google.Apis.Drive.v3.Data.File
                 {
                     Name = $"{file.Name}.{file.Type}",
-                    Parents = new List<string> { FolderStore.Find(c => c.Value == folderStoreValue).Key },
+                    Parents = new List<string> { FolderStore.Find(c => c.Value == folderStoreValue).Key ?? AppSettingsModel.DriveFolder },
                     CreatedTime = file.Created,
                     ModifiedTime = file.LastModified
                 };
@@ -585,7 +585,7 @@ namespace GoogleDriveSync.Services
 
                 FilesResource.UpdateMediaUpload moveRequest = service.Files.Update(fileMetaData, _googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Left"), fileStream, _googleDriveConverter.GetMimeType($".{file.Type}"));
                 moveRequest.RemoveParents = _googleDriveFunction.RemoveStringCharacters(file.PathIds, new char[] { '\\' }, "Right");
-                moveRequest.AddParents = FolderStore.Find(c => c.Value == folderStoreValue).Key;
+                moveRequest.AddParents = FolderStore.Find(c => c.Value == folderStoreValue).Key ?? AppSettingsModel.DriveFolder;
                 moveRequest.Fields = "id, name, parents";
                 requestStatus = moveRequest.Upload();
 
