@@ -1,1 +1,0 @@
-Possibly look to remake this with an interface. Create custom encryption algorithm first before attempting.
