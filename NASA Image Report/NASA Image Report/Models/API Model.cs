@@ -1,6 +1,7 @@
 ﻿// Copyright © - 14/08/2024 - Toby Hunter
 namespace NASAImageReport.Models
 {
+    // Stores the information about the APIs.
     internal class APIModel
     {
         public string? APIKey { get; set; }

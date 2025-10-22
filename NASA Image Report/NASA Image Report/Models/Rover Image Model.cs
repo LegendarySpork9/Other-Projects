@@ -1,6 +1,7 @@
 ﻿// Copyright © - 14/08/2024 - Toby Hunter
 namespace NASAImageReport.Models
 {
+    // Stores the information about the rover image.
     internal class RoverImageModel
     {
         public string? ImageId { get; set; }

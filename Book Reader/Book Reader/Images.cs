@@ -4,6 +4,7 @@ namespace Book_Reader
 {
     internal class Images
     {
+        // Obtains the images from the file location.
         public static void GetImages(string FileName)
         {
             switch (FileName)
@@ -13,6 +14,7 @@ namespace Book_Reader
             }
         }
 
+        // Gets the image from the location.
         public static string GetNextImage(string Chapter, int PictureNumber)
         {
             if (PictureNumber == 1)

@@ -9,6 +9,7 @@ namespace Book_Reader
 {
     class Document_Data
     {
+        // Opens a dialog box for you to select a word document to open.
         public static void LoadDocument()
         {
             using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "Word Documents|*.docx", ValidateNames = true, Multiselect = false })
@@ -25,6 +26,7 @@ namespace Book_Reader
             }
         }
 
+        // Reads the given word document.
         private static void ReadDocument(string FilePath)
         {
             string Password = Passwords.GetPassword(Path.GetFileNameWithoutExtension(FilePath));
@@ -43,6 +45,7 @@ namespace Book_Reader
             WordApp.Quit();
         }
         
+        // Obtains the paragraphs within a given range.
         private static void GetParagraphs(Range range)
         {
             Paragraph p = range.Paragraphs[1];
@@ -78,6 +81,7 @@ namespace Book_Reader
 
         }
 
+        // Splits the given string based on a character limit into a list.
         private static List<string> SplitText(string Text, int CharacterLimit)
         {
             List<string> Lines = new List<string>();
@@ -111,6 +115,7 @@ namespace Book_Reader
             return Lines;
         }
 
+        // Obtains the headings from a given range.
         private static void GetHeadings(Range range)
         {
             foreach (Paragraph paragraph in range.Paragraphs)
@@ -122,6 +127,7 @@ namespace Book_Reader
             }
         }
 
+        // Checks whether the paragraph is a heading type.
         public static bool IsHeading(Paragraph paragraph)
         {
             string[] headingStyles = { "Heading 1", "Heading 2", "Heading 3" };
@@ -137,6 +143,7 @@ namespace Book_Reader
             return false;
         }
 
+        // Gets the font of a given paragraph.
         public static string GetFontStyle(Paragraph paragraph)
         {
             if (!string.IsNullOrWhiteSpace(paragraph.Range.Text))

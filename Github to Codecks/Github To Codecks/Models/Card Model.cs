@@ -2,6 +2,7 @@
 
 namespace Github_To_Codecks.Models
 {
+    // Stores the information about the card.
     internal class CardModel
     {
         public string Title { get; set; }

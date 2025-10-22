@@ -11,6 +11,7 @@ namespace Github_To_Codecks.Services
         CodeckModel codeck;
         private string accountId;
 
+        // Sets the class's global variables.
         public CodeckService(CodeckModel _codeck)
         {
             codeck = _codeck;

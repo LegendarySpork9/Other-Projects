@@ -1,6 +1,7 @@
 ﻿// Copyright © - 14/08/2024 - Toby Hunter
 namespace NASAImageReport.Models
 {
+    // Stores the information about the image of the day.
     internal class APODModel
     {
         public string? Title { get; set; }
