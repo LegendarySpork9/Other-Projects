@@ -8,6 +8,7 @@ namespace NASAImageReport.Services
 {
     internal class WordDocumentService
     {
+        // Makes a word document from the gathered data.
         public void CreateDocument(List<RoverImageModel> roverImages, APODModel apod, string title)
         {
             object fileName = $@"{AppDomain.CurrentDomain.BaseDirectory}Reports\{title}";

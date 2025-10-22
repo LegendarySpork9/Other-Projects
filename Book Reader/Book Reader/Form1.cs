@@ -32,6 +32,7 @@ namespace Book_Reader
             Speech.SetOutputToDefaultAudioDevice();
         }
 
+        // Makes the text fit in the text box.
         private void TruncateText(List<string> Text)
         {
             string[] Lines = Text.ToArray();
@@ -76,11 +77,13 @@ namespace Book_Reader
             }
         }
 
+        // Closes the application.
         private new void Closing(object sender, FormClosingEventArgs e)
         {
             Application.Exit();
         }
 
+        // Performs the required steps to open a document.
         private void Open(object sender, EventArgs e)
         {
             PBOpen.Enabled = false;
@@ -96,11 +99,13 @@ namespace Book_Reader
             BTNext.Enabled = true;
         }
 
+        // Focuses a hidden label.
         private void Deselect(object sender, EventArgs e)
         {
             LBIgnore.Select();
         }
 
+        // Obtains a list of words in italics.
         private void GetItalicWords()
         {
             RTBChapterText.WordWrap = false;
@@ -127,6 +132,7 @@ namespace Book_Reader
             RTBChapterText.WordWrap = true;
         }
 
+        // Sets the text in the box to the format of the word document.
         private void FormatText()
         {
 
@@ -176,6 +182,7 @@ namespace Book_Reader
             RTBChapterText.WordWrap = true;
         }
 
+        // Creates a list of italic words.
         private string StoreItalicWords()
         {
             RTBChapterText.WordWrap = false;
@@ -193,6 +200,7 @@ namespace Book_Reader
             return Page;
         }
 
+        // Loads the previous page.
         private void Back(object sender, EventArgs e)
         {
             if (PageNumber == 0)
@@ -213,6 +221,7 @@ namespace Book_Reader
             }
         }
 
+        // Loads the next page.
         private void Next(object sender, EventArgs e)
         {
             if (Text_Model.ChapterText.Count() == 0 || Text_Model.ChapterText.Count() == Text_Model.ChapterText.IndexOf(LastLine) + 1)
@@ -261,6 +270,7 @@ namespace Book_Reader
             }
         }
 
+        // Changes the images based on chapter title.
         private void CycleImage(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(Text_Model.ImageLocation))
@@ -296,6 +306,7 @@ namespace Book_Reader
             }
         }
 
+        // Runs text to speach.
         private void TTS(object sender, EventArgs e)
         {
             switch (TTSFlag)
@@ -317,6 +328,7 @@ namespace Book_Reader
             }
         }
 
+        // Performs the actions to read the next page.
         private void SpeakNextPage(object sender, SpeakCompletedEventArgs e)
         {
             string Page = StoreItalicWords();

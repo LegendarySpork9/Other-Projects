@@ -2,6 +2,7 @@
 
 namespace Github_To_Codecks.Models
 {
+    // Stores all the information about the issue.
     internal class IssueModel
     {
         public int Number { get; set; }

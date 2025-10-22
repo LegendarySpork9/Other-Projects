@@ -5,6 +5,7 @@ namespace NASAImageReport.Services
 {
     internal class ImageDownloader
     {
+        // Downloads the image from the URL.
         public void DownloadImage(string url, string imageId)
         {
             Console.WriteLine("Downloading image {0}", imageId);

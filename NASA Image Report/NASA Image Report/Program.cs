@@ -7,6 +7,7 @@ namespace NASAImageReport
 {
     internal class Program
     {
+        // Runs the application.
         static void Main(string[] args)
         {
             NASAAPIService _nasaAPIService = new();

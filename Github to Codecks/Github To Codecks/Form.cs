@@ -31,6 +31,7 @@ namespace Github_To_Codecks
             _codeck = new CodeckService(codeck);
         }
 
+        // Loads the repositories in GitHub.
         private async void LoadRepos(object sender, EventArgs e)
         {
             ptbRepo.Image = Properties.Resources.LoadingSpinner;
@@ -54,6 +55,7 @@ namespace Github_To_Codecks
             }
         }
 
+        // Loads the issues and allows the user to select one.
         private async void RepoSelected(object sender, EventArgs e)
         {
             cmbRepo.Enabled = false;
@@ -88,6 +90,7 @@ namespace Github_To_Codecks
             }
         }
 
+        // Loadsthe Codecks projects and allows the user to select one.
         private async void IssueSelected(object sender, EventArgs e)
         {
             cmbIssue.Enabled = false;
@@ -126,6 +129,7 @@ namespace Github_To_Codecks
             }
         }
 
+        // Allows the user to migrate the GitHub issue.
         private void ProjectSelected(object sender, EventArgs e)
         {
             if (cmbProject.SelectedItem.ToString() == "--Back--")
@@ -141,6 +145,7 @@ namespace Github_To_Codecks
             }
         }
 
+        // Sends the GitHub issue to Codecks.
         private async void SendClick(object sender, EventArgs e)
         {
             cmbProject.Enabled = false;

@@ -10,12 +10,13 @@ namespace Github_To_Codecks.Services
     {
         GitModel git;
 
+        // Sets the class's global variables.
         public GithubService(GitModel _git)
         {
             git = _git;
         }
 
-        // Gets all the repos I own.
+        // Gets all the repos owned.
         public async Task<List<RepoModel>> GetRepos()
         {
             List<RepoModel> repos = new List<RepoModel>();

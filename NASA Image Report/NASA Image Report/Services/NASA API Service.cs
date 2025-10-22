@@ -8,6 +8,7 @@ namespace NASAImageReport.Services
 {
     internal class NASAAPIService
     {
+        // Collects the images from NASA.
         public List<RoverImageModel> GetRoverImages(APIModel api)
         {
             ImageDownloader _imageDownloader = new();
@@ -80,6 +81,7 @@ namespace NASAImageReport.Services
             return roverImages;
         }
 
+        // Collects the image of the day from NASA.
         public APODModel GetAPOD(APIModel api)
         {
             ImageDownloader _imageDownloader = new();

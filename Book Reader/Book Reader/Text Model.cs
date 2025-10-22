@@ -2,6 +2,7 @@
 
 namespace Book_Reader
 {
+    // Stores the information about the document.
     class Text_Model
     {
         public static string ImageLocation { get; set; }
