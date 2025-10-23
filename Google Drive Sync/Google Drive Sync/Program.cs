@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using System;
 using System.Windows.Forms;
 
 namespace GoogleDriveSync

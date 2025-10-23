@@ -1,4 +1,5 @@
-﻿namespace GoogleDriveSync.Models
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+namespace GoogleDriveSync.Models
 {
     public class ChangeModel
     {

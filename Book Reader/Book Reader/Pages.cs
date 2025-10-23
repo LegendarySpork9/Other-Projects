@@ -1,4 +1,5 @@
-﻿namespace Book_Reader
+﻿// Copyright © - Unpublished - Toby Hunter
+namespace Book_Reader
 {
     internal class Pages
     {

@@ -1,4 +1,5 @@
-﻿using Google.Apis.Auth.OAuth2;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;

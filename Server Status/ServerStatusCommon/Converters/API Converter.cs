@@ -1,4 +1,5 @@
-﻿namespace ServerSiteCommon.Converters
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+namespace ServerSiteCommon.Converters
 {
     public class APIConverter
     {

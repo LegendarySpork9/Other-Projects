@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using System.Collections.Generic;
 
 namespace Github_To_Codecks.Models
 {

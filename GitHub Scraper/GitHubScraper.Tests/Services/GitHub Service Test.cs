@@ -1,4 +1,5 @@
-﻿using GitHubScraper.Models;
+﻿// Copyright © - Unpublished - Toby Hunter
+using GitHubScraper.Models;
 using GitHubScraper.Models.Related;
 using GitHubScraper.Services;
 using Moq;

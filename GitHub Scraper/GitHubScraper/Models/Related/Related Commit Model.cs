@@ -1,4 +1,5 @@
-﻿namespace GitHubScraper.Models.Related
+﻿// Copyright © - Unpublished - Toby Hunter
+namespace GitHubScraper.Models.Related
 {
     // Stores information about the related commit.
     public class RelatedCommitModel

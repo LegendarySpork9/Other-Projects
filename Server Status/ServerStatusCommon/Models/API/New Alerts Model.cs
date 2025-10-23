@@ -1,4 +1,5 @@
-﻿namespace ServerSiteCommon.Models.API
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+namespace ServerSiteCommon.Models.API
 {
     // Stores the body data for the server alert post.
     public class APINewAlertsModel

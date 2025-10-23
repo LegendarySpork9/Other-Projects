@@ -1,4 +1,5 @@
-﻿using GitHubScraper.Converters;
+﻿// Copyright © - Unpublished - Toby Hunter
+using GitHubScraper.Converters;
 using GitHubScraper.Services;
 
 namespace GitHubScraper

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+using Microsoft.AspNetCore.Components;
 using System.Diagnostics;
 
 namespace ServerStatusSite.Components.Pages

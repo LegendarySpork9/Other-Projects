@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using log4net;
 
 namespace GoogleDriveSync.Services
 {

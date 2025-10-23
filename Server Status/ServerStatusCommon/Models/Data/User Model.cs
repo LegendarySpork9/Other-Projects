@@ -1,4 +1,5 @@
-﻿namespace ServerSiteCommon.Models.Data
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+namespace ServerSiteCommon.Models.Data
 {
     // Stores the user data and DarkMode event
     public class UserModel

@@ -1,4 +1,5 @@
-﻿namespace ServerStatusSite.Converters
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+namespace ServerStatusSite.Converters
 {
     // Returns the CSS to change the component to dark mode.
     public class StyleConverter

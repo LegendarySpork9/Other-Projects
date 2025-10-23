@@ -1,4 +1,5 @@
-﻿using GitHubScraper.Converters;
+﻿// Copyright © - Unpublished - Toby Hunter
+using GitHubScraper.Converters;
 using GitHubScraper.Models;
 using GitHubScraper.Models.Related;
 using Microsoft.Data.SqlClient;

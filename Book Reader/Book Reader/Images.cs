@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿// Copyright © - Unpublished - Toby Hunter
+using System.Configuration;
 
 namespace Book_Reader
 {

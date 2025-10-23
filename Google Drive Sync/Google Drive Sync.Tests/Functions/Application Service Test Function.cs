@@ -1,4 +1,5 @@
-﻿namespace GoogleDriveSync.Tests.Functions
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+namespace GoogleDriveSync.Tests.Functions
 {
     internal static class ApplicationServiceTestFunction
     {

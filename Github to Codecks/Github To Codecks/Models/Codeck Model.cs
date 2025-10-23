@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using System.Configuration;
 
 namespace Github_To_Codecks.Models
 {

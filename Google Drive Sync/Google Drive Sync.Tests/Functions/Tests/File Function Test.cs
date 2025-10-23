@@ -1,4 +1,5 @@
-﻿using GoogleDriveSync.Functions;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using GoogleDriveSync.Functions;
 using GoogleDriveSync.Models;
 using Moq;
 
