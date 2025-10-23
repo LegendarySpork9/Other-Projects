@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Word;
+﻿// Copyright © - Unpublished - Toby Hunter
+using Microsoft.Office.Interop.Word;
 using System;
 using System.Collections.Generic;
 using System.IO;

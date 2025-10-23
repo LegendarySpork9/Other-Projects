@@ -1,4 +1,5 @@
-﻿using GoogleDriveSync.Converters;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using GoogleDriveSync.Converters;
 using GoogleDriveSync.Functions;
 using GoogleDriveSync.Models;
 using GoogleDriveSync.Services;

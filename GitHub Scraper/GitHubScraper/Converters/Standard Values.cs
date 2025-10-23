@@ -1,4 +1,5 @@
-﻿namespace GitHubScraper.Converters
+﻿// Copyright © - Unpublished - Toby Hunter
+namespace GitHubScraper.Converters
 {
     internal class StandardValues
     {

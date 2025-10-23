@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ServerStatusSite.Functions

@@ -1,4 +1,5 @@
-﻿using ServerSiteCommon.Models;
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+using ServerSiteCommon.Models;
 
 namespace ServerStatusSite.Middleware
 {

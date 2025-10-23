@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+using Moq;
 using ServerStatusSite.Functions;
 
 namespace ServerSite.Tests.Site.Functions

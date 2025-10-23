@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using ServerSiteCommon.Converters;
 using ServerSiteCommon.Models;

@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+using System.Configuration;
 
 namespace ServerSiteReporter.Models
 {

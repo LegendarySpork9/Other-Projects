@@ -1,4 +1,5 @@
-﻿namespace ServerSiteCommon.Models.API
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+namespace ServerSiteCommon.Models.API
 {
     // Stores the server events's API response.
     public class APIStatusModel

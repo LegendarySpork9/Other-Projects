@@ -1,4 +1,5 @@
-﻿namespace ServerSiteCommon.Models
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+namespace ServerSiteCommon.Models
 {
     // Stores the settings shared by the three applications.
     public class SharedSettingsModel

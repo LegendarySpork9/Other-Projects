@@ -1,4 +1,5 @@
-﻿namespace GoogleDriveSync.Converters
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+namespace GoogleDriveSync.Converters
 {
     public class GoogleDriveConverter
     {

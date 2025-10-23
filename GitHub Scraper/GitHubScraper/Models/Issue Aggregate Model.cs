@@ -1,4 +1,5 @@
-﻿namespace GitHubScraper.Models
+﻿// Copyright © - Unpublished - Toby Hunter
+namespace GitHubScraper.Models
 {
     // Stores the issue counts.
     public class IssueAggregateModel

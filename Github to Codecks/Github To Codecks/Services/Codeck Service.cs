@@ -1,4 +1,5 @@
-﻿using Github_To_Codecks.Models;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using Github_To_Codecks.Models;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Collections.Generic;

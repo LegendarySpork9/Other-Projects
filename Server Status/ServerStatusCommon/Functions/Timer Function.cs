@@ -1,4 +1,5 @@
-﻿namespace ServerSiteCommon.Functions
+﻿// Copyright © - 05/10/2025 - Toby Hunter
+namespace ServerSiteCommon.Functions
 {
     public static class TimerFunction
     {

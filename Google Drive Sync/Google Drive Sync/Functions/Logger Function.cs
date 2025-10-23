@@ -1,4 +1,5 @@
-﻿namespace GoogleDriveSync.Functions
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+namespace GoogleDriveSync.Functions
 {
     public class LoggerFunction
     {

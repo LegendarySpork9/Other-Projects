@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿// Copyright © - 14/05/2025 - Toby Hunter
+using System.IO;
 
 namespace GoogleDriveSync.Functions
 {
