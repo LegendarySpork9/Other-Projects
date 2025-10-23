@@ -414,7 +414,7 @@ namespace GoogleDriveSync
 
             foreach (FileModel file in Files)
             {
-                if ((file.Id.Contains(",") && !_fileFunction.IsFileLocked(new FileInfo(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right")))) || (file.Id.Contains(":\\") && !_fileFunction.IsFileLocked(new FileInfo(file.Id))))
+                if ((file.Id.Contains(",") && !_fileFunction.IsFileLocked(new FileInfo(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right")))) || ((file.Id.Contains(":\\") && !file.Id.Contains(",")) && !_fileFunction.IsFileLocked(new FileInfo(file.Id))))
                 {
                     if (file.Changes.Count > 0)
                     {
