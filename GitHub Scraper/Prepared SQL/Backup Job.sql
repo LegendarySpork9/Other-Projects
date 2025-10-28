@@ -36,9 +36,22 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'1',
 		@retry_attempts=0, 
 		@retry_interval=0, 
 		@os_run_priority=0, @subsystem=N'TSQL', 
-		@command=N'BACKUP DATABASE [GitHub] TO  DISK = N''Q:\Program Files\Microsoft SQL Server\MSSQL16.QA\MSSQL\Backup\GitHub.bak'' WITH NOFORMAT, NOINIT,  NAME = N''GitHub-Full Database Backup'', SKIP, NOREWIND, NOUNLOAD,  STATS = 10
-GO
-', 
+		@command=N'
+DECLARE @BackupFileName NVARCHAR(260);
+DECLARE @DateSuffix NVARCHAR(20);
+
+/* Format date as YYYYMMDD */
+SET @DateSuffix = CONVERT(NVARCHAR(8), GETDATE(), 112);
+
+/* Build full backup file path */
+SET @BackupFileName = N''L:\Program Files\Microsoft SQL Server\MSSQL16.LIVE\MSSQL\Backup\GitHub_'' + @DateSuffix + ''.bak'';
+
+BACKUP DATABASE [GitHub]
+TO DISK = @BackupFileName
+WITH NOFORMAT, NOINIT,
+     NAME = N''GitHub-Full Database Backup'',
+     SKIP, NOREWIND, NOUNLOAD, STATS = 10;
+',
 		@database_name=N'master', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
