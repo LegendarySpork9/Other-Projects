@@ -394,6 +394,7 @@ namespace GoogleDriveSync
         private async void TMAutoSyncElapsedAsync(object sender, EventArgs e)
         {
             TMAutoSync.Stop();
+            CBAutoSync.Enabled = false;
 
             FileFunction _fileFunction = new FileFunction();
             GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
@@ -453,6 +454,7 @@ namespace GoogleDriveSync
             }
 
             PRBLoading.Value = 100;
+            CBAutoSync.Enabled = true;
             TMAutoSync.Start();
         }
 
