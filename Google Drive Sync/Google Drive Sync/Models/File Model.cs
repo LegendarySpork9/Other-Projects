@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace GoogleDriveSync.Models
 {
+    // Stores the information about the file.
     public class FileModel
     {
         public string Id { get; set; }

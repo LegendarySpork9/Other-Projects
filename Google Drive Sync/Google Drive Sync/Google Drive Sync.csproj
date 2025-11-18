@@ -73,6 +73,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstractions\IClock.cs" />
+    <Compile Include="Abstractions\IFileMetadataProvider.cs" />
+    <Compile Include="Abstractions\IFileSystem.cs" />
+    <Compile Include="Abstractions\ILoggerService.cs" />
+    <Compile Include="Abstractions\IUserNotifier.cs" />
     <Compile Include="Converters\Google Drive Converter.cs" />
     <Compile Include="Converters\Progress Bar Value Converter.cs" />
     <Compile Include="Forms\MainSyncPage.cs">
@@ -86,6 +91,11 @@
     <Compile Include="Functions\Folder Function.cs" />
     <Compile Include="Functions\Google Drive Function.cs" />
     <Compile Include="Functions\Logger Function.cs" />
+    <Compile Include="Implementations\File System.cs" />
+    <Compile Include="Implementations\File Metadata Provider.cs" />
+    <Compile Include="Implementations\Logger Service Wrapper.cs" />
+    <Compile Include="Implementations\Message Box Notifier.cs" />
+    <Compile Include="Implementations\System Clock.cs" />
     <Compile Include="Models\App Settings Model.cs" />
     <Compile Include="Models\Change Model.cs" />
     <Compile Include="Models\File Model.cs" />
@@ -130,5 +140,6 @@
     <Content Include="Content\Tick.png" />
     <Content Include="Content\Up Arrow.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

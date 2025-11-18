@@ -1,7 +1,7 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
+using GoogleDriveSync.Abstractions;
 using GoogleDriveSync.Converters;
 using GoogleDriveSync.Models;
-using GoogleDriveSync.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,12 +10,22 @@ namespace GoogleDriveSync.Functions
 {
     public class FileFunction
     {
+        private readonly ILoggerService _Logger;
+        private readonly IFileSystem _FileSystem;
+        private readonly IClock _Clock;
+
+        // Sets the class's gloabl variables.
+        public FileFunction(ILoggerService _logger, IFileSystem _fileSystem, IClock _clock)
+        {
+            _Logger = _logger;
+            _FileSystem = _fileSystem;
+            _Clock = _clock;
+        }
+
         // Compares the files and records the changes.
         public List<FileModel> CompareForChanges(List<FileModel> googleDrive, List<FileModel> localDrive)
         {
-            LoggerService _logger = new LoggerService();
-
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Comparing Google Drive and the Local Drive for changes");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Comparing Google Drive and the Local Drive for changes");
 
             List<FileModel> files = new List<FileModel>();
             int differences = 0;
@@ -27,7 +37,7 @@ namespace GoogleDriveSync.Functions
 
                 if (googleFile != null)
                 {
-                    DateTime lastModified = DateTime.Parse("01/01/1900");
+                    DateTime lastModified = _Clock.DefaultDate;
                     
                     if (localFile.Path != googleFile.Path)
                     {
@@ -73,7 +83,7 @@ namespace GoogleDriveSync.Functions
                         differences++;
                     }
 
-                    if (lastModified == DateTime.Parse("01/01/1900"))
+                    if (lastModified == _Clock.DefaultDate)
                     {
                         files.Add(new FileModel
                         {
@@ -140,7 +150,7 @@ namespace GoogleDriveSync.Functions
                 }
             }
 
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Compared Local Drive");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Compared Local Drive");
 
             foreach (FileModel googleFile in googleDrive)
             {
@@ -181,31 +191,13 @@ namespace GoogleDriveSync.Functions
                 }
             }
 
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Compared Google Drive");
-            _logger.LogMessage(StandardValues.LoggerValues.Info, $"Found {differences} change(s) between Google Drive and the Local Drive");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Compared Google Drive");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Found {differences} change(s) between Google Drive and the Local Drive");
 
             return files;
         }
 
         // Checks if the file is in use.
-        public bool IsFileLocked(FileInfo file)
-        {
-            bool locked = false;
-
-            try
-            {
-                using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
-                {
-                    stream.Close();
-                }
-            }
-
-            catch (Exception ex)
-            {
-                locked = true;
-            }
-
-            return locked;
-        }
+        public bool IsFileLocked(FileInfo file) => !_FileSystem.TryOpenRead(file.FullName);
     }
 }

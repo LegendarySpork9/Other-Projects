@@ -3,6 +3,7 @@ using System.Configuration;
 
 namespace GoogleDriveSync.Models
 {
+    // Stores the settings used by the application.
     public static class AppSettingsModel
     {
         public static string Credentials = ConfigurationManager.AppSettings["CredentialsLocation"].ToString();

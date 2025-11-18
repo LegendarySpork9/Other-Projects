@@ -1,6 +1,5 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
 using GoogleDriveSync.Converters;
-using Moq;
 
 namespace GoogleDriveSync.Tests.Converters
 {
@@ -9,13 +8,15 @@ namespace GoogleDriveSync.Tests.Converters
     {
         // Checks whether the GetPBIncreaseValue method returns the expected value.
         [TestMethod]
-        public void TestPBIncreaseValue()
+        public void TestGetPBIncreaseValue()
         {
-            Mock<ProgressBarValueConverter> _mockPorgressBarValueConverter = new();
+            ProgressBarValueConverter _porgressBarValueConverter = new();
 
-            int increase = _mockPorgressBarValueConverter.Object.GetPBIncreaseValue(5);
+            int expected = 20;
 
-            Assert.AreEqual(20, increase);
+            int actual = _porgressBarValueConverter.GetPBIncreaseValue(5);
+
+            Assert.AreEqual(expected, actual);
         }
     }
 }
