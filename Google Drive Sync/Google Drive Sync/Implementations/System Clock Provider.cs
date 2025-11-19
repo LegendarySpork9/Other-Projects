@@ -4,7 +4,7 @@ using System;
 
 namespace GoogleDriveSync.Implementations
 {
-    public class SystemClock : IClock
+    public class SystemClockProvider : IClock
     {
         // Returns the current UTC Date and time.
         public DateTime UtcNow => DateTime.UtcNow;

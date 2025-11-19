@@ -4,7 +4,7 @@ using System.IO;
 
 namespace GoogleDriveSync.Implementations
 {
-    public class FileSystem : IFileSystem
+    public class FileSystemWrapper : IFileSystem
     {
         #region Files
 

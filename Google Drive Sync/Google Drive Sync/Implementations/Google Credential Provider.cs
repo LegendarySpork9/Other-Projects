@@ -1,0 +1,59 @@
+﻿// Copyright © - Unpublished - Toby Hunter
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Drive.v3;
+using Google.Apis.Util.Store;
+using GoogleDriveSync.Abstractions;
+using GoogleDriveSync.Converters;
+using GoogleDriveSync.Models;
+using System;
+using System.IO;
+using System.Threading;
+
+namespace GoogleDriveSync.Implementations
+{
+    public class GoogleCredentialProvider : ICredentialProvider
+    {
+        private readonly ILoggerService _Logger;
+
+        // Sets the class's global variables.
+        public GoogleCredentialProvider(
+            ILoggerService _logger)
+        {
+            _Logger = _logger;
+        }
+
+        // Generates credentials from the specified json file.
+        public (UserCredential, bool) GetCredentials()
+        {
+            UserCredential credential = null;
+            bool hasErrored = false;
+
+            try
+            {
+                FileStream credentialsStream = new FileStream(AppSettingsModel.Credentials, FileMode.Open, FileAccess.Read);
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Opened stream to Google Drive OAuth Credentials");
+
+                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.FromStream(credentialsStream).Secrets,
+                    new[] { DriveService.Scope.Drive },
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore("token.json", true)
+                ).Result;
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Generated User Credentials");
+            }
+
+            catch (Exception ex)
+            {
+                hasErrored = true;
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, "An error occured when trying to generate user credentials");
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+            }
+
+            return (credential, hasErrored);
+        }
+    }
+}

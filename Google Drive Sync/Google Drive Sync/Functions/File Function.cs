@@ -15,7 +15,10 @@ namespace GoogleDriveSync.Functions
         private readonly IClock _Clock;
 
         // Sets the class's gloabl variables.
-        public FileFunction(ILoggerService _logger, IFileSystem _fileSystem, IClock _clock)
+        public FileFunction(
+            ILoggerService _logger,
+            IFileSystem _fileSystem,
+            IClock _clock)
         {
             _Logger = _logger;
             _FileSystem = _fileSystem;

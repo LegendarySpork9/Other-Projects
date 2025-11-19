@@ -9,7 +9,8 @@ namespace GoogleDriveSync.Functions
         private readonly IFileSystem _FileSystem;
 
         // Sets the class's global variables.
-        public FolderFunction(IFileSystem _fileSystem)
+        public FolderFunction(
+            IFileSystem _fileSystem)
         {
             _FileSystem = _fileSystem;
         }

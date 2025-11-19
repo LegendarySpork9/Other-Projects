@@ -13,18 +13,23 @@ namespace GoogleDriveSync.Services
     {
         private readonly ILoggerService _Logger;
         private readonly IFileSystem _FileSystem;
-        private readonly IFileMetadataProvider _FileMetadataProvider;
+        private readonly IFileMetadata _FileMetadata;
         private readonly IUserNotifier _UserNotifier;
         private readonly string FolderPath;
         private readonly string FolderName;
         private bool HasErrored = false;
 
         // Sets the class's global variables.
-        public DocumentService(ILoggerService _logger, IFileSystem _fileSystem, IFileMetadataProvider _fileMetadataProvider, IUserNotifier _userNotifier, string folder)
+        public DocumentService(
+            ILoggerService _logger,
+            IFileSystem _fileSystem,
+            IFileMetadata _fileMetadata,
+            IUserNotifier _userNotifier,
+            string folder)
         {
             _Logger = _logger;
             _FileSystem = _fileSystem;
-            _FileMetadataProvider = _fileMetadataProvider;
+            _FileMetadata = _fileMetadata;
             _UserNotifier = _userNotifier;
             FolderPath = folder;
             FolderName = folder.Remove(0, folder.LastIndexOf('\\') + 1);
@@ -170,7 +175,7 @@ namespace GoogleDriveSync.Services
 
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file information for file {_localDriveConverter.GetObjectName(file)}");
 
-            (DateTime created, DateTime modified, bool hidden) = _FileMetadataProvider.GetFileInformation(file);
+            (DateTime created, DateTime modified, bool hidden) = _FileMetadata.GetFileInformation(file);
 
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained file information for file {_localDriveConverter.GetObjectName(file)}");
 
