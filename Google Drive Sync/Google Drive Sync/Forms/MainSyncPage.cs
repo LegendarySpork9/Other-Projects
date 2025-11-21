@@ -1,6 +1,8 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
+using GoogleDriveSync.Abstractions;
 using GoogleDriveSync.Converters;
 using GoogleDriveSync.Functions;
+using GoogleDriveSync.Implementations;
 using GoogleDriveSync.Models;
 using GoogleDriveSync.Services;
 using System;
@@ -14,22 +16,22 @@ namespace GoogleDriveSync
     public partial class MainSyncPage : Form
     {
         private readonly ApplicationService AppService = new ApplicationService();
+        private readonly ILoggerService _Logger = new LoggerServiceWrapper();
+
         private List<FileModel> Files = new List<FileModel>();
+        private readonly List<DataGridViewRow> RowsToUpdate = new List<DataGridViewRow>();
         private DataGridViewRow CurrentRow;
         private bool TablePopulated = false;
-        private List<DataGridViewRow> RowsToUpdate = new List<DataGridViewRow>();
 
         public MainSyncPage()
         {
             InitializeComponent();
 
-            LoggerService _logger = new LoggerService();
-
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Google Drive Folder: {AppSettingsModel.DriveFolder}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Local Folder: {AppSettingsModel.LocalFolder}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Ignore Folder(s): {string.Join(",", AppSettingsModel.IgnoreFolders)}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Ignore File(s): {string.Join(",", AppSettingsModel.IgnoreFiles)}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Google Drive Folder: {AppSettingsModel.DriveFolder}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Local Folder: {AppSettingsModel.LocalFolder}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Ignore Folder(s): {string.Join(",", AppSettingsModel.IgnoreFolders)}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Ignore File(s): {string.Join(",", AppSettingsModel.IgnoreFiles)}");
 
             AppService.ProgressChanged += ProgressChanged;
         }
@@ -208,7 +210,10 @@ namespace GoogleDriveSync
         // Loads the file information into the information box.
         private void DGVFileInformationRowState(object sender, DataGridViewRowStateChangedEventArgs e)
         {
-            if (e.StateChanged != DataGridViewElementStates.Selected) return;
+            if (e.StateChanged != DataGridViewElementStates.Selected)
+            {
+                return;
+            }
 
             if (CurrentRow != e.Row)
             {
@@ -396,8 +401,7 @@ namespace GoogleDriveSync
             TMAutoSync.Stop();
             CBAutoSync.Enabled = false;
 
-            FileFunction _fileFunction = new FileFunction();
-            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+            FileFunction _fileFunction = new FileFunction(_Logger, new FileSystemWrapper(), new SystemClockProvider());
 
             PRBLoading.Value = 0;
             PBLoading.Image = Properties.Resources.LoadingSpinner;
@@ -415,7 +419,7 @@ namespace GoogleDriveSync
 
             foreach (FileModel file in Files)
             {
-                if ((file.Id.Contains(",") && !_fileFunction.IsFileLocked(new FileInfo(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right")))) || ((file.Id.Contains(":\\") && !file.Id.Contains(",")) && !_fileFunction.IsFileLocked(new FileInfo(file.Id))))
+                if ((file.Id.Contains(",") && !_fileFunction.IsFileLocked(new FileInfo(GoogleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right")))) || ((file.Id.Contains(":\\") && !file.Id.Contains(",")) && !_fileFunction.IsFileLocked(new FileInfo(file.Id))))
                 {
                     if (file.Changes.Count > 0)
                     {
@@ -461,9 +465,7 @@ namespace GoogleDriveSync
         // Logs the closing message.
         private void Exit(object sender, FormClosedEventArgs e)
         {
-            LoggerService _logger = new LoggerService();
-
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
         }
     }
 }

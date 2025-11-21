@@ -12,11 +12,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypeText()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "text/plain";
 
-            string actual = _googleDriveConverter.GetMimeType(".txt");
+            string actual = GoogleDriveConverter.GetMimeType(".txt");
 
             Assert.AreEqual(expected, actual);
         }
@@ -25,11 +23,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypePDF()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "application/pdf";
 
-            string actual = _googleDriveConverter.GetMimeType(".pdf");
+            string actual = GoogleDriveConverter.GetMimeType(".pdf");
 
             Assert.AreEqual(expected, actual);
         }
@@ -38,11 +34,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypeDoc()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "application/msword";
 
-            string actual = _googleDriveConverter.GetMimeType(".doc");
+            string actual = GoogleDriveConverter.GetMimeType(".doc");
 
             Assert.AreEqual(expected, actual);
         }
@@ -51,11 +45,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypeDocx()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-            string actual = _googleDriveConverter.GetMimeType(".docx");
+            string actual = GoogleDriveConverter.GetMimeType(".docx");
 
             Assert.AreEqual(expected, actual);
         }
@@ -64,11 +56,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypeXLS()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "application/vnd.ms-excel";
 
-            string actual = _googleDriveConverter.GetMimeType(".xls");
+            string actual = GoogleDriveConverter.GetMimeType(".xls");
 
             Assert.AreEqual(expected, actual);
         }
@@ -77,11 +67,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypeXLSX()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-            string actual = _googleDriveConverter.GetMimeType(".xlsx");
+            string actual = GoogleDriveConverter.GetMimeType(".xlsx");
 
             Assert.AreEqual(expected, actual);
         }
@@ -90,11 +78,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypePNG()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "image/png";
 
-            string actual = _googleDriveConverter.GetMimeType(".png");
+            string actual = GoogleDriveConverter.GetMimeType(".png");
 
             Assert.AreEqual(expected, actual);
         }
@@ -103,11 +89,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypeJPEG()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "image/jpeg";
 
-            string actual = _googleDriveConverter.GetMimeType(".jpeg");
+            string actual = GoogleDriveConverter.GetMimeType(".jpeg");
 
             Assert.AreEqual(expected, actual);
         }
@@ -116,11 +100,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetMimeTypeDefault()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = "application/octet-stream";
 
-            string actual = _googleDriveConverter.GetMimeType(".xml");
+            string actual = GoogleDriveConverter.GetMimeType(".xml");
 
             Assert.AreEqual(expected, actual);
         }
@@ -131,11 +113,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetFilePath()
         {
-            GoogleDriveConverter _googleDriveConverter = new();
-
             string expected = @"C:\GDSTests\Book Tests\Test.txt";
 
-            string actual = _googleDriveConverter.GetFilePath(@"C:\GDSTests", "Book Tests", "Test.txt");
+            string actual = GoogleDriveConverter.GetFilePath(@"C:\GDSTests", "Book Tests", "Test.txt");
 
             Assert.AreEqual(expected, actual);
         }

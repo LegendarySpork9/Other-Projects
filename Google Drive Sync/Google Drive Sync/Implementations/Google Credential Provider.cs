@@ -14,12 +14,15 @@ namespace GoogleDriveSync.Implementations
     public class GoogleCredentialProvider : ICredentialProvider
     {
         private readonly ILoggerService _Logger;
+        private readonly IFileSystem _FileSystem;
 
         // Sets the class's global variables.
         public GoogleCredentialProvider(
-            ILoggerService _logger)
+            ILoggerService _logger,
+            IFileSystem fileSystem)
         {
             _Logger = _logger;
+            _FileSystem = fileSystem;
         }
 
         // Generates credentials from the specified json file.
@@ -30,7 +33,7 @@ namespace GoogleDriveSync.Implementations
 
             try
             {
-                FileStream credentialsStream = new FileStream(AppSettingsModel.Credentials, FileMode.Open, FileAccess.Read);
+                Stream credentialsStream = _FileSystem.OpenRead(AppSettingsModel.Credentials);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Opened stream to Google Drive OAuth Credentials");
 

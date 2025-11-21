@@ -10,11 +10,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetObjectName()
         {
-            LocalDriveConverter _localDriveConverter = new();
-
             string expected = "Test.txt";
 
-            string actual = _localDriveConverter.GetObjectName(@"C:\GDSTests\Book Tests\Test.txt");
+            string actual = LocalDriveConverter.GetObjectName(@"C:\GDSTests\Book Tests\Test.txt");
 
             Assert.AreEqual(expected, actual);
         }

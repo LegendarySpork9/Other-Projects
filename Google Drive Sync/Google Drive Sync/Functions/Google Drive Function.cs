@@ -1,10 +1,10 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
 namespace GoogleDriveSync.Functions
 {
-    public class GoogleDriveFunction
+    public static class GoogleDriveFunction
     {
         // Returns the final folder in the given string.
-        public string RemoveStringCharacters(string value, char[] characters, string direction)
+        public static string RemoveStringCharacters(string value, char[] characters, string direction)
         {
             string modifiedValue = value;
 

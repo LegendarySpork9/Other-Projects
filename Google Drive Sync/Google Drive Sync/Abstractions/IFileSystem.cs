@@ -1,5 +1,7 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
+using System;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace GoogleDriveSync.Abstractions
 {
@@ -13,6 +15,9 @@ namespace GoogleDriveSync.Abstractions
         FileAttributes GetAttributes(string file);
         void SetAttributes(string file, FileAttributes attributes);
         void DeleteFile(string file);
+        void WriteDataToFile(string file, byte[] data);
+        void SetCreatedTime(string file, DateTime created);
+        void SetModifiedTime(string file, DateTime modified);
 
         #endregion
 
@@ -22,6 +27,13 @@ namespace GoogleDriveSync.Abstractions
         void CreateDirectory(string fileDirectory);
         string[] GetDirectories(string folder);
         string[] GetFiles(string folder);
+
+        #endregion
+
+        #region Stream
+
+        Stream Open(string file);
+        Stream OpenRead(string file);
 
         #endregion
     }

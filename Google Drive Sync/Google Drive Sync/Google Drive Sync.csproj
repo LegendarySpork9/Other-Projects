@@ -74,8 +74,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstractions\IClock.cs" />
-    <Compile Include="Abstractions\IFileMetadataProvider.cs" />
+    <Compile Include="Abstractions\ICredentialProvider.cs" />
+    <Compile Include="Abstractions\IFileMetadata.cs" />
     <Compile Include="Abstractions\IFileSystem.cs" />
+    <Compile Include="Abstractions\IGoogleDriveClient.cs" />
     <Compile Include="Abstractions\ILoggerService.cs" />
     <Compile Include="Abstractions\IUserNotifier.cs" />
     <Compile Include="Converters\Google Drive Converter.cs" />
@@ -91,11 +93,13 @@
     <Compile Include="Functions\Folder Function.cs" />
     <Compile Include="Functions\Google Drive Function.cs" />
     <Compile Include="Functions\Logger Function.cs" />
-    <Compile Include="Implementations\File System.cs" />
+    <Compile Include="Implementations\File System Wrapper.cs" />
     <Compile Include="Implementations\File Metadata Provider.cs" />
+    <Compile Include="Implementations\Google Credential Provider.cs" />
+    <Compile Include="Implementations\Google Drive Client Wrapper.cs" />
     <Compile Include="Implementations\Logger Service Wrapper.cs" />
-    <Compile Include="Implementations\Message Box Notifier.cs" />
-    <Compile Include="Implementations\System Clock.cs" />
+    <Compile Include="Implementations\Message Box Wrapper.cs" />
+    <Compile Include="Implementations\System Clock Provider.cs" />
     <Compile Include="Models\App Settings Model.cs" />
     <Compile Include="Models\Change Model.cs" />
     <Compile Include="Models\File Model.cs" />

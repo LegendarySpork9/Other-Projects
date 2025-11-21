@@ -10,11 +10,9 @@ namespace GoogleDriveSync.Tests.Converters
         [TestMethod]
         public void TestGetPBIncreaseValue()
         {
-            ProgressBarValueConverter _porgressBarValueConverter = new();
-
             int expected = 20;
 
-            int actual = _porgressBarValueConverter.GetPBIncreaseValue(5);
+            int actual = ProgressBarValueConverter.GetPBIncreaseValue(5);
 
             Assert.AreEqual(expected, actual);
         }
