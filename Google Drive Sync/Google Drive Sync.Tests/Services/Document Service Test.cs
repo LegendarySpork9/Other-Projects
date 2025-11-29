@@ -1,4 +1,5 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
+using GoogleDriveSync.Abstractions;
 using GoogleDriveSync.Models;
 using GoogleDriveSync.Services;
 using Moq;
@@ -10,61 +11,173 @@ namespace GoogleDriveSync.Tests.Services
     {
         // Checks whether the GetHasErrored method returns the expected value.
         [TestMethod]
-        public void TestHasErrored()
+        public void TestGetHasErrored()
         {
-            Mock<DocumentService> _mockDocumentService = new(AppSettingsModel.LocalFolder);
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IFileSystem> _mockFileSystem = new();
+            Mock<IFileMetadata> _mockFileMetadata = new();
+            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            bool hasErrored = _mockDocumentService.Object.GetHasErrored();
+            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, string.Empty);
+
+            bool hasErrored = _documentService.GetHasErrored();
 
             Assert.IsFalse(hasErrored);
         }
 
         // Checks whether the GetData method returns the expected list.
         [TestMethod]
-        public void TestData()
+        public void TestGetData()
         {
-            Mock<DocumentService> _mockDocumentService = new(AppSettingsModel.LocalFolder);
+            string root = @"C:\Test";
+            string file = @"C:\Test\Test.txt";
 
-            List<FileModel> files = _mockDocumentService.Object.GetData();
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IFileSystem> _mockFileSystem = new();
+            _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([]);
+            _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file]);
+            Mock<IFileMetadata> _mockFileMetadata = new();
+            _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
+            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            Assert.IsTrue(files.Count > 0);
-            Assert.AreEqual(10, files.Count);
+            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
+
+            List<FileModel> files = _documentService.GetData();
+
+            Assert.AreEqual(1, files.Count);
+
+            Assert.AreEqual(file, files[0].Id);
+            Assert.AreEqual("Test", files[0].Name);
+            Assert.AreEqual("txt", files[0].Type);
+            Assert.AreEqual("Test", files[0].Path);
         }
 
-        // Checks if the DeleteFile method can successfully delete files.
+        // Checks whether the GetData method returns the expected list.
         [TestMethod]
-        public void TestDelete()
+        public void TestGetDataSubFolder()
         {
-            Mock<DocumentService> _mockDocumentService = new(AppSettingsModel.LocalFolder);
+            string root = @"C:\Test";
+            string sub = @"C:\Test\Test 2";
 
-            string file = $@"{AppSettingsModel.LocalFolder}/Local Delete Test.txt";
-            string content = File.ReadAllText(file);
+            string file = @"C:\Test\Test.txt";
+            string file2 = @"C:\Test\Test 2.txt";
 
-            _mockDocumentService.Object.DeleteFile(file);
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IFileSystem> _mockFileSystem = new();
+            _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([sub]);
+            _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file]);
+            _mockFileSystem.Setup(fs => fs.GetFiles(sub)).Returns([file2]);
+            Mock<IFileMetadata> _mockFileMetadata = new();
+            _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
+            _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file2)).Returns((new DateTime(1900, 01, 05), new DateTime(1900, 01, 06), true));
+            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            Assert.IsFalse(File.Exists(file));
+            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
 
-            File.WriteAllText(file, content);
+            List<FileModel> files = _documentService.GetData();
+
+            Assert.AreEqual(2, files.Count);
+
+            Assert.AreEqual(file, files[0].Id);
+            Assert.AreEqual("Test", files[0].Name);
+            Assert.AreEqual("txt", files[0].Type);
+            Assert.AreEqual("Test", files[0].Path);
+
+            Assert.AreEqual(file2, files[1].Id);
+            Assert.AreEqual("Test 2", files[1].Name);
+            Assert.AreEqual("txt", files[1].Type);
+            Assert.AreEqual(@"Test\Test 2", files[1].Path);
         }
 
-        // Checks if the HideFile method can hide the file.
+        // Checks whether the GetData method returns the expected list.
         [TestMethod]
-        public void TestHide()
+        public void TestGetDataSubFolderEmpty()
         {
-            Mock<DocumentService> _mockDocumentService = new(AppSettingsModel.LocalFolder);
+            string root = @"C:\Test";
+            string sub = @"C:\Test\Test 2";
 
-            string file = $@"{AppSettingsModel.LocalFolder}/Hide Test.txt";
+            string file = @"C:\Test\Test.txt";
 
-            _mockDocumentService.Object.HideFile(file, true);
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IFileSystem> _mockFileSystem = new();
+            _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([sub]);
+            _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file]);
+            _mockFileSystem.Setup(fs => fs.GetFiles(sub)).Returns([]);
+            Mock<IFileMetadata> _mockFileMetadata = new();
+            _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
+            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            FileAttributes attributes = new FileInfo(file).Attributes;
+            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
 
-            if ((attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-            {
-                Assert.IsTrue(true);
-            }
+            List<FileModel> files = _documentService.GetData();
 
-            _mockDocumentService.Object.HideFile(file, false);
+            Assert.AreEqual(1, files.Count);
+
+            Assert.AreEqual(file, files[0].Id);
+            Assert.AreEqual("Test", files[0].Name);
+            Assert.AreEqual("txt", files[0].Type);
+            Assert.AreEqual("Test", files[0].Path);
+        }
+
+        // Checks whether the GetData method returns the expected list.
+        [TestMethod]
+        public void TestGetDataExcludedFile()
+        {
+            string root = @"C:\Test";
+            string file = @"C:\Test\Test.txt";
+            string excludedFile = @"C:\Test\Excluded.txt";
+
+            AppSettingsModel.IgnoreFiles = [excludedFile.Replace(@"C:\Test\", "")];
+
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IFileSystem> _mockFileSystem = new();
+            _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([]);
+            _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file, excludedFile]);
+            Mock<IFileMetadata> _mockFileMetadata = new();
+            _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
+            Mock<IUserNotifier> _mockUserNotifier = new();
+
+            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
+
+            List<FileModel> files = _documentService.GetData();
+
+            Assert.AreEqual(1, files.Count);
+
+            Assert.AreEqual(file, files[0].Id);
+            Assert.AreEqual("Test", files[0].Name);
+            Assert.AreEqual("txt", files[0].Type);
+            Assert.AreEqual("Test", files[0].Path);
+        }
+
+        // Checks whether the GetData method returns the expected list.
+        [TestMethod]
+        public void TestGetDataExcludedFolder()
+        {
+            string root = @"C:\Test";
+            string excludedSub = @"C:\Test\Excluded";
+
+            string file = @"C:\Test\Test.txt";
+
+            AppSettingsModel.IgnoreFolders = [excludedSub.Replace( @"C:\Test\", "")];
+
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IFileSystem> _mockFileSystem = new();
+            _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([excludedSub]);
+            _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file]);
+            Mock<IFileMetadata> _mockFileMetadata = new();
+            _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
+            Mock<IUserNotifier> _mockUserNotifier = new();
+
+            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
+
+            List<FileModel> files = _documentService.GetData();
+
+            Assert.AreEqual(1, files.Count);
+
+            Assert.AreEqual(file, files[0].Id);
+            Assert.AreEqual("Test", files[0].Name);
+            Assert.AreEqual("txt", files[0].Type);
+            Assert.AreEqual("Test", files[0].Path);
         }
     }
 }

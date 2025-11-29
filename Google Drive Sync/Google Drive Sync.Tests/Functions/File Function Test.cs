@@ -58,10 +58,10 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual(localDrive[0].Path, result[0].Changes[0].OldValue);
             Assert.AreEqual(googleDrive[0].Path, result[0].Changes[0].NewValue);
 
-            Assert.AreEqual("Last Modified", result[0].Changes[0].Field);
-            Assert.AreEqual("Up", result[0].Changes[0].Stream);
-            Assert.AreEqual(localDrive[0].LastModified.ToString(), result[0].Changes[0].OldValue);
-            Assert.AreEqual(googleDrive[0].LastModified.ToString(), result[0].Changes[0].NewValue);
+            Assert.AreEqual("Last Modified", result[0].Changes[1].Field);
+            Assert.AreEqual("Up", result[0].Changes[1].Stream);
+            Assert.AreEqual(localDrive[0].LastModified.ToString(), result[0].Changes[1].OldValue);
+            Assert.AreEqual(googleDrive[0].LastModified.ToString(), result[0].Changes[1].NewValue);
         }
 
         // Checks whether the CompareForChanges method returns the expected changes.
@@ -220,7 +220,7 @@ namespace GoogleDriveSync.Tests.Functions
         {
             Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
-            _mockFileSystem.Setup(fs => fs.TryOpenRead(It.IsAny<string>())).Returns(false);
+            _mockFileSystem.Setup(fs => fs.TryOpenRead(It.IsAny<string>())).Returns(true);
             Mock<IClock> _mockClock = new();
 
             FileFunction _fileFunction = new(_mockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
