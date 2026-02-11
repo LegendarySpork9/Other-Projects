@@ -58,7 +58,7 @@ namespace GoogleDriveSync.Services
         // Runs the process of updating the files selected.
         public bool SyncChanges(List<FileModel> uploadFiles, List<FileModel> downloadFiles)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Syncing {uploadFiles.Count + downloadFiles.Count} files(s) to root folder");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Syncing {uploadFiles.Count + downloadFiles.Count} file(s) to root folder");
 
             bool hasErrored = false;
 
@@ -118,7 +118,7 @@ namespace GoogleDriveSync.Services
                 OnProgressChanged(progress);
             }
 
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Synced {uploadFiles.Count + downloadFiles.Count} files(s) to root folder");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Synced {uploadFiles.Count + downloadFiles.Count} file(s) to root folder");
 
             return hasErrored;
         }

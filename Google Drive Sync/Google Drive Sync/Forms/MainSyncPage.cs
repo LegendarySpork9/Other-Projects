@@ -27,12 +27,6 @@ namespace GoogleDriveSync
         {
             InitializeComponent();
 
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
-            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Google Drive Folder: {AppSettingsModel.DriveFolder}");
-            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Local Folder: {AppSettingsModel.LocalFolder}");
-            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Ignore Folder(s): {string.Join(",", AppSettingsModel.IgnoreFolders)}");
-            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Ignore File(s): {string.Join(",", AppSettingsModel.IgnoreFiles)}");
-
             AppService.ProgressChanged += ProgressChanged;
         }
 
