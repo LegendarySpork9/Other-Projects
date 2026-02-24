@@ -13,7 +13,7 @@ namespace GitHubScraper.Tests.Converters
         {
             Mock<GitHubConverter> _mockGitHubConverter = new();
 
-            Assert.IsFalse(_mockGitHubConverter.Object.IsType("Trombone"));
+            Assert.IsFalse(GitHubConverter.IsType("Trombone"));
         }
 
         // Tests whether the IsType method returns true when given "bug".
@@ -22,7 +22,7 @@ namespace GitHubScraper.Tests.Converters
         {
             Mock<GitHubConverter> _mockGitHubConverter = new();
 
-            Assert.IsTrue(_mockGitHubConverter.Object.IsType("bug"));
+            Assert.IsTrue(GitHubConverter.IsType("bug"));
         }
 
         // Tests whether the IsType method returns true when given "enhancement".
@@ -31,7 +31,7 @@ namespace GitHubScraper.Tests.Converters
         {
             Mock<GitHubConverter> _mockGitHubConverter = new();
 
-            Assert.IsTrue(_mockGitHubConverter.Object.IsType("enhancement"));
+            Assert.IsTrue(GitHubConverter.IsType("enhancement"));
         }
 
         // Tests whether the IsType method returns true when given "documentation".
@@ -40,7 +40,7 @@ namespace GitHubScraper.Tests.Converters
         {
             Mock<GitHubConverter> _mockGitHubConverter = new();
 
-            Assert.IsTrue(_mockGitHubConverter.Object.IsType("documentation"));
+            Assert.IsTrue(GitHubConverter.IsType("documentation"));
         }
 
         // Tests whether the GetType method returns the value it's given when given any value.
@@ -50,7 +50,7 @@ namespace GitHubScraper.Tests.Converters
             Mock<GitHubConverter> _mockGitHubConverter = new();
 
             string expected = "Trombone";
-            string actual = _mockGitHubConverter.Object.GetType("Trombone");
+            string actual = GitHubConverter.GetType("Trombone");
 
             Assert.AreEqual(expected, actual);
         }
@@ -62,7 +62,7 @@ namespace GitHubScraper.Tests.Converters
             Mock<GitHubConverter> _mockGitHubConverter = new();
 
             string expected = "Bug";
-            string actual = _mockGitHubConverter.Object.GetType("bug");
+            string actual = GitHubConverter.GetType("bug");
 
             Assert.AreEqual(expected, actual);
         }
@@ -74,7 +74,7 @@ namespace GitHubScraper.Tests.Converters
             Mock<GitHubConverter> _mockGitHubConverter = new();
 
             string expected = "New Feature";
-            string actual = _mockGitHubConverter.Object.GetType("enhancement");
+            string actual = GitHubConverter.GetType("enhancement");
 
             Assert.AreEqual(expected, actual);
         }
@@ -86,7 +86,7 @@ namespace GitHubScraper.Tests.Converters
             Mock<GitHubConverter> _mockGitHubConverter = new();
 
             string expected = "Documentation";
-            string actual = _mockGitHubConverter.Object.GetType("documentation");
+            string actual = GitHubConverter.GetType("documentation");
 
             Assert.AreEqual(expected, actual);
         }

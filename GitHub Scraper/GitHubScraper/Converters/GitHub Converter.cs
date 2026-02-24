@@ -1,10 +1,10 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 namespace GitHubScraper.Converters
 {
-    public class GitHubConverter
+    public static class GitHubConverter
     {
         // Returns whether the label is an issue type.
-        public bool IsType(string label)
+        public static bool IsType(string label)
         {
             return label switch
             {
@@ -16,7 +16,7 @@ namespace GitHubScraper.Converters
         }
 
         // Returns the correct issue type for the label.
-        public string GetType(string label)
+        public static string GetType(string label)
         {
             return label switch
             {

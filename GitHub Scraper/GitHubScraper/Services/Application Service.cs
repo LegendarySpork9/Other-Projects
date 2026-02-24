@@ -137,7 +137,7 @@ namespace GitHubScraper.Services
 
                 _databaseService.OutputReleases(repository, releases);
 
-                List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates(repository, issues, existingIssues);
+                List<IssueAggregateModel> issueAggregates = DatabaseFunction.CreateAggregates(repository, DatabaseFunction.FilterIssues(repository, issues, existingIssues), existingIssues);
 
                 _databaseService.LogIssueAggregates(repository, issueAggregates);
                 _databaseService.LogRun(repository, issues.Count, commits.Count, pullRequests.Count, totalWorkflowRuns, releases.Count);

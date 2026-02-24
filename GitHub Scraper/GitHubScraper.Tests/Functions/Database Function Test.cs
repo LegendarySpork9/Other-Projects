@@ -14,7 +14,7 @@ namespace GitHubScraper.Tests.Functions
         {
             Mock<DatabaseFunction> _mockDatabaseFunction = new();
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", [], []);
+            List<IssueAggregateModel> issueAggregates = DatabaseFunction.CreateAggregates("Unit-Test", [], []);
 
             Assert.AreEqual(1, issueAggregates.Count);
             Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
@@ -53,7 +53,7 @@ namespace GitHubScraper.Tests.Functions
                 }
             };
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, []);
+            List<IssueAggregateModel> issueAggregates = DatabaseFunction.CreateAggregates("Unit-Test", mockIssue, []);
 
             Assert.AreEqual(1, issueAggregates.Count);
             Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
@@ -108,7 +108,7 @@ namespace GitHubScraper.Tests.Functions
                 }
             ];
 
-            List<IssueAggregateModel> actual = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, []);
+            List<IssueAggregateModel> actual = DatabaseFunction.CreateAggregates("Unit-Test", mockIssue, []);
 
             Assert.AreEqual(2, actual.Count);
 
@@ -155,7 +155,7 @@ namespace GitHubScraper.Tests.Functions
                 }
             };
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, []);
+            List<IssueAggregateModel> issueAggregates = DatabaseFunction.CreateAggregates("Unit-Test", mockIssue, []);
 
             Assert.AreEqual(16, issueAggregates.Count);
 
@@ -227,7 +227,7 @@ namespace GitHubScraper.Tests.Functions
                 }
             };
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
+            List<IssueAggregateModel> issueAggregates = DatabaseFunction.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
 
             Assert.AreEqual(1, issueAggregates.Count);
             Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
@@ -280,7 +280,7 @@ namespace GitHubScraper.Tests.Functions
                 }
             };
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
+            List<IssueAggregateModel> issueAggregates = DatabaseFunction.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
 
             Assert.AreEqual(1, issueAggregates.Count);
             Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
@@ -334,7 +334,7 @@ namespace GitHubScraper.Tests.Functions
                 }
             };
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
+            List<IssueAggregateModel> issueAggregates = DatabaseFunction.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
 
             Assert.AreEqual(1, issueAggregates.Count);
             Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);

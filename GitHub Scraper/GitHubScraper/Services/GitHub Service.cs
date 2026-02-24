@@ -82,9 +82,9 @@ namespace GitHubScraper.Services
 
                                     foreach (LabelModel label in issue.Labels)
                                     {
-                                        if (_gitHubConverter.IsType(label.Name))
+                                        if (GitHubConverter.IsType(label.Name))
                                         {
-                                            issue.Type = _gitHubConverter.GetType(label.Name);
+                                            issue.Type = GitHubConverter.GetType(label.Name);
 
                                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Type: {issue.Type}");
 
@@ -276,9 +276,9 @@ namespace GitHubScraper.Services
 
                                     foreach (LabelModel label in pullRequest.Labels)
                                     {
-                                        if (_gitHubConverter.IsType(label.Name))
+                                        if (GitHubConverter.IsType(label.Name))
                                         {
-                                            pullRequest.Type = _gitHubConverter.GetType(label.Name);
+                                            pullRequest.Type = GitHubConverter.GetType(label.Name);
 
                                             Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Type: {pullRequest.Type}");
 
