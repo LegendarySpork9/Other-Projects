@@ -48,7 +48,7 @@ namespace GitHubScraper.Functions
                     issueAggregate.Created++;
                 }
 
-                if (issue.Closed_At is DateTime && (existingIssue == null || issue.Closed_At != existingIssue.Closed_At))
+                if (issue.Closed_At is DateTimeOffset && (existingIssue == null || issue.Closed_At != existingIssue.Closed_At))
                 {
                     DateTime closedDate = issue.Closed_At.Value.Date;
 
@@ -70,7 +70,7 @@ namespace GitHubScraper.Functions
 
             if (sortedIssueAggregates.Count == 0)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"1 aggregate(s) created");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"1 aggregate created");
                 _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Created aggregates for repository {repository}");
 
                 return [new IssueAggregateModel

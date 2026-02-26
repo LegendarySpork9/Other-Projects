@@ -5,5 +5,6 @@ namespace GitHubScraper.Abstractions
     public interface IClock
     {
         DateTime UtcNow { get; }
+        DateTime DefaultDate { get; }
     }
 }

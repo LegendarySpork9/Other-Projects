@@ -7,5 +7,8 @@ namespace GitHubScraper.Implementations
     {
         // Returns the current UTC Date and time.
         public DateTime UtcNow => DateTime.UtcNow;
+
+        // Returns the default date and time.
+        public DateTime DefaultDate => new(1900, 01, 01, 0, 0, 0, DateTimeKind.Utc);
     }
 }

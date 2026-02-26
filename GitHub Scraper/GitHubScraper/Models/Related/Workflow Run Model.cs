@@ -13,7 +13,7 @@ namespace GitHubScraper.Models.Related
         public required string Event { get; set; }
         public required string Status { get; set; }
         public required string Conclusion { get; set; }
-        public required DateTime Created_At { get; set; }
-        public required DateTime Updated_At { get; set; }
+        public required DateTimeOffset Created_At { get; set; }
+        public required DateTimeOffset Updated_At { get; set; }
     }
 }

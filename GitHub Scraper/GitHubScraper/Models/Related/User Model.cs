@@ -6,6 +6,6 @@ namespace GitHubScraper.Models.Related
     {
         public string? Login { get; set; }
         public string? Name { get; set; }
-        public DateTime? Date { get; set; }
+        public DateTimeOffset? Date { get; set; }
     }
 }
