@@ -85,82 +85,16 @@ namespace GitHubScraper.Services
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching commits from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
-            List<CommitModel> commits = [];
+            List<CommitModel> commits = _GitHubClient.GetCommits(repository, lastRunDate).Result;
 
-            string url;
-            int page = 1;
-
-            try
+            foreach (CommitModel commit in commits)
             {
-                if (lastRunDate == DateTime.Parse("1900-01-01 00:00:00").ToUniversalTime())
-                {
-                    url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/commits?per_page=100";
-                }
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for commit {commit.Sha}");
 
-                else
-                {
-                    url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/commits?since={lastRunDate:yyyy-MM-ddTHH:mm:ssZ}&per_page=100";
-                }
+                commit.Repository = repository;
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
-
-                RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", $"Bearer {AppSettingsModel.BearerToken}");
-
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
-
-                while (true)
-                {
-                    RestRequest request = new()
-                    {
-                        Method = Method.Get
-                    };
-                    request.AddParameter("page", page);
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page: {page}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
-
-                    RestResponse response = client.Execute(request);
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
-                    {
-                        List<CommitModel> apiCommits = JsonConvert.DeserializeObject<List<CommitModel>>(response.Content) ?? [];
-
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Commits Returned: {commits.Count}");
-
-                        if (apiCommits.Count > 0)
-                        {
-                            foreach (CommitModel commit in apiCommits)
-                            {
-                                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for commit {commit.Sha}");
-
-                                commit.Repository = repository;
-
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for commit {commit.Sha}");
-
-                                commits.Add(commit);
-                            }
-
-                            page++;
-                        }
-
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-
-            catch (Exception ex)
-            {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for commit {commit.Sha}");
             }
 
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {commits.Count} commit(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
@@ -170,113 +104,51 @@ namespace GitHubScraper.Services
         // Returns a list of the pull requests for the repository.
         public List<PullRequestModel> GetPullRequests(string repository, DateTime lastRunDate)
         {
-            GitHubConverter _gitHubConverter = new();
-
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching pull requests from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
-            List<PullRequestModel> pullRequests = [];
+            List<PullRequestModel> pullRequests = _GitHubClient.GetPullRequests(repository, lastRunDate).Result;
             TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
-            int page = 1;
-
-            try
+            foreach (PullRequestModel pullRequest in pullRequests)
             {
-                string url = $"https://api.github.com/repos/{AppSettingsModel.Owner}/{repository}/pulls?state=all&sort=updated&direction=desc&per_page=100";
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for pull request {pullRequest.Number}");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                pullRequest.Repository = repository;
 
-                RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", $"Bearer {AppSettingsModel.BearerToken}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
-
-                while (true)
+                foreach (LabelModel label in pullRequest.Labels)
                 {
-                    RestRequest request = new()
+                    if (GitHubConverter.IsType(label.Name))
                     {
-                        Method = Method.Get
-                    };
-                    request.AddParameter("page", page);
+                        pullRequest.Type = GitHubConverter.GetType(label.Name);
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page: {page}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Type: {pullRequest.Type}");
 
-                    RestResponse response = client.Execute(request);
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
-                    {
-                        List<PullRequestModel> apiPullRequests = JsonConvert.DeserializeObject<List<PullRequestModel>>(response.Content) ?? [];
-
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Pull Requests Returned: {pullRequests.Count}");
-
-                        if (apiPullRequests.Count > 0)
-                        {
-                            bool nextPage = true;
-
-                            foreach (PullRequestModel pullRequest in apiPullRequests)
-                            {
-                                if (pullRequest.Updated_At >= lastRunDate)
-                                {
-                                    _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filling blanks for pull request {pullRequest.Number}");
-
-                                    pullRequest.Repository = repository;
-
-                                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
-
-                                    foreach (LabelModel label in pullRequest.Labels)
-                                    {
-                                        if (GitHubConverter.IsType(label.Name))
-                                        {
-                                            pullRequest.Type = GitHubConverter.GetType(label.Name);
-
-                                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Type: {pullRequest.Type}");
-
-                                            break;
-                                        }
-                                    }
-
-                                    pullRequest.State = textInfo.ToTitleCase(pullRequest.State);
-
-                                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"State: {pullRequest.State}");
-                                    _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for pull request {pullRequest.Number}");
-
-                                    pullRequests.Add(pullRequest);
-                                }
-
-                                else
-                                {
-                                    nextPage = false;
-                                    break;
-                                }
-                            }
-
-                            if (nextPage)
-                            {
-                                page++;
-                            }
-
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        else
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
-            }
 
-            catch (Exception ex)
-            {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                pullRequest.State = textInfo.ToTitleCase(pullRequest.State);
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"State: {pullRequest.State}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for pull request {pullRequest.Number}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Converting date times to UTC for issue {issue.Number}");
+
+                pullRequest.Created_At = pullRequest.Created_At.UtcDateTime;
+                pullRequest.Updated_At = pullRequest.Updated_At.UtcDateTime;
+
+                if (pullRequest.Merged_At.HasValue)
+                {
+                    pullRequest.Merged_At = pullRequest.Merged_At.Value.UtcDateTime;
+                }
+
+                if (pullRequest.Closed_At.HasValue)
+                {
+                    pullRequest.Closed_At = pullRequest.Closed_At.Value.UtcDateTime;
+                }
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Converted date times to UTC for issue {issue.Number}");
             }
 
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {pullRequests.Count} pull request(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");

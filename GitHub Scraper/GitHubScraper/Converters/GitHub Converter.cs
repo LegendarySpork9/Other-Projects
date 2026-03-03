@@ -9,6 +9,8 @@ namespace GitHubScraper.Converters
             return endpoint switch
             {
                 "/issues" => "?state=all&sort=updated&per_page=100",
+                "/commits" => "?per_page=100",
+                "/pulls" => "?state=all&sort=updated&direction=desc&per_page=100",
                 _ => string.Empty
             };
         }

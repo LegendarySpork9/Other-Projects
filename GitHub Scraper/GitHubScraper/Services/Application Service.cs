@@ -100,8 +100,8 @@ namespace GitHubScraper.Services
         // Runs the application.
         public void Run()
         {
-            DatabaseService _databaseService = new();
-            GitHubService _gitHubService = new(_Logger, new GitHubClientWrapper(new GitHubOptionsProvider(), _Logger));
+            DatabaseService _databaseService = new(_Logger, new SystemClockProvider(), new DatabaseOptionsProvider(), new FileSystemWrapper());
+            GitHubService _gitHubService = new(_Logger, new GitHubClientWrapper(_Logger, new GitHubOptionsProvider()));
             DatabaseFunction _databaseFunction = new(_Logger, new SystemClockProvider());
 
             foreach (string repository in AppSettingsModel.Repositories.Split(','))
