@@ -6,10 +6,14 @@ namespace GitHubScraper.Implementations
 {
     public class GitHubOptionsProvider : IGitHubOptions
     {
-        // Returns the Owner from AppSettings.
+        /// <summary>
+        /// Returns the Owner from AppSettings.
+        /// </summary>
         public string Owner => AppSettingsModel.Owner;
 
-        // Returns the Bearer Token from AppSettings.
+        /// <summary>
+        /// Returns the Bearer Token from AppSettings.
+        /// </summary>
         public string BearerToken => AppSettingsModel.BearerToken;
     }
 }

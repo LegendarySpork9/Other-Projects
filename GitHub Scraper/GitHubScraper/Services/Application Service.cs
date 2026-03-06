@@ -19,7 +19,9 @@ namespace GitHubScraper.Services
             _Logger = _logger;
         }
 
-        // Checks the application settings are present.
+        /// <summary>
+        /// Checks the application settings are present.
+        /// </summary>
         public bool Setup()
         {
             bool configured = true;
@@ -97,11 +99,14 @@ namespace GitHubScraper.Services
             return configured;
         }
 
-        // Runs the application.
+        /// <summary>
+        /// Runs the application.
+        /// </summary>
         public void Run()
         {
-            DatabaseService _databaseService = new(_Logger, new SystemClockProvider(), new DatabaseOptionsProvider(), new FileSystemWrapper());
-            GitHubService _gitHubService = new(_Logger, new GitHubClientWrapper(_Logger, new GitHubOptionsProvider()));
+            IDatabaseOptions _options = new DatabaseOptionsProvider();
+            DatabaseService _databaseService = new(_Logger, new SystemClockProvider(), new FileSystemWrapper(), _options, new DatabaseClientWrapper(_options, _Logger));
+            GitHubService _gitHubService = new(_Logger, new GitHubClientWrapper(_Logger, new GitHubOptionsProvider(), new SystemClockProvider()));
             DatabaseFunction _databaseFunction = new(_Logger, new SystemClockProvider());
 
             foreach (string repository in AppSettingsModel.Repositories.Split(','))
@@ -122,9 +127,9 @@ namespace GitHubScraper.Services
                 {
                     foreach (string workflow in AppSettingsModel.Workflows.Split(','))
                     {
-                        List<WorkflowRunModel>? workflowRuns = _gitHubService.GetWorkflowRuns(repository, workflow, lastRunDate);
+                        List<WorkflowRunModel> workflowRuns = _gitHubService.GetWorkflowRuns(repository, workflow, lastRunDate);
 
-                        if (workflowRuns != null)
+                        if (workflowRuns.Count > 0)
                         {
                             workflows.Add(new()
                             {

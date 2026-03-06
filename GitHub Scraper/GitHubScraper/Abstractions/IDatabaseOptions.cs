@@ -1,7 +1,9 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 namespace GitHubScraper.Abstractions
 {
-    // Interface for the database options.
+    /// <summary>
+    /// Interface for the database options.
+    /// </summary>
     public interface IDatabaseOptions
     {
         string ConnectionString { get; }

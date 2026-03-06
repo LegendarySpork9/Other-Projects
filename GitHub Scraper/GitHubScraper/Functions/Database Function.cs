@@ -19,7 +19,9 @@ namespace GitHubScraper.Functions
             Clock = clock;
         }
 
-        // Creates the issue aggregates.
+        /// <summary>
+        /// Creates the issue aggregates.
+        /// </summary>
         public List<IssueAggregateModel> CreateAggregates(string repository, List<IssueModel> issues, List<IssueModel> existingIssues)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Creating aggregates for repository {repository}");
@@ -108,7 +110,9 @@ namespace GitHubScraper.Functions
             return issueAggregates;
         }
 
-        // Filters out existing issues from the given list of issues.
+        /// <summary>
+        /// Filters out existing issues from the given list of issues.
+        /// </summary>
         public List<IssueModel> FilterIssues(string repository, List<IssueModel> issues, List<IssueModel> existingIssues)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filtering issues for repository {repository}");

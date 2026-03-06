@@ -1,7 +1,9 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 namespace GitHubScraper.Models.Related
 {
-    // Stores information about the label.
+    /// <summary>
+    /// Stores information about the label.
+    /// </summary>
     public class LabelModel
     {
         public required string Name { get; set; }

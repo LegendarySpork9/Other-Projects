@@ -1,7 +1,9 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 namespace GitHubScraper.Models.Related
 {
-    // Stores information about the workflow run.
+    /// <summary>
+    /// Stores information about the workflow run.
+    /// </summary>
     public class WorkflowRunModel
     {
         public string? RepositoryName { get; set; }

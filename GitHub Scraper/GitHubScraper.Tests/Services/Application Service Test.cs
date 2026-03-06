@@ -1,50 +1,62 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
+using GitHubScraper.Abstractions;
 using GitHubScraper.Models;
 using GitHubScraper.Services;
 using Moq;
-using System.Configuration;
 
 namespace GitHubScraper.Tests.Services
 {
     [TestClass]
     public class ApplicationServiceTest
     {
-        // Checks whether the configuration passes with all configuration values provided.
+        /// <summary>
+        /// Checks whether the configuration passes with all configuration values provided.
+        /// </summary>
         [TestMethod]
         public void TestSetupPass()
         {
-            Mock<ApplicationService> _mockApplicationService = new();
+            Mock<ILoggerService> _mockLogger = new();
 
-            AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
-            AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"];
-            AppSettingsModel.Workflows = ConfigurationManager.AppSettings["Workflows"];
-            AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
-            AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
-            AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
+            ApplicationService _applicationService = new(_mockLogger.Object);
 
-            Assert.IsTrue(_mockApplicationService.Object.Setup());
+            AppSettingsModel.Owner = "UnitTester";
+            AppSettingsModel.Repositories = "Unit-Test";
+            AppSettingsModel.Workflows = "Unit Test.yml";
+            AppSettingsModel.BearerToken = "This is a token";
+            AppSettingsModel.ConnectionString = "This is a connection string";
+            AppSettingsModel.SQLFiles = @"C:\SQL";
+
+            Assert.IsTrue(_applicationService.Setup());
         }
 
-        // Checks whether the configuration passes with all configuration values provided except the workflows.
+        /// <summary>
+        /// Checks whether the configuration passes with all configuration values provided except the workflows.
+        /// </summary>
         [TestMethod]
         public void TestSetupPassNoWorkflow()
         {
-            Mock<ApplicationService> _mockApplicationService = new();
+            Mock<ILoggerService> _mockLogger = new();
 
-            AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
-            AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"];
-            AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
-            AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
-            AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
+            ApplicationService _applicationService = new(_mockLogger.Object);
 
-            Assert.IsTrue(_mockApplicationService.Object.Setup());
+            AppSettingsModel.Owner = AppSettingsModel.Owner = "UnitTester";;
+            AppSettingsModel.Repositories = "Unit-Test";
+            AppSettingsModel.BearerToken = "This is a token";
+            AppSettingsModel.ConnectionString = "This is a connection string";
+            AppSettingsModel.SQLFiles = @"C:\SQL";
+
+            Assert.IsTrue(_applicationService.Setup());
         }
 
-        // Checks whether the configuration fails when all the configuration values are missing.
+        /// <summary>
+        /// Checks whether the configuration fails when all the configuration values are missing.
+        /// </summary>
         [TestMethod]
         public void TestSetupAllFail()
         {
-            Mock<ApplicationService> _mockApplicationService = new();
+            Mock<ILoggerService> _mockLogger = new();
+
+            ApplicationService _applicationService = new(_mockLogger.Object);
 
             AppSettingsModel.Owner = null;
             AppSettingsModel.Repositories = null;
@@ -52,87 +64,107 @@ namespace GitHubScraper.Tests.Services
             AppSettingsModel.ConnectionString = null;
             AppSettingsModel.SQLFiles = null;
 
-            Assert.IsFalse(_mockApplicationService.Object.Setup());
+            Assert.IsTrue(_applicationService.Setup());
         }
 
-        // Checks whether the configuration fails when the owner configuration value is missing.
+        /// <summary>
+        /// Checks whether the configuration fails when the owner configuration value is missing.
+        /// </summary>
         [TestMethod]
         public void TestSetupOwnerFail()
         {
-            Mock<ApplicationService> _mockApplicationService = new();
+            Mock<ILoggerService> _mockLogger = new();
+
+            ApplicationService _applicationService = new(_mockLogger.Object);
 
             AppSettingsModel.Owner = null;
-            AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"];
-            AppSettingsModel.Workflows = ConfigurationManager.AppSettings["Workflows"];
-            AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
-            AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
-            AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
+            AppSettingsModel.Repositories = "Unit-Test";
+            AppSettingsModel.Workflows = "Unit Test.yml";
+            AppSettingsModel.BearerToken = "This is a token";
+            AppSettingsModel.ConnectionString = "This is a connection string";
+            AppSettingsModel.SQLFiles = @"C:\SQL";
 
-            Assert.IsFalse(_mockApplicationService.Object.Setup());
+            Assert.IsTrue(_applicationService.Setup());
         }
 
-        // Checks whether the configuration fails when the repository configuration value is missing.
+        /// <summary>
+        /// Checks whether the configuration fails when the repository configuration value is missing.
+        /// </summary>
         [TestMethod]
         public void TestSetupRepositoryFail()
         {
-            Mock<ApplicationService> _mockApplicationService = new();
+            Mock<ILoggerService> _mockLogger = new();
 
-            AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
+            ApplicationService _applicationService = new(_mockLogger.Object);
+
+            AppSettingsModel.Owner = AppSettingsModel.Owner = "UnitTester";;
             AppSettingsModel.Repositories = null;
-            AppSettingsModel.Workflows = ConfigurationManager.AppSettings["Workflows"];
-            AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
-            AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
-            AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
+            AppSettingsModel.Workflows = "Unit Test.yml";
+            AppSettingsModel.BearerToken = "This is a token";
+            AppSettingsModel.ConnectionString = "This is a connection string";
+            AppSettingsModel.SQLFiles = @"C:\SQL";
 
-            Assert.IsFalse(_mockApplicationService.Object.Setup());
+            Assert.IsTrue(_applicationService.Setup());
         }
 
-        // Checks whether the configuration fails when the token configuration value is missing.
+        /// <summary>
+        /// Checks whether the configuration fails when the token configuration value is missing.
+        /// </summary>
         [TestMethod]
         public void TestSetupTokenFail()
         {
-            Mock<ApplicationService> _mockApplicationService = new();
+            Mock<ILoggerService> _mockLogger = new();
 
-            AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
-            AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"];
-            AppSettingsModel.Workflows = ConfigurationManager.AppSettings["Workflows"];
+            ApplicationService _applicationService = new(_mockLogger.Object);
+
+            AppSettingsModel.Owner = AppSettingsModel.Owner = "UnitTester";;
+            AppSettingsModel.Repositories = "Unit-Test";
+            AppSettingsModel.Workflows = "Unit Test.yml";
             AppSettingsModel.BearerToken = null;
-            AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
-            AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
+            AppSettingsModel.ConnectionString = "This is a connection string";
+            AppSettingsModel.SQLFiles = @"C:\SQL";
 
-            Assert.IsFalse(_mockApplicationService.Object.Setup());
+            Assert.IsTrue(_applicationService.Setup());
         }
 
-        // Checks whether the configuration fails when the connection string configuration value is missing.
+        /// <summary>
+        /// Checks whether the configuration fails when the connection string configuration value is missing.
+        /// </summary>
         [TestMethod]
         public void TestSetupConnectionStringFail()
         {
-            Mock<ApplicationService> _mockApplicationService = new();
+            Mock<ILoggerService> _mockLogger = new();
 
-            AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
-            AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"];
-            AppSettingsModel.Workflows = ConfigurationManager.AppSettings["Workflows"];
-            AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
+            ApplicationService _applicationService = new(_mockLogger.Object);
+
+            AppSettingsModel.Owner = AppSettingsModel.Owner = "UnitTester";;
+            AppSettingsModel.Repositories = "Unit-Test";
+            AppSettingsModel.Workflows = "Unit Test.yml";
+            AppSettingsModel.BearerToken = "This is a token";
             AppSettingsModel.ConnectionString = null;
-            AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
+            AppSettingsModel.SQLFiles = @"C:\SQL";
 
-            Assert.IsFalse(_mockApplicationService.Object.Setup());
+            Assert.IsTrue(_applicationService.Setup());
         }
 
-        // Checks whether the configuration fails when the SQL files configuration value is missing.
+        /// <summary>
+        /// Checks whether the configuration fails when the SQL files configuration value is missing.
+        /// </summary>
         [TestMethod]
         public void TestSetupSQLFail()
         {
-            Mock<ApplicationService> _mockApplicationService = new();
+            Mock<ILoggerService> _mockLogger = new();
 
-            AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
-            AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"];
-            AppSettingsModel.Workflows = ConfigurationManager.AppSettings["Workflows"];
-            AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
-            AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
+            ApplicationService _applicationService = new(_mockLogger.Object);
+
+            AppSettingsModel.Owner = AppSettingsModel.Owner = "UnitTester";;
+            AppSettingsModel.Repositories = "Unit-Test";
+            AppSettingsModel.Workflows = "Unit Test.yml";
+            AppSettingsModel.BearerToken = "This is a token";
+            AppSettingsModel.ConnectionString = "This is a connection string";
             AppSettingsModel.SQLFiles = null;
 
-            Assert.IsFalse(_mockApplicationService.Object.Setup());
+            Assert.IsTrue(_applicationService.Setup());
         }
     }
 }

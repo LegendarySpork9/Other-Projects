@@ -1,7 +1,9 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 namespace GitHubScraper.Models.Related
 {
-    // Stores information about the user.
+    /// <summary>
+    /// Stores information about the user.
+    /// </summary>
     public class UserModel
     {
         public string? Login { get; set; }

@@ -3,7 +3,9 @@ namespace GitHubScraper.Converters
 {
     public static class GitHubConverter
     {
-        // Returns the query parameters for a given endpoint.
+        /// <summary>
+        /// Returns the query parameters for a given endpoint.
+        /// </summary>
         public static string GetQuery(string endpoint)
         {
             return endpoint switch
@@ -11,11 +13,15 @@ namespace GitHubScraper.Converters
                 "/issues" => "?state=all&sort=updated&per_page=100",
                 "/commits" => "?per_page=100",
                 "/pulls" => "?state=all&sort=updated&direction=desc&per_page=100",
+                "/runs" => "?per_page=100",
+                "/releases" => "?Per_Page=100",
                 _ => string.Empty
             };
         }
 
-        // Returns whether the label is an issue type.
+        /// <summary>
+        /// Returns whether the label is an issue type.
+        /// </summary>
         public static bool IsType(string label)
         {
             return label switch
@@ -27,7 +33,9 @@ namespace GitHubScraper.Converters
             };
         }
 
-        // Returns the correct issue type for the label.
+        /// <summary>
+        /// Returns the correct issue type for the label.
+        /// </summary>
         public static string GetType(string label)
         {
             return label switch

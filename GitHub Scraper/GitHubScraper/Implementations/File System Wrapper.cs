@@ -5,7 +5,9 @@ namespace GitHubScraper.Implementations
 {
     public class FileSystemWrapper : IFileSystem
     {
-        // Returns the text in a given file.
+        /// <summary>
+        /// Returns the text in a given file.
+        /// </summary>
         public string ReadAllText(string path) => File.ReadAllText(path);
     }
 }

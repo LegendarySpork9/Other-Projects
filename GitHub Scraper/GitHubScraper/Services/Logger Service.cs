@@ -7,7 +7,9 @@ namespace GitHubScraper.Services
     {
         private readonly ILog Logger = LogManager.GetLogger("Logs");
 
-        // Sends a meessage to the specified logs.
+        /// <summary>
+        /// Sends a meessage to the specified logs.
+        /// </summary>
         public void LogMessage(string level, string message)
         {
             switch (level)

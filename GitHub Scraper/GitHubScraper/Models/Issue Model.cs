@@ -3,7 +3,9 @@ using GitHubScraper.Models.Related;
 
 namespace GitHubScraper.Models
 {
-    // Stores information about the issue.
+    /// <summary>
+    /// Stores information about the issue.
+    /// </summary>
     public class IssueModel
     {
         public string? Repository { get; set; }

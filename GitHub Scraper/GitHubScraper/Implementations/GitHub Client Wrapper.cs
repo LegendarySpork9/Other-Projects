@@ -2,7 +2,9 @@
 using GitHubScraper.Abstractions;
 using GitHubScraper.Converters;
 using GitHubScraper.Models;
+using GitHubScraper.Models.Related;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace GitHubScraper.Implementations
@@ -11,19 +13,24 @@ namespace GitHubScraper.Implementations
     {
         private readonly ILoggerService _Logger;
         private readonly IGitHubOptions _Options;
+        private readonly IClock _Clock;
 
         private readonly string BaseURL = "https://api.github.com";
 
         // Sets the class's global variables.
         public GitHubClientWrapper(
             ILoggerService _logger,
-            IGitHubOptions _options)
+            IGitHubOptions _options,
+            IClock _clock)
         {
             _Logger = _logger;
             _Options = _options;
+            _Clock = _clock;
         }
 
-        // Returns a list of the issues for the repository.
+        /// <summary>
+        /// Returns a list of the issues for the repository.
+        /// </summary>
         public async Task<List<IssueModel>> GetIssues(string repository, DateTime lastRunDate)
         {
             List<IssueModel> issues = [];
@@ -91,7 +98,9 @@ namespace GitHubScraper.Implementations
             return issues;
         }
 
-        // Returns a list of the commits for the repository.
+        /// <summary>
+        /// Returns a list of the commits for the repository.
+        /// </summary>
         public async Task<List<CommitModel>> GetCommits(string repository, DateTime lastRunDate)
         {
             List<CommitModel> commits = [];
@@ -129,7 +138,7 @@ namespace GitHubScraper.Implementations
                     {
                         List<CommitModel> apiCommits = JsonConvert.DeserializeObject<List<CommitModel>>(response.Content) ?? [];
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Issues Returned: {apiCommits.Count}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Commits Returned: {apiCommits.Count}");
 
                         if (apiCommits.Count > 0)
                         {
@@ -159,7 +168,9 @@ namespace GitHubScraper.Implementations
             return commits;
         }
 
-        // Returns a list of the pull requests for the repository.
+        /// <summary>
+        /// Returns a list of the pull requests for the repository.
+        /// </summary>
         public async Task<List<PullRequestModel>> GetPullRequests(string repository, DateTime lastRunDate)
         {
             List<PullRequestModel> pullRequests = [];
@@ -197,7 +208,7 @@ namespace GitHubScraper.Implementations
                     {
                         List<PullRequestModel> apiPullRequests = JsonConvert.DeserializeObject<List<PullRequestModel>>(response.Content) ?? [];
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Issues Returned: {apiPullRequests.Count}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Pull Requests Returned: {apiPullRequests.Count}");
 
                         if (apiPullRequests.Count > 0)
                         {
@@ -238,12 +249,204 @@ namespace GitHubScraper.Implementations
             return pullRequests;
         }
 
-        private string BuildURL(string endpoint, string repository, DateTime? lastRunDate)
+        /// <summary>
+        /// Returns a list of the workflow runs for the repository and workflow.
+        /// </summary>
+        public async Task<List<WorkflowRunModel>> GetWorkflowRuns(string repository, string workflow, DateTime lastRunDate)
+        {
+            List<WorkflowRunModel> workflowRuns = [];
+            int page = 1;
+
+            try
+            {
+                string url = BuildURL("/actions/workflows", repository, null, workflow);
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+
+                RestClient client = new(url);
+                client.AddDefaultHeader("Authorization", $"Bearer {_Options.BearerToken}");
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+
+                while (true)
+                {
+                    RestRequest request = new()
+                    {
+                        Method = Method.Get
+                    };
+                    request.AddParameter("page", page);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page: {page}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                    RestResponse response = await client.ExecuteAsync(request);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                    {
+                        JObject responseContent = JObject.Parse(response.Content);
+                        JToken? workflowRunsToken = responseContent["workflow_runs"];
+
+                        if (workflowRunsToken != null)
+                        {
+                            List<WorkflowRunModel> apiWorkflowRuns = JsonConvert.DeserializeObject<List<WorkflowRunModel>>(response.Content) ?? [];
+
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Workflow Runs Returned: {apiWorkflowRuns.Count}");
+
+                            if (apiWorkflowRuns.Count > 0)
+                            {
+                                int workflowRunsToIgnore = apiWorkflowRuns.Where(awr => awr.Updated_At < lastRunDate).ToList().Count;
+
+                                if (workflowRunsToIgnore > 0)
+                                {
+                                    workflowRuns.AddRange(apiWorkflowRuns.Where(awr => awr.Updated_At >= lastRunDate));
+                                    break;
+                                }
+
+                                else
+                                {
+                                    workflowRuns.AddRange(apiWorkflowRuns);
+                                    page++;
+                                }
+                            }
+
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+            }
+
+            return workflowRuns;
+        }
+
+        /// <summary>
+        /// Returns a list of the releases for the repository.
+        /// </summary>
+        public async Task<List<ReleaseModel>> GetReleases(string repository, DateTime lastRunDate)
+        {
+            List<ReleaseModel> releases = [];
+            int page = 1;
+
+            try
+            {
+                string url = BuildURL("/releases", repository, null);
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+
+                RestClient client = new(url);
+                client.AddDefaultHeader("Authorization", $"Bearer {_Options.BearerToken}");
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+
+                while (true)
+                {
+                    RestRequest request = new()
+                    {
+                        Method = Method.Get
+                    };
+                    request.AddParameter("page", page);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page: {page}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                    RestResponse response = await client.ExecuteAsync(request);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                    {
+                        List<ReleaseModel> apiReleases = JsonConvert.DeserializeObject<List<ReleaseModel>>(response.Content) ?? [];
+
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Releases Returned: {apiReleases.Count}");
+
+                        if (apiReleases.Count > 0)
+                        {
+                            int releasesToIgnore = apiReleases.Where(ar => ar.Updated_At < lastRunDate).ToList().Count;
+
+                            if (releasesToIgnore > 0)
+                            {
+                                releases.AddRange(apiReleases.Where(ar => ar.Updated_At >= lastRunDate));
+                                break;
+                            }
+
+                            else
+                            {
+                                releases.AddRange(apiReleases);
+                                page++;
+                            }
+                        }
+
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+            }
+
+            return releases;
+        }
+
+        /// <summary>
+        /// Returns the API url.
+        /// </summary>
+        private string BuildURL(string endpoint, string repository, DateTime? lastRunDate, string? workflow = null)
         {
             string url = $"{BaseURL}/repos/{_Options.Owner}/{repository}{endpoint}";
             string query = GitHubConverter.GetQuery(endpoint);
 
-            if (lastRunDate.HasValue)
+            if (!string.IsNullOrWhiteSpace(workflow))
+            {
+                url = $"{url}/{workflow}/runs";
+                query = GitHubConverter.GetQuery("/runs");
+
+                if (!lastRunDate.HasValue)
+                {
+                    query += "&created=>1970-01-01T00:00:00Z";
+                }
+
+                else
+                {
+                    query += $"&created=>{_Clock.UtcNow:yyyy-MM-ddT00:00:00Z}";
+                }
+            }
+
+            if (lastRunDate.HasValue && string.IsNullOrWhiteSpace(workflow))
             {
                 query += $"&since={lastRunDate:yyyy-MM-ddTHH:mm:ssZ}";
             }

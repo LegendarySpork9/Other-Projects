@@ -1,7 +1,9 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 namespace GitHubScraper.Models.Related
 {
-    // Stores information about the related commit.
+    /// <summary>
+    /// Stores information about the related commit.
+    /// </summary>
     public class RelatedCommitModel
     {
         public required UserModel Author { get; set; }

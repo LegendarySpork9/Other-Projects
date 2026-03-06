@@ -1,7 +1,9 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 namespace GitHubScraper.Models
 {
-    // Stores the issue counts.
+    /// <summary>
+    /// Stores the issue counts.
+    /// </summary>
     public class IssueAggregateModel
     {
         public DateTime Date { get; set; }

@@ -7,88 +7,172 @@ namespace GitHubScraper.Tests.Converters
     [TestClass]
     public class GitHubConverterTest
     {
-        // Tests whether the IsType method returns false when given any value.
+        #region IsType
+
+        /// <summary>
+        /// Tests whether the IsType method returns false when given any value.
+        /// </summary>
         [TestMethod]
         public void TestIsType()
         {
-            Mock<GitHubConverter> _mockGitHubConverter = new();
-
             Assert.IsFalse(GitHubConverter.IsType("Trombone"));
         }
 
-        // Tests whether the IsType method returns true when given "bug".
+        /// <summary>
+        /// Tests whether the IsType method returns true when given "bug".
+        /// </summary>
         [TestMethod]
         public void TestIsTypeBug()
         {
-            Mock<GitHubConverter> _mockGitHubConverter = new();
-
             Assert.IsTrue(GitHubConverter.IsType("bug"));
         }
 
-        // Tests whether the IsType method returns true when given "enhancement".
+        /// <summary>
+        /// Tests whether the IsType method returns true when given "enhancement".
+        /// </summary>
         [TestMethod]
         public void TestIsTypeEnhancement()
         {
-            Mock<GitHubConverter> _mockGitHubConverter = new();
-
             Assert.IsTrue(GitHubConverter.IsType("enhancement"));
         }
 
-        // Tests whether the IsType method returns true when given "documentation".
+        /// <summary>
+        /// Tests whether the IsType method returns true when given "documentation".
+        /// </summary>
         [TestMethod]
         public void TestIsTypeDocumentation()
         {
-            Mock<GitHubConverter> _mockGitHubConverter = new();
-
             Assert.IsTrue(GitHubConverter.IsType("documentation"));
         }
 
-        // Tests whether the GetType method returns the value it's given when given any value.
+        #endregion
+
+        #region GetType
+
+        /// <summary>
+        /// Tests whether the GetType method returns the value it's given when given any value.
+        /// </summary>
         [TestMethod]
         public void TestGetType()
         {
-            Mock<GitHubConverter> _mockGitHubConverter = new();
-
             string expected = "Trombone";
             string actual = GitHubConverter.GetType("Trombone");
 
             Assert.AreEqual(expected, actual);
         }
 
-        // Tests whether the GetType method returns "Bug" when given "bug".
+        /// <summary>
+        /// Tests whether the GetType method returns "Bug" when given "bug".
+        /// </summary>
         [TestMethod]
         public void TestGetTypeBug()
         {
-            Mock<GitHubConverter> _mockGitHubConverter = new();
-
             string expected = "Bug";
             string actual = GitHubConverter.GetType("bug");
 
             Assert.AreEqual(expected, actual);
         }
 
-        // Tests whether the GetType method returns "New Feature" when given "enhancement".
+        /// <summary>
+        /// Tests whether the GetType method returns "New Feature" when given "enhancement".
+        /// </summary>
         [TestMethod]
         public void TestGetTypeEnhancement()
         {
-            Mock<GitHubConverter> _mockGitHubConverter = new();
-
             string expected = "New Feature";
             string actual = GitHubConverter.GetType("enhancement");
 
             Assert.AreEqual(expected, actual);
         }
 
-        // Tests whether the GetType method returns "Documentation" when given "documentation".
+        /// <summary>
+        /// Tests whether the GetType method returns "Documentation" when given "documentation".
+        /// </summary>
         [TestMethod]
         public void TestGetTypeDocumentation()
         {
-            Mock<GitHubConverter> _mockGitHubConverter = new();
-
             string expected = "Documentation";
             string actual = GitHubConverter.GetType("documentation");
 
             Assert.AreEqual(expected, actual);
         }
+
+        #endregion
+
+        #region GetQuery
+
+        /// <summary>
+        /// Tests whether the GetQuery method returns an empty string when given any value.
+        /// </summary>
+        [TestMethod]
+        public void TestGetQuery()
+        {
+            string expected = string.Empty;
+            string actual = GitHubConverter.GetQuery("Trombone");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Tests whether the GetQuery method returns the correct value when given "/issues".
+        /// </summary>
+        [TestMethod]
+        public void TestGetQueryIssues()
+        {
+            string expected = "?state=all&sort=updated&per_page=100";
+            string actual = GitHubConverter.GetQuery("/issues");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Tests whether the GetQuery method returns the correct value when given "/commits".
+        /// </summary>
+        [TestMethod]
+        public void TestGetQueryCommits()
+        {
+            string expected = "?per_page=100";
+            string actual = GitHubConverter.GetQuery("/commits");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Tests whether the GetQuery method returns the correct value when given "/pulls".
+        /// </summary>
+        [TestMethod]
+        public void TestGetQueryPulls()
+        {
+            string expected = "?state=all&sort=updated&direction=desc&per_page=100";
+            string actual = GitHubConverter.GetQuery("/pulls");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Tests whether the GetQuery method returns the correct value when given "/runs".
+        /// </summary>
+        [TestMethod]
+        public void TestGetQueryRuns()
+        {
+            string expected = "?per_page=100";
+            string actual = GitHubConverter.GetQuery("/runs");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Tests whether the GetQuery method returns the correct value when given "/releases".
+        /// </summary>
+        [TestMethod]
+        public void TestGetQueryReleases()
+        {
+            string expected = "?Per_Page=100";
+            string actual = GitHubConverter.GetQuery("/releases");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        #endregion
     }
 }

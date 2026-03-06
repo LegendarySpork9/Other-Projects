@@ -1,7 +1,9 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 namespace GitHubScraper.Abstractions
 {
-    // Interface for the GitHub Options.
+    /// <summary>
+    /// Interface for the GitHub Options.
+    /// </summary>
     public interface IGitHubOptions
     {
         string Owner { get; }

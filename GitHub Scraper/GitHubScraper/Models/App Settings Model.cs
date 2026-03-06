@@ -3,7 +3,9 @@ using System.Configuration;
 
 namespace GitHubScraper.Models
 {
-    // Stores the settings used by the application.
+    /// <summary>
+    /// Stores the settings used by the application.
+    /// </summary>
     public static class AppSettingsModel
     {
         public static string? Owner { get; set; } = ConfigurationManager.AppSettings["Owner"];

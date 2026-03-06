@@ -6,10 +6,14 @@ namespace GitHubScraper.Implementations
 {
     public class DatabaseOptionsProvider : IDatabaseOptions
     {
-        // Returns the ConnectionString from AppSettings.
+        /// <summary>
+        /// Returns the ConnectionString from AppSettings.
+        /// </summary>
         public string ConnectionString => AppSettingsModel.ConnectionString;
 
-        // Returns the SQLFiles from AppSettings.
+        /// <summary>
+        /// Returns the SQLFiles from AppSettings.
+        /// </summary>
         public string SQLFiles => AppSettingsModel.SQLFiles;
     }
 }

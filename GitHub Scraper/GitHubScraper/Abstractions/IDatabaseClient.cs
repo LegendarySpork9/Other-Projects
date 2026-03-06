@@ -1,9 +1,15 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
+using Microsoft.Data.SqlClient;
+
 namespace GitHubScraper.Abstractions
 {
-    // Interface for the database.
+    /// <summary>
+    /// Interface for the database.
+    /// </summary>
     public interface IDatabase
     {
-        DateTime GetLastRunDate(string repository);
+        Task<(List<T>, Exception?)> Query<T>(string sql, Func<SqlDataReader, T> map, params SqlParameter[] parameters);
+        Task<(T?, Exception?)> QuerySingle<T>(string sql, Func<SqlDataReader, T> map, params SqlParameter[] parameters);
+        Task<(int, Exception?)> Execute(string sql, params SqlParameter[] parameters);
     }
 }

@@ -3,7 +3,9 @@ using GitHubScraper.Models.Related;
 
 namespace GitHubScraper.Models
 {
-    // Stores information about the release.
+    /// <summary>
+    /// Stores information about the release.
+    /// </summary>
     public class ReleaseModel
     {
         public string? Repository { get; set; }

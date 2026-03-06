@@ -3,7 +3,9 @@ using GitHubScraper.Models.Related;
 
 namespace GitHubScraper.Models
 {
-    // Stores information about the pull request.
+    /// <summary>
+    /// Stores information about the pull request.
+    /// </summary>
     public class PullRequestModel
     {
         public string? Repository { get; set; }
