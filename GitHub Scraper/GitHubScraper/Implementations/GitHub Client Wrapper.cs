@@ -288,11 +288,12 @@ namespace GitHubScraper.Implementations
                     if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                     {
                         JObject responseContent = JObject.Parse(response.Content);
+                        int workflowCount = int.Parse(responseContent["total_count"]?.ToString() ?? "0");
                         JToken? workflowRunsToken = responseContent["workflow_runs"];
 
-                        if (workflowRunsToken != null)
+                        if (workflowCount > 0 && workflowRunsToken != null)
                         {
-                            List<WorkflowRunModel> apiWorkflowRuns = JsonConvert.DeserializeObject<List<WorkflowRunModel>>(response.Content) ?? [];
+                            List<WorkflowRunModel> apiWorkflowRuns = JsonConvert.DeserializeObject<List<WorkflowRunModel>>(workflowRunsToken.ToString()) ?? [];
 
                             _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Workflow Runs Returned: {apiWorkflowRuns.Count}");
 
@@ -437,7 +438,7 @@ namespace GitHubScraper.Implementations
 
                 if (!lastRunDate.HasValue)
                 {
-                    query += "&created=>1970-01-01T00:00:00Z";
+                    query += "&created=>2000-01-01T00:00:00Z";
                 }
 
                 else
@@ -446,7 +447,7 @@ namespace GitHubScraper.Implementations
                 }
             }
 
-            if (lastRunDate.HasValue && string.IsNullOrWhiteSpace(workflow))
+            if (lastRunDate.HasValue && lastRunDate != _Clock.DefaultDate && string.IsNullOrWhiteSpace(workflow))
             {
                 query += $"&since={lastRunDate:yyyy-MM-ddTHH:mm:ssZ}";
             }

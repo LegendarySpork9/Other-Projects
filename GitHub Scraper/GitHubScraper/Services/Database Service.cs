@@ -153,8 +153,8 @@ namespace GitHubScraper.Services
                         new SqlParameter("@assignee", System.Data.SqlDbType.VarChar) { Value = issue.Assignee?.Login ?? "Unassigned" },
                         new SqlParameter("@type", System.Data.SqlDbType.VarChar) { Value = issue.Type ?? "Undefined" },
                         new SqlParameter("@status", System.Data.SqlDbType.VarChar) { Value = issue.State },
-                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = issue.Created_At },
-                        new SqlParameter("@dateSolved", System.Data.SqlDbType.DateTime) { Value = issue.Closed_At ?? _Clock.DefaultDate }
+                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = issue.Created_At.UtcDateTime },
+                        new SqlParameter("@dateSolved", System.Data.SqlDbType.DateTime) { Value = issue.Closed_At?.UtcDateTime ?? _Clock.DefaultDate }
                     ];
 
                     (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
@@ -285,9 +285,9 @@ namespace GitHubScraper.Services
                         new SqlParameter("@assignee", System.Data.SqlDbType.VarChar) { Value = pullRequest.Assignee?.Login ?? "Unassigned" },
                         new SqlParameter("@type", System.Data.SqlDbType.VarChar) { Value = pullRequest.Type ?? "Undefined" },
                         new SqlParameter("@status", System.Data.SqlDbType.VarChar) { Value = pullRequest.State },
-                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = pullRequest.Created_At },
-                        new SqlParameter("@dateClosed", System.Data.SqlDbType.DateTime) { Value = pullRequest.Closed_At ?? _Clock.DefaultDate },
-                        new SqlParameter("@dateMerged", System.Data.SqlDbType.DateTime) { Value = pullRequest.Merged_At ?? _Clock.DefaultDate }
+                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = pullRequest.Created_At.UtcDateTime },
+                        new SqlParameter("@dateSolved", System.Data.SqlDbType.DateTime) { Value = pullRequest.Closed_At?.UtcDateTime ?? _Clock.DefaultDate },
+                        new SqlParameter("@dateMerged", System.Data.SqlDbType.DateTime) { Value = pullRequest.Merged_At?.UtcDateTime ?? _Clock.DefaultDate }
                     ];
 
                     (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
@@ -356,7 +356,7 @@ namespace GitHubScraper.Services
                         new SqlParameter("@event", System.Data.SqlDbType.VarChar) { Value = workflowRun.Event },
                         new SqlParameter("@status", System.Data.SqlDbType.VarChar) { Value = workflowRun.Status },
                         new SqlParameter("@conclusion", System.Data.SqlDbType.VarChar) { Value = workflowRun.Conclusion },
-                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = workflowRun.Created_At },
+                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = workflowRun.Created_At.UtcDateTime },
                     ];
 
                     (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
@@ -423,8 +423,8 @@ namespace GitHubScraper.Services
                         new SqlParameter("@draft", System.Data.SqlDbType.Bit) { Value = release.Draft },
                         new SqlParameter("@assets", System.Data.SqlDbType.Int) { Value = release.Assets.Count },
                         new SqlParameter("@body", System.Data.SqlDbType.VarChar) { Value = release.Body },
-                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = release.Created_At },
-                        new SqlParameter("@datePublished", System.Data.SqlDbType.DateTime) { Value = release.Published_At ?? _Clock.DefaultDate },
+                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = release.Created_At.UtcDateTime },
+                        new SqlParameter("@datePublished", System.Data.SqlDbType.DateTime) { Value = release.Published_At?.UtcDateTime ?? _Clock.DefaultDate },
                     ];
 
                     (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>

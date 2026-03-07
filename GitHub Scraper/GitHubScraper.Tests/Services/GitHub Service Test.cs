@@ -259,17 +259,64 @@ namespace GitHubScraper.Tests.Services
             Assert.IsTrue(workflowRuns.Count == 0);
         }
 
-        /*
-
-        // Checks whether the GetReleases method returns a list of releases.
+        /// <summary>
+        /// Checks whether the GetReleases method returns a list of releases.
+        /// </summary>
         [TestMethod]
         public void TestGetReleases()
         {
-            Mock<GitHubService> _mockGitHubService = new();
+            List<ReleaseModel> mockRelease =
+            [
+                new()
+                {
+                    Id = 46578346587688,
+                    Name = "Test",
+                    Author = new()
+                    {
+                        Login = "UnitTester"
+                    },
+                    Body = "This is a test release.",
+                    Draft = false,
+                    Created_At = Date,
+                    Updated_At = Date,
+                    Published_At = Date.AddDays(1),
+                    Assets =
+                    [
+                        new()
+                        {
+                            Id = 465783465
+                        }
+                    ]
+                }
+            ];
 
-            List<ReleaseModel> releases = _mockGitHubService.Object.GetReleases(AppSettingsModel.Repositories, DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime());
+            Mock<IGitHubClient> _mockGitHubClient = new();
+            _mockGitHubClient.Setup(ghc => ghc.GetReleases(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockRelease);
+
+            GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
+
+            List<ReleaseModel> releases = _gitHubService.GetReleases("Unit-Test", _MockClock.Object.DefaultDate);
 
             Assert.IsTrue(releases.Count > 0);
-        }*/
+            Assert.AreEqual(mockRelease[0].Id, releases[0].Id);
+        }
+
+        /// <summary>
+        /// Checks whether the GetReleases method returns an empty list of releases.
+        /// </summary>
+        [TestMethod]
+        public void TestGetReleasesEmpty()
+        {
+            List<ReleaseModel> mockRelease = [];
+
+            Mock<IGitHubClient> _mockGitHubClient = new();
+            _mockGitHubClient.Setup(ghc => ghc.GetReleases(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockRelease);
+
+            GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
+
+            List<ReleaseModel> releases = _gitHubService.GetReleases("Unit-Test", _MockClock.Object.DefaultDate);
+
+            Assert.IsTrue(releases.Count == 0);
+        }
     }
 }

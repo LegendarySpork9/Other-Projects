@@ -96,7 +96,7 @@ namespace GoogleDriveSync.Functions
                             PathIds = googleFile.PathIds,
                             Path = $"{googleFile.Path},{localFile.Path}",
                             Hidden = localFile.Hidden,
-                            Created = localFile.Created,
+                            Created = googleFile.Created,
                             LastModified = googleFile.LastModified,
                             Changes = changes
                         });
@@ -112,7 +112,7 @@ namespace GoogleDriveSync.Functions
                             PathIds = googleFile.PathIds,
                             Path = $"{googleFile.Path},{localFile.Path}",
                             Hidden = localFile.Hidden,
-                            Created = localFile.Created,
+                            Created = googleFile.Created,
                             LastModified = lastModified,
                             Changes = changes
                         });
