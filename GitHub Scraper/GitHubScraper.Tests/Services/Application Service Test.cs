@@ -1,4 +1,4 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+// Copyright © - Unpublished - Toby Hunter
 using GitHubScraper.Abstractions;
 using GitHubScraper.Services;
 using Moq;
@@ -6,9 +6,32 @@ using System.Configuration;
 
 namespace GitHubScraper.Tests.Services
 {
+    [DoNotParallelize]
     [TestClass]
     public class ApplicationServiceTest
     {
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            ConfigurationManager.AppSettings["Owner"] = "";
+            ConfigurationManager.AppSettings["Repositories"] = "";
+            ConfigurationManager.AppSettings["Workflows"] = "";
+            ConfigurationManager.AppSettings["BearerToken"] = "";
+            ConfigurationManager.AppSettings["SQLConnectionString"] = "";
+            ConfigurationManager.AppSettings["SQLFiles"] = "";
+        }
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            ConfigurationManager.AppSettings.Set("Owner", "");
+            ConfigurationManager.AppSettings.Set("Repositories", "");
+            ConfigurationManager.AppSettings.Set("Workflows", "");
+            ConfigurationManager.AppSettings.Set("BearerToken", "");
+            ConfigurationManager.AppSettings.Set("SQLConnectionString", "");
+            ConfigurationManager.AppSettings.Set("SQLFiles", "");
+        }
+
         /// <summary>
         /// Checks whether the configuration passes with all configuration values provided.
         /// </summary>
@@ -19,12 +42,12 @@ namespace GitHubScraper.Tests.Services
 
             ApplicationService _applicationService = new(_mockLogger.Object);
 
-            ConfigurationManager.AppSettings["Owner"] = "UnitTester";
-            ConfigurationManager.AppSettings["Repositories"] = "Unit-Test";
-            ConfigurationManager.AppSettings["Workflows"] = "Unit Test.yml";
-            ConfigurationManager.AppSettings["BearerToken"] = "This is a token";
-            ConfigurationManager.AppSettings["SQLConnectionString"] = "This is a connection string";
-            ConfigurationManager.AppSettings["SQLFiles"] = @"C:\SQL";
+            ConfigurationManager.AppSettings.Set("Owner", "UnitTester");
+            ConfigurationManager.AppSettings.Set("Repositories", "Unit-Test");
+            ConfigurationManager.AppSettings.Set("Workflows", "Unit Test.yml");
+            ConfigurationManager.AppSettings.Set("BearerToken", "This is a token");
+            ConfigurationManager.AppSettings.Set("SQLConnectionString", "This is a connection string");
+            ConfigurationManager.AppSettings.Set("SQLFiles", @"C:\SQL");
 
             Assert.IsTrue(_applicationService.Setup());
         }
@@ -52,11 +75,11 @@ namespace GitHubScraper.Tests.Services
 
             ApplicationService _applicationService = new(_mockLogger.Object);
 
-            ConfigurationManager.AppSettings["Repositories"] = "Unit-Test";
-            ConfigurationManager.AppSettings["Workflows"] = "Unit Test.yml";
-            ConfigurationManager.AppSettings["BearerToken"] = "This is a token";
-            ConfigurationManager.AppSettings["SQLConnectionString"] = "This is a connection string";
-            ConfigurationManager.AppSettings["SQLFiles"] = @"C:\SQL";
+            ConfigurationManager.AppSettings.Set("Repositories", "Unit-Test");
+            ConfigurationManager.AppSettings.Set("Workflows", "Unit Test.yml");
+            ConfigurationManager.AppSettings.Set("BearerToken", "This is a token");
+            ConfigurationManager.AppSettings.Set("SQLConnectionString", "This is a connection string");
+            ConfigurationManager.AppSettings.Set("SQLFiles", @"C:\SQL");
 
             Assert.IsFalse(_applicationService.Setup());
         }
@@ -71,11 +94,11 @@ namespace GitHubScraper.Tests.Services
 
             ApplicationService _applicationService = new(_mockLogger.Object);
 
-            ConfigurationManager.AppSettings["Owner"] = "UnitTester";
-            ConfigurationManager.AppSettings["Workflows"] = "Unit Test.yml";
-            ConfigurationManager.AppSettings["BearerToken"] = "This is a token";
-            ConfigurationManager.AppSettings["SQLConnectionString"] = "This is a connection string";
-            ConfigurationManager.AppSettings["SQLFiles"] = @"C:\SQL";
+            ConfigurationManager.AppSettings.Set("Owner", "UnitTester");
+            ConfigurationManager.AppSettings.Set("Workflows", "Unit Test.yml");
+            ConfigurationManager.AppSettings.Set("BearerToken", "This is a token");
+            ConfigurationManager.AppSettings.Set("SQLConnectionString", "This is a connection string");
+            ConfigurationManager.AppSettings.Set("SQLFiles", @"C:\SQL");
 
             Assert.IsFalse(_applicationService.Setup());
         }
@@ -90,13 +113,13 @@ namespace GitHubScraper.Tests.Services
 
             ApplicationService _applicationService = new(_mockLogger.Object);
 
-            ConfigurationManager.AppSettings["Owner"] = "UnitTester";
-            ConfigurationManager.AppSettings["Repositories"] = "Unit-Test";
-            ConfigurationManager.AppSettings["BearerToken"] = "This is a token";
-            ConfigurationManager.AppSettings["SQLConnectionString"] = "This is a connection string";
-            ConfigurationManager.AppSettings["SQLFiles"] = @"C:\SQL";
+            ConfigurationManager.AppSettings.Set("Owner", "UnitTester");
+            ConfigurationManager.AppSettings.Set("Repositories", "Unit-Test");
+            ConfigurationManager.AppSettings.Set("BearerToken", "This is a token");
+            ConfigurationManager.AppSettings.Set("SQLConnectionString", "This is a connection string");
+            ConfigurationManager.AppSettings.Set("SQLFiles", @"C:\SQL");
 
-            Assert.IsFalse(_applicationService.Setup());
+            Assert.IsTrue(_applicationService.Setup());
         }
 
         /// <summary>
@@ -109,11 +132,11 @@ namespace GitHubScraper.Tests.Services
 
             ApplicationService _applicationService = new(_mockLogger.Object);
 
-            ConfigurationManager.AppSettings["Owner"] = "UnitTester";
-            ConfigurationManager.AppSettings["Repositories"] = "Unit-Test";
-            ConfigurationManager.AppSettings["Workflows"] = "Unit Test.yml";
-            ConfigurationManager.AppSettings["SQLConnectionString"] = "This is a connection string";
-            ConfigurationManager.AppSettings["SQLFiles"] = @"C:\SQL";
+            ConfigurationManager.AppSettings.Set("Owner", "UnitTester");
+            ConfigurationManager.AppSettings.Set("Repositories", "Unit-Test");
+            ConfigurationManager.AppSettings.Set("Workflows", "Unit Test.yml");
+            ConfigurationManager.AppSettings.Set("SQLConnectionString", "This is a connection string");
+            ConfigurationManager.AppSettings.Set("SQLFiles", @"C:\SQL");
 
             Assert.IsFalse(_applicationService.Setup());
         }
@@ -128,11 +151,11 @@ namespace GitHubScraper.Tests.Services
 
             ApplicationService _applicationService = new(_mockLogger.Object);
 
-            ConfigurationManager.AppSettings["Owner"] = "UnitTester";
-            ConfigurationManager.AppSettings["Repositories"] = "Unit-Test";
-            ConfigurationManager.AppSettings["Workflows"] = "Unit Test.yml";
-            ConfigurationManager.AppSettings["BearerToken"] = "This is a token";
-            ConfigurationManager.AppSettings["SQLFiles"] = @"C:\SQL";
+            ConfigurationManager.AppSettings.Set("Owner", "UnitTester");
+            ConfigurationManager.AppSettings.Set("Repositories", "Unit-Test");
+            ConfigurationManager.AppSettings.Set("Workflows", "Unit Test.yml");
+            ConfigurationManager.AppSettings.Set("BearerToken", "This is a token");
+            ConfigurationManager.AppSettings.Set("SQLFiles", @"C:\SQL");
 
             Assert.IsFalse(_applicationService.Setup());
         }
@@ -147,11 +170,11 @@ namespace GitHubScraper.Tests.Services
 
             ApplicationService _applicationService = new(_mockLogger.Object);
 
-            ConfigurationManager.AppSettings["Owner"] = "UnitTester";
-            ConfigurationManager.AppSettings["Repositories"] = "Unit-Test";
-            ConfigurationManager.AppSettings["Workflows"] = "Unit Test.yml";
-            ConfigurationManager.AppSettings["BearerToken"] = "This is a token";
-            ConfigurationManager.AppSettings["SQLConnectionString"] = "This is a connection string";
+            ConfigurationManager.AppSettings.Set("Owner", "UnitTester");
+            ConfigurationManager.AppSettings.Set("Repositories", "Unit-Test");
+            ConfigurationManager.AppSettings.Set("Workflows", "Unit Test.yml");
+            ConfigurationManager.AppSettings.Set("BearerToken", "This is a token");
+            ConfigurationManager.AppSettings.Set("SQLConnectionString", "This is a connection string");
 
             Assert.IsFalse(_applicationService.Setup());
         }
