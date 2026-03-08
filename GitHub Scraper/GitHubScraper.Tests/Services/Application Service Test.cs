@@ -10,6 +10,9 @@ namespace GitHubScraper.Tests.Services
     [TestClass]
     public class ApplicationServiceTest
     {
+        /// <summary>
+        /// Sets the configuration manager up for the tests.
+        /// </summary>
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
@@ -20,6 +23,10 @@ namespace GitHubScraper.Tests.Services
             ConfigurationManager.AppSettings["SQLConnectionString"] = "";
             ConfigurationManager.AppSettings["SQLFiles"] = "";
         }
+
+        /// <summary>
+        /// Sets the app settings up for the tests.
+        /// </summary>
 
         [TestInitialize]
         public void TestInitialize()
