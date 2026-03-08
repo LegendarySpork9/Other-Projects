@@ -5,7 +5,9 @@ namespace GoogleDriveSync.Functions
 {
     public static class LoggerFunction
     {
-        // Returns a sting of the meta data for a Google Drive file.
+        /// <summary>
+        /// Returns a sting of the meta data for a Google Drive file.
+        /// </summary>
         public static string FormatFileMetaData(File fileMetaData, string method)
         {
             string formattedFMD = string.Empty;

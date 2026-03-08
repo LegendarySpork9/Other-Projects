@@ -6,10 +6,14 @@ namespace GoogleDriveSync.Implementations
 {
     public class SystemClockProvider : IClock
     {
-        // Returns the current UTC Date and time.
+        /// <summary>
+        /// Returns the current UTC Date and time.
+        /// </summary>
         public DateTime UtcNow => DateTime.UtcNow;
 
-        // Returns the default date and time.
+        /// <summary>
+        /// Returns the default date and time.
+        /// </summary>
         public DateTime DefaultDate => new DateTime(1900, 01, 01);
     }
 }

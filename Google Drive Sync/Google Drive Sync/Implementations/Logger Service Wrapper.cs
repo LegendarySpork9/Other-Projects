@@ -8,7 +8,9 @@ namespace GoogleDriveSync.Implementations
     {
         readonly LoggerService _Logger = new LoggerService();
 
-        // Logs the given message to the log file.
+        /// <summary>
+        /// Logs the given message to the log file.
+        /// </summary>
         public void LogMessage(string level, string message)
         {
             _Logger.LogMessage(level, message);

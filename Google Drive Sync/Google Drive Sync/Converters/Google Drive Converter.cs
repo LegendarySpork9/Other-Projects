@@ -3,7 +3,9 @@ namespace GoogleDriveSync.Converters
 {
     public static class GoogleDriveConverter
     {
-        // Returns the google drive file type.
+        /// <summary>
+        /// Returns the google drive file type.
+        /// </summary>
         public static string GetMimeType(string fileType)
         {
             switch (fileType)
@@ -20,7 +22,9 @@ namespace GoogleDriveSync.Converters
             }
         }
 
-        // Returns the full file path of a file.
+        /// <summary>
+        /// Returns the full file path of a file.
+        /// </summary>
         public static string GetFilePath(string root, string sourcePath, string file) => $@"{root}\{sourcePath}\{file}";
     }
 }

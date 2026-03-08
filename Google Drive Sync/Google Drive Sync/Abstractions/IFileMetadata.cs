@@ -3,7 +3,9 @@ using System;
 
 namespace GoogleDriveSync.Abstractions
 {
-    // Interface for file metadata operations.
+    /// <summary>
+    /// Interface for file metadata operations.
+    /// </summary>
     public interface IFileMetadata
     {
         (DateTime, DateTime, bool) GetFileInformation(string file);

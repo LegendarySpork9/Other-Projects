@@ -8,14 +8,18 @@ namespace GoogleDriveSync.Functions
     {
         private readonly IFileSystem _FileSystem;
 
-        // Sets the class's global variables.
+        /// <summary>
+        /// Sets the class's global variables.
+        /// </summary>
         public FolderFunction(
             IFileSystem _fileSystem)
         {
             _FileSystem = _fileSystem;
         }
 
-        // Creates the local directory if it is not present.
+        /// <summary>
+        /// Creates the local directory if it is not present.
+        /// </summary>
         public void CheckPath(string filePath)
         {
             string fileDirectory = Path.GetDirectoryName(filePath);

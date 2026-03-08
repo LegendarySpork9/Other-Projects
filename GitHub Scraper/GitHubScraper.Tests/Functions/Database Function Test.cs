@@ -383,6 +383,7 @@ namespace GitHubScraper.Tests.Functions
             List<IssueModel> filteredIssues = _databaseFunction.FilterIssues("Unit-Test", mockIssue, mockExistingIssue);
 
             Assert.AreEqual(1, filteredIssues.Count);
+            Assert.AreEqual(mockIssue[0].Id, filteredIssues[0].Id);
         }
 
         /// <summary>
@@ -498,6 +499,7 @@ namespace GitHubScraper.Tests.Functions
             List<IssueModel> filteredIssues = _databaseFunction.FilterIssues("Unit-Test", mockIssue, mockExistingIssue);
 
             Assert.AreEqual(1, filteredIssues.Count);
+            Assert.AreEqual(mockIssue[0].Id, filteredIssues[0].Id);
         }
 
         #endregion

@@ -1,11 +1,12 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 using System;
-using System.IO;
-using System.Security.Cryptography;
+using System.IO; 
 
 namespace GoogleDriveSync.Abstractions
 {
-    // Interface for the file system operations.
+    /// <summary>
+    /// Interface for the file system operations.
+    /// </summary>
     public interface IFileSystem
     {
         #region Files

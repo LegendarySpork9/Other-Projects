@@ -7,7 +7,9 @@ using System.Collections.Generic;
 
 namespace GoogleDriveSync.Abstractions
 {
-    // Interface for the Google Drive operations.
+    /// <summary>
+    /// Interface for the Google Drive operations.
+    /// </summary>
     public interface IGoogleDriveClient
     {
         void CreateGoogleDriveService(UserCredential credentials);

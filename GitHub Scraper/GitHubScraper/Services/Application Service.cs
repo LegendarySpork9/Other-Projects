@@ -5,6 +5,7 @@ using GitHubScraper.Functions;
 using GitHubScraper.Implementations;
 using GitHubScraper.Models;
 using GitHubScraper.Models.Related;
+using System.Configuration;
 
 namespace GitHubScraper.Services
 {
@@ -26,7 +27,7 @@ namespace GitHubScraper.Services
         {
             bool configured = true;
 
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.Owner))
+            if (string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["Owner"]))
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Warning, "Valid owner not found. Please provide one in the app settings with the tag \"Owner\"");
 
@@ -35,10 +36,12 @@ namespace GitHubScraper.Services
 
             else
             {
+                AppSettingsModel.Owner = ConfigurationManager.AppSettings["Owner"];
+
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Owner: {AppSettingsModel.Owner}");
             }
 
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.Repositories))
+            if (string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["Repositories"]))
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Warning, "Valid repositories not found. Please provide one in the app settings with the tag \"Repositories\"");
 
@@ -47,20 +50,24 @@ namespace GitHubScraper.Services
 
             else
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repositories: {AppSettingsModel.Repositories.Split(',').Length}");
+                AppSettingsModel.Repositories = ConfigurationManager.AppSettings["Repositories"].Split(',');
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repositories: {AppSettingsModel.Repositories.Length}");
             }
 
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.Workflows))
+            if (string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["Workflows"]))
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Warning, "Valid workflows not found. Please provide them in the app settings with the tag \"Workflows\" if required");
             }
 
             else
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Workflows: {AppSettingsModel.Workflows.Split(',').Length}");
+                AppSettingsModel.Workflows = ConfigurationManager.AppSettings["Workflows"].Split(',');
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Workflows: {AppSettingsModel.Workflows.Length}");
             }
 
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.BearerToken))
+            if (string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["BearerToken"]))
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Warning, "Valid authentication token not found. Please provide one in the app settings with the tag \"BearerToken\"");
 
@@ -69,10 +76,12 @@ namespace GitHubScraper.Services
 
             else
             {
+                AppSettingsModel.BearerToken = ConfigurationManager.AppSettings["BearerToken"];
+
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {AppSettingsModel.BearerToken}");
             }
 
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.ConnectionString))
+            if (string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SQLConnectionString"]))
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Warning, "Valid connection string not found. Please provide one in the app settings with the tag \"SQLConnectionString\"");
 
@@ -81,10 +90,12 @@ namespace GitHubScraper.Services
 
             else
             {
+                AppSettingsModel.ConnectionString = ConfigurationManager.AppSettings["SQLConnectionString"];
+
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Connection String: {AppSettingsModel.ConnectionString}");
             }
 
-            if (string.IsNullOrWhiteSpace(AppSettingsModel.SQLFiles))
+            if (string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SQLFiles"]))
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Warning, "Valid sql files not found. Please provide one in the app settings with the tag \"SQLFiles\"");
 
@@ -93,6 +104,8 @@ namespace GitHubScraper.Services
 
             else
             {
+                AppSettingsModel.SQLFiles = ConfigurationManager.AppSettings["SQLFiles"];
+
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"SQL Files: {AppSettingsModel.SQLFiles}");
             }
 
@@ -109,7 +122,7 @@ namespace GitHubScraper.Services
             GitHubService _gitHubService = new(_Logger, new GitHubClientWrapper(_Logger, new GitHubOptionsProvider(), new SystemClockProvider()));
             DatabaseFunction _databaseFunction = new(_Logger, new SystemClockProvider());
 
-            foreach (string repository in AppSettingsModel.Repositories.Split(','))
+            foreach (string repository in AppSettingsModel.Repositories)
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Running Scraper for {repository}");
 
@@ -123,9 +136,9 @@ namespace GitHubScraper.Services
 
                 int totalWorkflowRuns = 0;
 
-                if (!string.IsNullOrWhiteSpace(AppSettingsModel.Workflows))
+                if (!string.IsNullOrWhiteSpace(string.Join(',', AppSettingsModel.Workflows)))
                 {
-                    foreach (string workflow in AppSettingsModel.Workflows.Split(','))
+                    foreach (string workflow in AppSettingsModel.Workflows)
                     {
                         List<WorkflowRunModel> workflowRuns = _gitHubService.GetWorkflowRuns(repository, workflow, lastRunDate);
 

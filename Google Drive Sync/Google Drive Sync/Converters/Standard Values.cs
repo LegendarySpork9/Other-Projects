@@ -3,7 +3,9 @@ namespace GoogleDriveSync.Converters
 {
     internal static class StandardValues
     {
-        // Standard Logger Values.
+        /// <summary>
+        /// Standard Logger Values.
+        /// </summary>
         public static class LoggerValues
         {
             public const string Debug = "Debug";

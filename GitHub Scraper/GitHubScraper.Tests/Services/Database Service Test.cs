@@ -72,7 +72,7 @@ namespace GitHubScraper.Tests.Services
             DatabaseService _databaseService = new(_MockLogger.Object, _MockClock.Object, _MockFileSystem.Object, _MockOptions.Object, _mockDatabase.Object);
             List<IssueModel> issues = _databaseService.GetIssues("Unit-Test");
 
-            Assert.IsTrue(issues.Count == 0);
+            Assert.AreEqual(0, issues.Count);
         }
 
         /// <summary>
@@ -83,25 +83,13 @@ namespace GitHubScraper.Tests.Services
         {
             IssueModel issue = new()
             {
-                Repository = "Unit-Test",
                 Id = 46578346587688,
-                Number = 1,
-                Title = "Test",
-                Assignee = new()
-                {
-                    Login = "UnitTester"
-                },
-                Type = "Bug",
-                State = "Open",
+                Number = 0,
+                Title = "UnLoaded",
+                State = "UnLoaded",
                 Created_At = Date,
                 Closed_At = Date,
-                Labels =
-                [
-                    new()
-                    {
-                        Name = "bug"
-                    }
-                ]
+                Labels = []
             };
 
             Mock<IDatabase> _mockDatabase = new();
@@ -113,8 +101,7 @@ namespace GitHubScraper.Tests.Services
             List<IssueModel> actual = _databaseService.GetIssues("Unit-Test");
 
             Assert.AreEqual(expected.Count, actual.Count);
-            Assert.IsTrue(actual.Count == 1);
-            Assert.IsTrue(actual[0].Id == expected[0].Id);
+            Assert.AreEqual(expected[0].Id, actual[0].Id);
         }
     }
 }

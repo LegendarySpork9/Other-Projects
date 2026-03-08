@@ -9,16 +9,19 @@ namespace GoogleDriveSync.Tests.Functions
     [TestClass]
     public class FileFunctionTest
     {
-        // Checks whether the CompareForChanges method returns the expected changes.
+        private readonly Mock<ILoggerService> _MockLogger = new();
+
+        /// <summary>
+        /// Checks whether the CompareForChanges method returns the expected changes.
+        /// </summary>
         [TestMethod]
         public void TestCompareForChangesFullUp()
         {
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             Mock<IClock> _mockClock = new();
             _mockClock.Setup(mc => mc.DefaultDate).Returns(new DateTime(1900, 01, 01));
 
-            FileFunction _fileFunction = new(_mockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
+            FileFunction _fileFunction = new(_MockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
 
             List<FileModel> googleDrive =
             [
@@ -64,16 +67,15 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual(googleDrive[0].LastModified.ToString(), result[0].Changes[1].NewValue);
         }
 
-        // Checks whether the CompareForChanges method returns the expected changes.
+        // /hecks whether the CompareForChanges method returns the expected changes.
         [TestMethod]
         public void TestCompareForChangesPathUp()
         {
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             Mock<IClock> _mockClock = new();
             _mockClock.Setup(mc => mc.DefaultDate).Returns(new DateTime(1900, 01, 01));
 
-            FileFunction _fileFunction = new(_mockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
+            FileFunction _fileFunction = new(_MockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
 
             List<FileModel> googleDrive =
             [
@@ -114,16 +116,17 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual(googleDrive[0].Path, result[0].Changes[0].NewValue);
         }
 
-        // Checks whether the CompareForChanges method returns the expected changes.
+        /// <summary>
+        /// Checks whether the CompareForChanges method returns the expected changes.
+        /// </summary>
         [TestMethod]
         public void TestCompareForChangesModifiedUp()
         {
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             Mock<IClock> _mockClock = new();
             _mockClock.Setup(mc => mc.DefaultDate).Returns(new DateTime(1900, 01, 01));
 
-            FileFunction _fileFunction = new(_mockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
+            FileFunction _fileFunction = new(_MockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
 
             List<FileModel> googleDrive =
             [
@@ -164,16 +167,17 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual(googleDrive[0].LastModified.ToString(), result[0].Changes[0].NewValue);
         }
 
-        // Checks whether the CompareForChanges method returns the expected changes.
+        /// <summary>
+        /// Checks whether the CompareForChanges method returns the expected changes.
+        /// </summary>
         [TestMethod]
         public void TestCompareForChangesModifiedDown()
         {
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             Mock<IClock> _mockClock = new();
             _mockClock.Setup(mc => mc.DefaultDate).Returns(new DateTime(1900, 01, 01));
 
-            FileFunction _fileFunction = new(_mockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
+            FileFunction _fileFunction = new(_MockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
 
             List<FileModel> googleDrive =
             [
@@ -214,16 +218,17 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual(localDrive[0].LastModified.ToString(), result[0].Changes[0].NewValue);
         }
 
-        // Checks whether the IsFileLocked method returns the expected value.
+        /// <summary>
+        /// Checks whether the IsFileLocked method returns the expected value.
+        /// </summary>
         [TestMethod]
         public void TestIsFileLocked()
         {
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             _mockFileSystem.Setup(fs => fs.TryOpenRead(It.IsAny<string>())).Returns(true);
             Mock<IClock> _mockClock = new();
 
-            FileFunction _fileFunction = new(_mockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
+            FileFunction _fileFunction = new(_MockLogger.Object, _mockFileSystem.Object, _mockClock.Object);
 
             bool result = _fileFunction.IsFileLocked(new("C:\\GDSTests\\Book Tests\\Test.txt"));
 

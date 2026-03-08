@@ -16,7 +16,9 @@ namespace GoogleDriveSync.Implementations
         private readonly ILoggerService _Logger;
         private readonly IFileSystem _FileSystem;
 
-        // Sets the class's global variables.
+        /// <summary>
+        /// Sets the class's global variables.
+        /// </summary>
         public GoogleCredentialProvider(
             ILoggerService _logger,
             IFileSystem fileSystem)
@@ -25,7 +27,9 @@ namespace GoogleDriveSync.Implementations
             _FileSystem = fileSystem;
         }
 
-        // Generates credentials from the specified json file.
+        /// <summary>
+        /// Generates credentials from the specified json file.
+        /// </summary>
         public (UserCredential, bool) GetCredentials()
         {
             UserCredential credential = null;

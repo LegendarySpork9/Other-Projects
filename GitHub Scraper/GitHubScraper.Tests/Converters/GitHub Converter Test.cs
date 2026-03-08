@@ -167,7 +167,7 @@ namespace GitHubScraper.Tests.Converters
         [TestMethod]
         public void TestGetQueryReleases()
         {
-            string expected = "?Per_Page=100";
+            string expected = "?per_page=100";
             string actual = GitHubConverter.GetQuery("/releases");
 
             Assert.AreEqual(expected, actual);

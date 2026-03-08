@@ -6,7 +6,9 @@ namespace GoogleDriveSync.Tests.Converters
     [TestClass]
     public class LocalDriveConverterTest
     {
-        // Checks whether the GetObjectName method returns the expected file name.
+        /// <summary>
+        /// Checks whether the GetObjectName method returns the expected file name.
+        /// </summary>
         [TestMethod]
         public void TestGetObjectName()
         {

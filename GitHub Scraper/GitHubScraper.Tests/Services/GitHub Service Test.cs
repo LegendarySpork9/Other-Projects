@@ -14,7 +14,6 @@ namespace GitHubScraper.Tests.Services
         private readonly Mock<ILoggerService> _MockLogger = new();
         private readonly Mock<IClock> _MockClock = new();
 
-
         /// <summary>
         /// Sets the mocks up for the tests.
         /// </summary>
@@ -82,7 +81,7 @@ namespace GitHubScraper.Tests.Services
 
             List<IssueModel> issues = _gitHubService.GetIssues("Unit-Test", Date);
 
-            Assert.IsTrue(issues.Count == 0);
+            Assert.AreEqual(0, issues.Count);
         }
 
         /// <summary>
@@ -138,7 +137,7 @@ namespace GitHubScraper.Tests.Services
 
             List<CommitModel> commits = _gitHubService.GetCommits("Unit-Test", Date);
 
-            Assert.IsTrue(commits.Count == 0);
+            Assert.AreEqual(0, commits.Count);
         }
 
         /// <summary>
@@ -201,7 +200,7 @@ namespace GitHubScraper.Tests.Services
 
             List<PullRequestModel> pullRequests = _gitHubService.GetPullRequests("Unit-Test", _MockClock.Object.DefaultDate);
 
-            Assert.IsTrue(pullRequests.Count == 0);
+            Assert.AreEqual(0, pullRequests.Count);
         }
 
         /// <summary>
@@ -256,7 +255,7 @@ namespace GitHubScraper.Tests.Services
 
             List<WorkflowRunModel> workflowRuns = _gitHubService.GetWorkflowRuns("Unit-Test", "Test Workflow", _MockClock.Object.DefaultDate);
 
-            Assert.IsTrue(workflowRuns.Count == 0);
+            Assert.AreEqual(0, workflowRuns.Count);
         }
 
         /// <summary>
@@ -316,7 +315,7 @@ namespace GitHubScraper.Tests.Services
 
             List<ReleaseModel> releases = _gitHubService.GetReleases("Unit-Test", _MockClock.Object.DefaultDate);
 
-            Assert.IsTrue(releases.Count == 0);
+            Assert.AreEqual(0, releases.Count);
         }
     }
 }

@@ -9,38 +9,41 @@ namespace GoogleDriveSync.Tests.Services
     [TestClass]
     public class DocumentServiceTest
     {
-        // Checks whether the GetHasErrored method returns the expected value.
+        private readonly Mock<ILoggerService> _MockLogger = new();
+        private readonly Mock<IUserNotifier> _MockUserNotifier = new();
+
+        /// <summary>
+        /// Checks whether the GetHasErrored method returns the expected value.
+        /// </summary>
         [TestMethod]
         public void TestGetHasErrored()
         {
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             Mock<IFileMetadata> _mockFileMetadata = new();
-            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, string.Empty);
+            DocumentService _documentService = new(_MockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _MockUserNotifier.Object, string.Empty);
 
             bool hasErrored = _documentService.GetHasErrored();
 
             Assert.IsFalse(hasErrored);
         }
 
-        // Checks whether the GetData method returns the expected list.
+        /// <summary>
+        /// Checks whether the GetData method returns the expected list.
+        /// </summary>
         [TestMethod]
         public void TestGetData()
         {
             string root = @"C:\Test";
             string file = @"C:\Test\Test.txt";
 
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([]);
             _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file]);
             Mock<IFileMetadata> _mockFileMetadata = new();
             _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
-            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
+            DocumentService _documentService = new(_MockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _MockUserNotifier.Object, root);
 
             List<FileModel> files = _documentService.GetData();
 
@@ -52,7 +55,9 @@ namespace GoogleDriveSync.Tests.Services
             Assert.AreEqual("Test", files[0].Path);
         }
 
-        // Checks whether the GetData method returns the expected list.
+        /// <summary>
+        /// Checks whether the GetData method returns the expected list.
+        /// </summary>
         [TestMethod]
         public void TestGetDataSubFolder()
         {
@@ -62,7 +67,6 @@ namespace GoogleDriveSync.Tests.Services
             string file = @"C:\Test\Test.txt";
             string file2 = @"C:\Test\Test 2.txt";
 
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([sub]);
             _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file]);
@@ -70,9 +74,8 @@ namespace GoogleDriveSync.Tests.Services
             Mock<IFileMetadata> _mockFileMetadata = new();
             _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
             _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file2)).Returns((new DateTime(1900, 01, 05), new DateTime(1900, 01, 06), true));
-            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
+            DocumentService _documentService = new(_MockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _MockUserNotifier.Object, root);
 
             List<FileModel> files = _documentService.GetData();
 
@@ -89,7 +92,9 @@ namespace GoogleDriveSync.Tests.Services
             Assert.AreEqual(@"Test\Test 2", files[1].Path);
         }
 
-        // Checks whether the GetData method returns the expected list.
+        /// <summary>
+        /// Checks whether the GetData method returns the expected list.
+        /// </summary>
         [TestMethod]
         public void TestGetDataSubFolderEmpty()
         {
@@ -98,16 +103,14 @@ namespace GoogleDriveSync.Tests.Services
 
             string file = @"C:\Test\Test.txt";
 
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([sub]);
             _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file]);
             _mockFileSystem.Setup(fs => fs.GetFiles(sub)).Returns([]);
             Mock<IFileMetadata> _mockFileMetadata = new();
             _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
-            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
+            DocumentService _documentService = new(_MockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _MockUserNotifier.Object, root);
 
             List<FileModel> files = _documentService.GetData();
 
@@ -119,7 +122,9 @@ namespace GoogleDriveSync.Tests.Services
             Assert.AreEqual("Test", files[0].Path);
         }
 
-        // Checks whether the GetData method returns the expected list.
+        /// <summary>
+        /// Checks whether the GetData method returns the expected list.
+        /// </summary>
         [TestMethod]
         public void TestGetDataExcludedFile()
         {
@@ -129,15 +134,13 @@ namespace GoogleDriveSync.Tests.Services
 
             AppSettingsModel.IgnoreFiles = [excludedFile.Replace(@"C:\Test\", "")];
 
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([]);
             _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file, excludedFile]);
             Mock<IFileMetadata> _mockFileMetadata = new();
             _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
-            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
+            DocumentService _documentService = new(_MockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _MockUserNotifier.Object, root);
 
             List<FileModel> files = _documentService.GetData();
 
@@ -149,7 +152,9 @@ namespace GoogleDriveSync.Tests.Services
             Assert.AreEqual("Test", files[0].Path);
         }
 
-        // Checks whether the GetData method returns the expected list.
+        /// <summary>
+        /// Checks whether the GetData method returns the expected list.
+        /// </summary>
         [TestMethod]
         public void TestGetDataExcludedFolder()
         {
@@ -160,15 +165,13 @@ namespace GoogleDriveSync.Tests.Services
 
             AppSettingsModel.IgnoreFolders = [excludedSub.Replace( @"C:\Test\", "")];
 
-            Mock<ILoggerService> _mockLogger = new();
             Mock<IFileSystem> _mockFileSystem = new();
             _mockFileSystem.Setup(fs => fs.GetDirectories(root)).Returns([excludedSub]);
             _mockFileSystem.Setup(fs => fs.GetFiles(root)).Returns([file]);
             Mock<IFileMetadata> _mockFileMetadata = new();
             _mockFileMetadata.Setup(fmd => fmd.GetFileInformation(file)).Returns((new DateTime(1900, 01, 01), new DateTime(1900, 01, 02), false));
-            Mock<IUserNotifier> _mockUserNotifier = new();
 
-            DocumentService _documentService = new(_mockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _mockUserNotifier.Object, root);
+            DocumentService _documentService = new(_MockLogger.Object, _mockFileSystem.Object, _mockFileMetadata.Object, _MockUserNotifier.Object, root);
 
             List<FileModel> files = _documentService.GetData();
 

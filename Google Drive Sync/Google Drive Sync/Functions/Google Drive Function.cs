@@ -3,7 +3,9 @@ namespace GoogleDriveSync.Functions
 {
     public static class GoogleDriveFunction
     {
-        // Returns the final folder in the given string.
+        /// <summary>
+        /// Returns the final folder in the given string.
+        /// </summary>
         public static string RemoveStringCharacters(string value, char[] characters, string direction)
         {
             string modifiedValue = value;

@@ -14,7 +14,9 @@ namespace GoogleDriveSync.Functions
         private readonly IFileSystem _FileSystem;
         private readonly IClock _Clock;
 
-        // Sets the class's gloabl variables.
+        /// <summary>
+        /// Sets the class's gloabl variables.
+        /// </summary>
         public FileFunction(
             ILoggerService _logger,
             IFileSystem _fileSystem,
@@ -25,7 +27,9 @@ namespace GoogleDriveSync.Functions
             _Clock = _clock;
         }
 
-        // Compares the files and records the changes.
+        /// <summary>
+        /// Compares the files and records the changes.
+        /// </summary>
         public List<FileModel> CompareForChanges(List<FileModel> googleDrive, List<FileModel> localDrive)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, "Comparing Google Drive and the Local Drive for changes");
@@ -200,7 +204,9 @@ namespace GoogleDriveSync.Functions
             return files;
         }
 
-        // Checks if the file is in use.
+        /// <summary>
+        /// Checks if the file is in use.
+        /// </summary>
         public bool IsFileLocked(FileInfo file) => !_FileSystem.TryOpenRead(file.FullName);
     }
 }

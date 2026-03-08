@@ -6,7 +6,9 @@ namespace GoogleDriveSync.Tests.Converters
     [TestClass]
     public class ProgressBarValueConverterTest
     {
-        // Checks whether the GetPBIncreaseValue method returns the expected value.
+        /// <summary>
+        /// Checks whether the GetPBIncreaseValue method returns the expected value.
+        /// </summary>
         [TestMethod]
         public void TestGetPBIncreaseValue()
         {

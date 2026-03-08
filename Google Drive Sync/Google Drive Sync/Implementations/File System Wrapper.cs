@@ -9,19 +9,29 @@ namespace GoogleDriveSync.Implementations
     {
         #region Files
 
-        // Returns whether the given file exists.
+        /// <summary>
+        /// Returns whether the given file exists.
+        /// </summary>
         public bool FileExists(string file) => File.Exists(file);
 
-        // Returns the attributes for the given file.
+        /// <summary>
+        /// Returns the attributes for the given file.
+        /// </summary>
         public FileAttributes GetAttributes(string file) => File.GetAttributes(file);
 
-        // Changes the value of an attribute for the given file.
+        /// <summary>
+        /// Changes the value of an attribute for the given file.
+        /// </summary>
         public void SetAttributes(string file, FileAttributes attribute) => File.SetAttributes(file, attribute);
 
-        // Deletes the given file.
+        /// <summary>
+        /// Deletes the given file.
+        /// </summary>
         public void DeleteFile(string file) => File.Delete(file);
 
-        // Returns whether the file is in use.
+        /// <summary>
+        /// Returns whether the file is in use.
+        /// </summary>
         public bool TryOpenRead(string file)
         {
             try
@@ -38,39 +48,57 @@ namespace GoogleDriveSync.Implementations
             }
         }
 
-        // Writes bytes to the given file.
+        /// <summary>
+        /// Writes bytes to the given file.
+        /// </summary>
         public void WriteDataToFile(string file, byte[] data) => File.WriteAllBytes(file, data);
 
-        // Sets the created time of the given file.
+        /// <summary>
+        /// Sets the created time of the given file.
+        /// </summary>
         public void SetCreatedTime(string file, DateTime created) => File.SetCreationTime(file, created);
 
-        // Sets the modified time of the given file.
+        /// <summary>
+        /// Sets the modified time of the given file.
+        /// </summary>
         public void SetModifiedTime(string file, DateTime modified) => File.SetLastWriteTime(file, modified);
 
         #endregion
 
         #region Directories
 
-        // Returns whether the given directory exists.
+        /// <summary>
+        /// Returns whether the given directory exists.
+        /// </summary>
         public bool DirectoryExists(string fileDirectory) => Directory.Exists(fileDirectory);
 
-        // Creates the given directory.
+        /// <summary>
+        /// Creates the given directory.
+        /// </summary>
         public void CreateDirectory(string fileDirectory) => Directory.CreateDirectory(fileDirectory);
 
-        // Returns an array of the directories in a given folder.
+        /// <summary>
+        /// Returns an array of the directories in a given folder.
+        /// </summary>
         public string[] GetDirectories(string folder) => Directory.GetDirectories(folder);
 
-        // Returns an array of the files in a given folder.
+        /// <summary>
+        /// Returns an array of the files in a given folder.
+        /// </summary>
         public string[] GetFiles(string folder) => Directory.GetFiles(folder);
 
         #endregion
 
         #region Stream
 
-        // Returns a new stream for the given file.
+        /// <summary>
+        /// Returns a new stream for the given file.
+        /// </summary>
         public Stream Open(string file) => new FileStream(file, FileMode.Open);
 
-        // Returns a new read stream for the given file.
+        /// <summary>
+        /// Returns a new read stream for the given file.
+        /// </summary>
         public Stream OpenRead(string file) => new FileStream(file, FileMode.Open, FileAccess.Read);
 
         #endregion

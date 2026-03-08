@@ -19,13 +19,17 @@ namespace GoogleDriveSync.Services
 
         public event Action<int> ProgressChanged;
 
-        // Increases the value of the pogress bar.
+        /// <summary>
+        /// Increases the value of the pogress bar.
+        /// </summary>
         private void OnProgressChanged(int progress)
         {
             ProgressChanged?.Invoke(progress);
         }
 
-        // Runs the process of checking for updates.
+        /// <summary>
+        /// Runs the process of checking for updates.
+        /// </summary>
         public (List<FileModel>, bool) CheckUpdates()
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking for updates in root folder");
@@ -55,7 +59,9 @@ namespace GoogleDriveSync.Services
             return (files, hasErrored);
         }
 
-        // Runs the process of updating the files selected.
+        /// <summary>
+        /// Runs the process of updating the files selected.
+        /// </summary>
         public bool SyncChanges(List<FileModel> uploadFiles, List<FileModel> downloadFiles)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Syncing {uploadFiles.Count + downloadFiles.Count} file(s) to root folder");

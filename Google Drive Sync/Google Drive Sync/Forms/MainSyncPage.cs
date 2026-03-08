@@ -30,7 +30,9 @@ namespace GoogleDriveSync
             AppService.ProgressChanged += ProgressChanged;
         }
 
-        // Increases the value of the pogress bar.
+        /// <summary>
+        /// Increases the value of the pogress bar.
+        /// </summary>
         private void ProgressChanged(int value)
         {
             if (PRBLoading.InvokeRequired)
@@ -44,7 +46,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Populates the file information grid.
+        /// <summary>
+        /// Populates the file information grid.
+        /// </summary>
         private async void BTNCompareClick(object sender, EventArgs e)
         {
             BTNCompare.Enabled = false;
@@ -127,7 +131,9 @@ namespace GoogleDriveSync
             BTNCompare.Enabled = true;
         }
 
-        // Triggers the process of syncing the chosen files.
+        /// <summary>
+        /// Triggers the process of syncing the chosen files.
+        /// </summary>
         private async void BTNSyncClick(object sender, EventArgs e)
         {
             BTNSync.Enabled = false;
@@ -201,7 +207,9 @@ namespace GoogleDriveSync
             BTNCompare.Enabled = true;
         }
 
-        // Loads the file information into the information box.
+        /// <summary>
+        /// Loads the file information into the information box.
+        /// </summary>
         private void DGVFileInformationRowState(object sender, DataGridViewRowStateChangedEventArgs e)
         {
             if (e.StateChanged != DataGridViewElementStates.Selected)
@@ -276,7 +284,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Checks merge type and update cells to see if a merge should be done.
+        /// <summary>
+        /// Checks merge type and update cells to see if a merge should be done.
+        /// </summary>
         private void DGVFileInformationCellValue(object sender, DataGridViewCellEventArgs e)
         {
             if (TablePopulated)
@@ -335,7 +345,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Sets all files with changes to be synced up stream.
+        /// <summary>
+        /// Sets all files with changes to be synced up stream.
+        /// </summary>
         private void SyncUp(object sender, EventArgs e)
         {
             RowsToUpdate.Clear();
@@ -352,7 +364,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Sets all files with changes to be synced down stream.
+        /// <summary>
+        /// Sets all files with changes to be synced down stream.
+        /// </summary>
         private void SyncDown(object sender, EventArgs e)
         {
             RowsToUpdate.Clear();
@@ -369,7 +383,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Starts the auto sync timer.
+        /// <summary>
+        /// Starts the auto sync timer.
+        /// </summary>
         private void CBAutoSyncChecked(object sender, EventArgs e)
         {
             if (CBAutoSync.Checked)
@@ -389,7 +405,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Performs the auto sync process.
+        /// <summary>
+        /// Performs the auto sync process.
+        /// </summary>
         private async void TMAutoSyncElapsedAsync(object sender, EventArgs e)
         {
             TMAutoSync.Stop();
@@ -456,7 +474,9 @@ namespace GoogleDriveSync
             TMAutoSync.Start();
         }
 
-        // Logs the closing message.
+        /// <summary>
+        /// Logs the closing message.
+        /// </summary>
         private void Exit(object sender, FormClosedEventArgs e)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");

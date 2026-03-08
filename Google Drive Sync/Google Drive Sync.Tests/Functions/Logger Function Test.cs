@@ -7,7 +7,9 @@ namespace GoogleDriveSync.Tests.Functions
     [TestClass]
     public class LoggerFunctionTest
     {
-        // Checks whether the FormatFileMetaData method returns the expected string values.
+        /// <summary>
+        /// Checks whether the FormatFileMetaData method returns the expected string values.
+        /// </summary>
         [TestMethod]
         public void TestFileMetaDataCreate()
         {
@@ -28,7 +30,9 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("\"1987-09-05T12:45:00.000Z\"", result[3].Trim());
         }
 
-        // Checks whether the FormatFileMetaData method returns the expected string values.
+        /// <summary>
+        /// Checks whether the FormatFileMetaData method returns the expected string values.
+        /// </summary>
         [TestMethod]
         public void TestFileMetaDataUpdate()
         {
@@ -42,7 +46,9 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("\"1987-09-05T12:45:00.000Z\"", result);
         }
 
-        // Checks whether the FormatFileMetaData method returns the expected string values.
+        /// <summary>
+        /// Checks whether the FormatFileMetaData method returns the expected string values.
+        /// </summary>
         [TestMethod]
         public void TestFileMetaDataMove()
         {

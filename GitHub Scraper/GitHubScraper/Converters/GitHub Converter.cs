@@ -14,7 +14,7 @@ namespace GitHubScraper.Converters
                 "/commits" => "?per_page=100",
                 "/pulls" => "?state=all&sort=updated&direction=desc&per_page=100",
                 "/runs" => "?per_page=100",
-                "/releases" => "?Per_Page=100",
+                "/releases" => "?per_page=100",
                 _ => string.Empty
             };
         }

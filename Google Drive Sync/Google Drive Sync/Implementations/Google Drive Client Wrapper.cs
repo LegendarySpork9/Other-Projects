@@ -21,6 +21,9 @@ namespace GoogleDriveSync.Implementations
 
         private DriveService _Service;
 
+        /// <summary>
+        /// Sets the class's global variables.
+        /// </summary>
         public GoogleDriveClientWrapper(
             ILoggerService _logger,
             IFileSystem _fileSystem)
@@ -29,7 +32,9 @@ namespace GoogleDriveSync.Implementations
             _FileSystem = _fileSystem;
         }
 
-        // Creates the Google Drive service.
+        /// <summary>
+        /// Creates the Google Drive service.
+        /// </summary>
         public void CreateGoogleDriveService(UserCredential credential)
         {
             _Service = new DriveService(new BaseClientService.Initializer()
@@ -41,7 +46,9 @@ namespace GoogleDriveSync.Implementations
             _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Service");
         }
 
-        // Gets the folders or sub folders in Google Drive or the specified folder.
+        /// <summary>
+        /// Gets the folders or sub folders in Google Drive or the specified folder.
+        /// </summary>
         public (IList<Google.Apis.Drive.v3.Data.File>, bool) GetFolders(string folderId = null)
         {
             bool hasErrored = false;
@@ -89,7 +96,9 @@ namespace GoogleDriveSync.Implementations
             return (response.Files ?? new List<Google.Apis.Drive.v3.Data.File>(), hasErrored);
         }
 
-        // Gets all the files under a given folder.
+        /// <summary>
+        /// Gets all the files under a given folder.
+        /// </summary>
         public (IList<Google.Apis.Drive.v3.Data.File>, bool) GetFiles(string folderId)
         {
             bool hasErrored = false;
@@ -119,7 +128,9 @@ namespace GoogleDriveSync.Implementations
             return (response.Files ?? new List<Google.Apis.Drive.v3.Data.File>(), hasErrored);
         }
 
-        // Creates a folder under the specified folder.
+        /// <summary>
+        /// Creates a folder under the specified folder.
+        /// </summary>
         public (Google.Apis.Drive.v3.Data.File, bool) CreateFolder(string folderName, string parent)
         {
             bool hasErrored = false;
@@ -157,7 +168,9 @@ namespace GoogleDriveSync.Implementations
             return (response ?? new Google.Apis.Drive.v3.Data.File(), hasErrored);
         }
 
-        // Uploads a new file.
+        /// <summary>
+        /// Uploads a new file.
+        /// </summary>
         public (IUploadProgress, bool) CreateFile(FileModel file, string parent)
         {
             bool hasErrored = false;
@@ -204,7 +217,9 @@ namespace GoogleDriveSync.Implementations
             return (requestStatus, hasErrored);
         }
 
-        // Modifies the existing file.
+        /// <summary>
+        /// Modifies the existing file.
+        /// </summary>
         public (IUploadProgress, bool) UpdateFile(FileModel file)
         {
             bool hasErrored = false;
@@ -248,7 +263,9 @@ namespace GoogleDriveSync.Implementations
             return (requestStatus, hasErrored);
         }
 
-        // Changes the location of the file.
+        /// <summary>
+        /// Changes the location of the file.
+        /// </summary>
         public (IUploadProgress, bool) MoveFile(FileModel file, string oldParent, string newParent)
         {
             bool hasErrored = false;
@@ -294,7 +311,9 @@ namespace GoogleDriveSync.Implementations
             return (requestStatus, hasErrored);
         }
 
-        // Downloads the file.
+        /// <summary>
+        /// Downloads the file.
+        /// </summary>
         public bool DownloadFile(FileModel file, string filePath)
         {
             FolderFunction _folderFunction = new FolderFunction(_FileSystem);
@@ -348,7 +367,9 @@ namespace GoogleDriveSync.Implementations
             return hasErrored;
         }
 
-        // Removes the file.
+        /// <summary>
+        /// Removes the file.
+        /// </summary>
         public bool DeleteFile(FileModel file)
         {
             bool hasErrored = false;

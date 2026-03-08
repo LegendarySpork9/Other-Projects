@@ -7,7 +7,9 @@ namespace GoogleDriveSync.Implementations
 {
     public class FileMetadataProvider : IFileMetadata
     {
-        // Returns a files created, modified and hidden attributes.
+        /// <summary>
+        /// Returns a files created, modified and hidden attributes.
+        /// </summary>
         public (DateTime, DateTime, bool) GetFileInformation(string file)
         {
             FileInfo info = new FileInfo(file);

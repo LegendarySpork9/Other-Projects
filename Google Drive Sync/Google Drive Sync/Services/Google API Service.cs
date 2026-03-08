@@ -23,7 +23,9 @@ namespace GoogleDriveSync.Services
         private bool HasErrored = false;
         private List<KeyValuePair<string, string>> FolderStore = new List<KeyValuePair<string, string>>();
 
-        // Sets the class's global variables.
+        /// <summary>
+        /// Sets the class's global variables.
+        /// </summary>
         public GoogleAPIService(
             ILoggerService _logger,
             ICredentialProvider _credentialProvider,
@@ -42,13 +44,20 @@ namespace GoogleDriveSync.Services
             FolderName = GetFolderName(folderId);
         }
 
-        // Returns the value of the HasErrored variable.
+        /// <summary>
+        /// Returns the value of the HasErrored variable.
+        /// </summary>
+        /// <returns></returns>
         public bool GetHasErrored() => HasErrored;
 
-        // Resets the HasErrored variable.
+        /// <summary>
+        /// Resets the HasErrored variable.
+        /// </summary>
         public void ResetHasErrored() => HasErrored = false;
 
-        // Gets the name of the given folder id.
+        /// <summary>
+        /// Gets the name of the given folder id.
+        /// </summary>
         private string GetFolderName(string folderId)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder name for folder id {folderId}");
@@ -94,7 +103,9 @@ namespace GoogleDriveSync.Services
             return folderName;
         }
 
-        // Generates credentials from the specified json file.
+        /// <summary>
+        /// Generates credentials from the specified json file.
+        /// </summary>
         private UserCredential GetCredentials()
         {
             (UserCredential credential, bool hasErrored) = _CredentialProvider.GetCredentials();
@@ -109,7 +120,9 @@ namespace GoogleDriveSync.Services
             return credential;
         }
 
-        // Obtains all the files and folders of the specified directory.
+        /// <summary>
+        /// Obtains all the files and folders of the specified directory.
+        /// </summary>
         public List<FileModel> GetData()
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file(s) under folder {FolderName ?? FolderId}");
@@ -140,7 +153,9 @@ namespace GoogleDriveSync.Services
             return googleDrive;
         }
 
-        // Obtains all the folders under a given folder.
+        /// <summary>
+        /// Obtains all the folders under a given folder.
+        /// </summary>
         private (string[], string[]) GetFolders(string folderId)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder information for folder(s) under folder {folderId}");
@@ -181,7 +196,9 @@ namespace GoogleDriveSync.Services
             return (folderIds, folderNames);
         }
 
-        // Obtains all the files under a given folder.
+        /// <summary>
+        /// Obtains all the files under a given folder.
+        /// </summary>
         private List<FileModel> GetFiles(string folderId, string pathIds, string path)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file information for file(s) under folder {folderId}");
@@ -234,7 +251,9 @@ namespace GoogleDriveSync.Services
             return googleDrive;
         }
 
-        // Loops through all folders and sub folders to obtain all files.
+        /// <summary>
+        /// Loops through all folders and sub folders to obtain all files.
+        /// </summary>
         private void TraverseFolders(List<FileModel> googleDrive, string folderId, string pathIds, string path)
         {
             (string[] folderIds, string[] folderNames) = GetFolders(folderId);
@@ -253,7 +272,9 @@ namespace GoogleDriveSync.Services
             }
         }
 
-        // Creates a folder under the specified folder.
+        /// <summary>
+        /// Creates a folder under the specified folder.
+        /// </summary>
         private string CreateFolder(string folderName, string parent)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Creating {folderName} folder in Google Drive");
@@ -277,7 +298,9 @@ namespace GoogleDriveSync.Services
             return folder.Id;
         }
 
-        // Checks if the required folders exist.
+        /// <summary>
+        /// Checks if the required folders exist.
+        /// </summary>
         private string CheckFolders(string[] folders)
         {
             string parent = AppSettingsModel.DriveFolder;
@@ -308,7 +331,9 @@ namespace GoogleDriveSync.Services
             return parent;
         }
 
-        // Uploads a new file.
+        /// <summary>
+        /// Uploads a new file.
+        /// </summary>
         public void CreateFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploading {file.Name}.{file.Type} to Google Drive");
@@ -337,7 +362,9 @@ namespace GoogleDriveSync.Services
             }
         }
 
-        // Modifies the existing file.
+        /// <summary>
+        /// Modifies the existing file.
+        /// </summary>
         public void UpdateFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Updating {file.Name}.{file.Type} in Google Drive");
@@ -362,7 +389,9 @@ namespace GoogleDriveSync.Services
             }
         }
 
-        // Changes the location of the file.
+        /// <summary>
+        /// Changes the location of the file.
+        /// </summary>
         public void MoveFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Moving {file.Name}.{file.Type} in Google Drive");
@@ -393,7 +422,9 @@ namespace GoogleDriveSync.Services
             }
         }
 
-        // Downloads the file.
+        /// <summary>
+        /// Downloads the file.
+        /// </summary>
         public void DownloadFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Downloading {file.Name}.{file.Type} to Local Drive");
@@ -412,7 +443,9 @@ namespace GoogleDriveSync.Services
             }
         }
 
-        // Removes the file.
+        /// <summary>
+        /// Removes the file.
+        /// </summary>
         public void DeleteFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Deleting {file.Name}.{file.Type} from Google Drive");

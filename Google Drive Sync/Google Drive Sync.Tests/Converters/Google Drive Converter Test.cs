@@ -8,7 +8,9 @@ namespace GoogleDriveSync.Tests.Converters
     {
         #region GetMimeType
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypeText()
         {
@@ -19,7 +21,9 @@ namespace GoogleDriveSync.Tests.Converters
             Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypePDF()
         {
@@ -30,7 +34,9 @@ namespace GoogleDriveSync.Tests.Converters
             Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypeDoc()
         {
@@ -41,7 +47,9 @@ namespace GoogleDriveSync.Tests.Converters
             Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypeDocx()
         {
@@ -52,7 +60,9 @@ namespace GoogleDriveSync.Tests.Converters
             Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypeXLS()
         {
@@ -63,7 +73,9 @@ namespace GoogleDriveSync.Tests.Converters
             Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypeXLSX()
         {
@@ -74,7 +86,9 @@ namespace GoogleDriveSync.Tests.Converters
             Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypePNG()
         {
@@ -85,7 +99,9 @@ namespace GoogleDriveSync.Tests.Converters
             Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypeJPEG()
         {
@@ -96,7 +112,9 @@ namespace GoogleDriveSync.Tests.Converters
             Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
         public void TestGetMimeTypeDefault()
         {
@@ -109,7 +127,9 @@ namespace GoogleDriveSync.Tests.Converters
 
         #endregion
 
-        // Checks whether the GetFilePath method returns the expected file location. 
+        /// <summary>
+        /// Checks whether the GetFilePath method returns the expected file location. 
+        /// </summary>
         [TestMethod]
         public void TestGetFilePath()
         {

@@ -6,7 +6,9 @@ namespace GoogleDriveSync.Tests.Functions
     [TestClass]
     public class GoogleDriveFunctionTest
     {
-        // Checks whether the RemoveStringCharacters method returns the expected string.
+        /// <summary>
+        /// Checks whether the RemoveStringCharacters method returns the expected string.
+        /// </summary>
         [TestMethod]
         public void TestRemoveStringCharactersRightBackSlash()
         {
@@ -16,7 +18,7 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("Test Folder Two", result);
         }
 
-        // Checks whether the RemoveStringCharacters method returns the expected string.
+        // /hecks whether the RemoveStringCharacters method returns the expected string.
         [TestMethod]
         public void TestRemoveStringCharactersRightComma()
         {
@@ -26,7 +28,9 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("rqfqjFATIC6bSvmuTxvov0BD3kVvh0UYE", result);
         }
 
-        // Checks whether the RemoveStringCharacters method returns the expected string.
+        /// <summary>
+        /// Checks whether the RemoveStringCharacters method returns the expected string.
+        /// </summary>
         [TestMethod]
         public void TestRemoveStringCharactersRightBoth()
         {
@@ -36,7 +40,9 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("Test Folder Two", result);
         }
 
-        // Checks whether the RemoveStringCharacters method returns the expected string.
+        /// <summary>
+        /// Checks whether the RemoveStringCharacters method returns the expected string.
+        /// </summary>
         [TestMethod]
         public void TestRemoveStringCharactersLeft()
         {
@@ -46,7 +52,9 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("C:\\GDSTests\\Book Tests", result);
         }
 
-        // Checks whether the RemoveStringCharacters method returns the expected string.
+        /// <summary>
+        /// Checks whether the RemoveStringCharacters method returns the expected string.
+        /// </summary>
         [TestMethod]
         public void TestRemoveStringCharactersRightNoBackSlash()
         {
@@ -56,7 +64,9 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("Book Tests", result);
         }
 
-        // Checks whether the RemoveStringCharacters method returns the expected string.
+        /// <summary>
+        /// Checks whether the RemoveStringCharacters method returns the expected string.
+        /// </summary>
         [TestMethod]
         public void TestRemoveStringCharactersLeftNoBackSlash()
         {
@@ -66,7 +76,9 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("Book Tests", result);
         }
 
-        // Checks whether the RemoveStringCharacters method returns the expected string.
+        /// <summary>
+        /// Checks whether the RemoveStringCharacters method returns the expected string.
+        /// </summary>
         [TestMethod]
         public void TestRemoveStringCharactersRightNoComma()
         {
@@ -76,7 +88,9 @@ namespace GoogleDriveSync.Tests.Functions
             Assert.AreEqual("rqfqjFATIC6bSvmuTxvov0BD3kVvh0UYE", result);
         }
 
-        // Checks whether the RemoveStringCharacters method returns the expected string.
+        /// <summary>
+        /// Checks whether the RemoveStringCharacters method returns the expected string.
+        /// </summary>
         [TestMethod]
         public void TestRemoveStringCharactersLeftNoComma()
         {
