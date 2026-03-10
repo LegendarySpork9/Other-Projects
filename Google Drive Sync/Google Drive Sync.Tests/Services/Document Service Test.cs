@@ -7,10 +7,21 @@ using Moq;
 namespace GoogleDriveSync.Tests.Services
 {
     [TestClass]
+    [DoNotParallelize]
     public class DocumentServiceTest
     {
         private readonly Mock<ILoggerService> _MockLogger = new();
         private readonly Mock<IUserNotifier> _MockUserNotifier = new();
+
+        /// <summary>
+        /// Resets the static state before each test.
+        /// </summary>
+        [TestInitialize]
+        public void Setup()
+        {
+            AppSettingsModel.IgnoreFolders = [];
+            AppSettingsModel.IgnoreFiles = [];
+        }
 
         /// <summary>
         /// Checks whether the GetHasErrored method returns the expected value.

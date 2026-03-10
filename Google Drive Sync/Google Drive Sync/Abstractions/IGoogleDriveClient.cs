@@ -4,6 +4,7 @@ using Google.Apis.Drive.v3.Data;
 using Google.Apis.Upload;
 using GoogleDriveSync.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GoogleDriveSync.Abstractions
 {
@@ -13,13 +14,13 @@ namespace GoogleDriveSync.Abstractions
     public interface IGoogleDriveClient
     {
         void CreateGoogleDriveService(UserCredential credentials);
-        (IList<File>, bool) GetFolders(string folderId = null);
-        (IList<File>, bool) GetFiles(string folderId);
-        (File, bool) CreateFolder(string folderName, string parent);
-        (IUploadProgress, bool) CreateFile(FileModel file, string parent);
-        (IUploadProgress, bool) UpdateFile(FileModel file);
-        (IUploadProgress, bool) MoveFile(FileModel file, string oldParent, string newParent);
-        bool DownloadFile(FileModel file, string filePath);
-        bool DeleteFile(FileModel file);
+        Task<(IList<File>, bool)> GetFolders(string folderId = null);
+        Task<(IList<File>, bool)> GetFiles(string folderId);
+        Task<(File, bool)> CreateFolder(string folderName, string parent);
+        Task<(IUploadProgress, bool)> CreateFile(FileModel file, string parent);
+        Task<(IUploadProgress, bool)> UpdateFile(FileModel file);
+        Task<(IUploadProgress, bool)> MoveFile(FileModel file, string oldParent, string newParent);
+        Task<bool> DownloadFile(FileModel file, string filePath);
+        Task<bool> DeleteFile(FileModel file);
     }
 }

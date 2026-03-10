@@ -5,13 +5,13 @@ using Microsoft.Data.SqlClient;
 
 namespace GitHubScraper.Implementations
 {
-    public class DatabaseClientWrapper : IDatabase
+    public class DatabaseWrapper : IDatabase
     {
         private readonly IDatabaseOptions _Options;
         private readonly ILoggerService _Logger;
 
         // Sets the class's global variables.
-        public DatabaseClientWrapper(
+        public DatabaseWrapper(
             IDatabaseOptions _options,
             ILoggerService _logger)
         {

@@ -6,6 +6,6 @@ namespace GitHubScraper.Abstractions
     /// </summary>
     public interface IFileSystem
     {
-        string ReadAllText(string path);
+        Task<string> ReadAllTextAsync(string path);
     }
 }

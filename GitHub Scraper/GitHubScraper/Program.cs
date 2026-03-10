@@ -8,7 +8,7 @@ namespace GitHubScraper
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             log4net.Config.XmlConfigurator.Configure();
 
@@ -27,7 +27,7 @@ namespace GitHubScraper
             logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
             logger.LogMessage(StandardValues.LoggerValues.Info, "Running Application");
 
-            _applicationService.Run();
+            await _applicationService.Run();
 
             logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
         }

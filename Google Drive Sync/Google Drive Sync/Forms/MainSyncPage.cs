@@ -62,9 +62,9 @@ namespace GoogleDriveSync
             PBLoading.Image = Properties.Resources.LoadingSpinner;
             bool hasErrored = false;
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                (Files, hasErrored) = AppService.CheckUpdates();
+                (Files, hasErrored) = await AppService.CheckUpdates();
             });
 
             foreach (FileModel file in Files)
@@ -161,9 +161,9 @@ namespace GoogleDriveSync
                 }
             }
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                hasErrored = AppService.SyncChanges(uploadFiles, downloadFiles);
+                hasErrored = await AppService.SyncChanges(uploadFiles, downloadFiles);
             });
 
             foreach (FileModel file in uploadFiles)
@@ -419,9 +419,9 @@ namespace GoogleDriveSync
             PBLoading.Image = Properties.Resources.LoadingSpinner;
             bool hasErrored = false;
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                (Files, hasErrored) = AppService.CheckUpdates();
+                (Files, hasErrored) = await AppService.CheckUpdates();
             });
 
             PRBLoading.Value = 0;
@@ -454,9 +454,9 @@ namespace GoogleDriveSync
                 }
             }
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                hasErrored = AppService.SyncChanges(uploadFiles, downloadFiles);
+                hasErrored = await AppService.SyncChanges(uploadFiles, downloadFiles);
             });
 
             if (hasErrored)

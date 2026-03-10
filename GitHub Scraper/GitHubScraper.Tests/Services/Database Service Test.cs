@@ -23,7 +23,7 @@ namespace GitHubScraper.Tests.Services
         public void Setup()
         {
             Date = new(2026, 03, 05, 00, 00, 00, DateTimeKind.Utc);
-            _MockFileSystem.Setup(fs => fs.ReadAllText(It.IsAny<string>())).Returns("select 1");
+            _MockFileSystem.Setup(fs => fs.ReadAllTextAsync(It.IsAny<string>())).ReturnsAsync("select 1");
             _MockOptions.Setup(o => o.ConnectionString).Returns("This is a connection string");
             _MockOptions.Setup(o => o.SQLFiles).Returns(@"C:\SQL");
         }
@@ -32,7 +32,7 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetLastRunDate method returns 01/01/1900 if the given repository has never run before.
         /// </summary>
         [TestMethod]
-        public void TestGetLastRunDateNew()
+        public async Task TestGetLastRunDateNew()
         {
             DateTime expected = _MockClock.Object.DefaultDate;
 
@@ -40,7 +40,7 @@ namespace GitHubScraper.Tests.Services
             _mockDatabase.Setup(d => d.QuerySingle(It.IsAny<string>(), It.IsAny<Func<SqlDataReader, DateTime>>(), It.IsAny<SqlParameter[]>()).Result).Returns((expected, null));
 
             DatabaseService _databaseService = new(_MockLogger.Object, _MockClock.Object, _MockFileSystem.Object, _MockOptions.Object, _mockDatabase.Object);
-            DateTime actual = _databaseService.GetLastRunDate("Unit-Test");
+            DateTime actual = await _databaseService.GetLastRunDate("Unit-Test");
 
             Assert.AreEqual(expected, actual);
         }
@@ -49,13 +49,13 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetLastRunDate method returns the last time the given repository ran.
         /// </summary>
         [TestMethod]
-        public void TestGetLastRunDate()
+        public async Task TestGetLastRunDate()
         {
             Mock<IDatabase> _mockDatabase = new();
             _mockDatabase.Setup(d => d.QuerySingle(It.IsAny<string>(), It.IsAny<Func<SqlDataReader, DateTime>>(), It.IsAny<SqlParameter[]>()).Result).Returns((Date, null));
 
             DatabaseService _databaseService = new(_MockLogger.Object, _MockClock.Object, _MockFileSystem.Object, _MockOptions.Object, _mockDatabase.Object);
-            DateTime actual = _databaseService.GetLastRunDate("Unit-Test");
+            DateTime actual = await _databaseService.GetLastRunDate("Unit-Test");
             
             Assert.AreEqual(Date, actual);
         }
@@ -64,13 +64,13 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetIssues method returns an empty list if there are no issues for the given repository.
         /// </summary>
         [TestMethod]
-        public void TestGetIssuesNone()
+        public async Task TestGetIssuesNone()
         {
             Mock<IDatabase> _mockDatabase = new();
             _mockDatabase.Setup(d => d.Query(It.IsAny<string>(), It.IsAny<Func<SqlDataReader, IssueModel>>(), It.IsAny<SqlParameter[]>()).Result).Returns(([], null));
 
             DatabaseService _databaseService = new(_MockLogger.Object, _MockClock.Object, _MockFileSystem.Object, _MockOptions.Object, _mockDatabase.Object);
-            List<IssueModel> issues = _databaseService.GetIssues("Unit-Test");
+            List<IssueModel> issues = await _databaseService.GetIssues("Unit-Test");
 
             Assert.AreEqual(0, issues.Count);
         }
@@ -79,7 +79,7 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetIssues method returns an list of issues if there are some issues for the given repository.
         /// </summary>
         [TestMethod]
-        public void TestGetIssues()
+        public async Task TestGetIssues()
         {
             IssueModel issue = new()
             {
@@ -98,7 +98,7 @@ namespace GitHubScraper.Tests.Services
             DatabaseService _databaseService = new(_MockLogger.Object, _MockClock.Object, _MockFileSystem.Object, _MockOptions.Object, _mockDatabase.Object);
 
             List<IssueModel> expected = [issue];
-            List<IssueModel> actual = _databaseService.GetIssues("Unit-Test");
+            List<IssueModel> actual = await _databaseService.GetIssues("Unit-Test");
 
             Assert.AreEqual(expected.Count, actual.Count);
             Assert.AreEqual(expected[0].Id, actual[0].Id);

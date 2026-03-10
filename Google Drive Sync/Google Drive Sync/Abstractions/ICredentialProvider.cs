@@ -1,5 +1,6 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 using Google.Apis.Auth.OAuth2;
+using System.Threading.Tasks;
 
 namespace GoogleDriveSync.Abstractions
 {
@@ -8,6 +9,6 @@ namespace GoogleDriveSync.Abstractions
     /// </summary>
     public interface ICredentialProvider
     {
-        (UserCredential, bool) GetCredentials();
+        Task<(UserCredential, bool)> GetCredentials();
     }
 }

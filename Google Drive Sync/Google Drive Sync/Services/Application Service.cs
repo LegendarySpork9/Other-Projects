@@ -1,4 +1,4 @@
-﻿// Copyright © - 14/05/2025 - Toby Hunter
+// Copyright © - 14/05/2025 - Toby Hunter
 using GoogleDriveSync.Abstractions;
 using GoogleDriveSync.Converters;
 using GoogleDriveSync.Functions;
@@ -6,6 +6,7 @@ using GoogleDriveSync.Implementations;
 using GoogleDriveSync.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GoogleDriveSync.Services
 {
@@ -30,14 +31,14 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Runs the process of checking for updates.
         /// </summary>
-        public (List<FileModel>, bool) CheckUpdates()
+        public async Task<(List<FileModel>, bool)> CheckUpdates()
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking for updates in root folder");
 
             int progress = 0;
             int increaseValue = ProgressBarValueConverter.GetPBIncreaseValue(4);
 
-            List<FileModel> googleDrive = _GoogleAPI.GetData();
+            List<FileModel> googleDrive = await _GoogleAPI.GetData();
             bool hasErrored = _GoogleAPI.GetHasErrored();
 
             progress += increaseValue;
@@ -62,7 +63,7 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Runs the process of updating the files selected.
         /// </summary>
-        public bool SyncChanges(List<FileModel> uploadFiles, List<FileModel> downloadFiles)
+        public async Task<bool> SyncChanges(List<FileModel> uploadFiles, List<FileModel> downloadFiles)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Syncing {uploadFiles.Count + downloadFiles.Count} file(s) to root folder");
 
@@ -77,19 +78,19 @@ namespace GoogleDriveSync.Services
             {
                 if (file.Changes[0].OldValue == "Not Uploaded")
                 {
-                    _GoogleAPI.CreateFile(file);
+                    await _GoogleAPI.CreateFile(file);
                 }
 
                 else
                 {
                     if (file.Changes[0].Field == "Path")
                     {
-                        _GoogleAPI.MoveFile(file);
+                        await _GoogleAPI.MoveFile(file);
                     }
 
                     else
                     {
-                        _GoogleAPI.UpdateFile(file);
+                        await _GoogleAPI.UpdateFile(file);
                     }
                 }
 
@@ -105,14 +106,14 @@ namespace GoogleDriveSync.Services
 
                 if (file.Changes[0].Field == "Path")
                 {
-                    _GoogleAPI.DownloadFile(file);
+                    await _GoogleAPI.DownloadFile(file);
 
                     _DocumentService.DeleteFile(GoogleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right"));
                 }
 
                 else
                 {
-                    _GoogleAPI.DownloadFile(file);
+                    await _GoogleAPI.DownloadFile(file);
                 }
 
                 hasErrored = _GoogleAPI.GetHasErrored();

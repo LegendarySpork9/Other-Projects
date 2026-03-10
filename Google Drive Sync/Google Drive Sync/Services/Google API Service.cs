@@ -1,4 +1,4 @@
-﻿// Copyright © - 14/05/2025 - Toby Hunter
+// Copyright © - 14/05/2025 - Toby Hunter
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Upload;
 using GoogleDriveSync.Abstractions;
@@ -8,6 +8,7 @@ using GoogleDriveSync.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GoogleDriveSync.Services
 {
@@ -19,8 +20,9 @@ namespace GoogleDriveSync.Services
         private readonly IUserNotifier _UserNotifier;
 
         private readonly string FolderId;
-        private readonly string FolderName;
+        private string FolderName;
         private bool HasErrored = false;
+        private bool _Initialized = false;
         private List<KeyValuePair<string, string>> FolderStore = new List<KeyValuePair<string, string>>();
 
         /// <summary>
@@ -37,11 +39,20 @@ namespace GoogleDriveSync.Services
             _CredentialProvider = _credentialProvider;
             _GoogleDriveClient = _googleDriveClient;
             _UserNotifier = _userNotifier;
-
-            _GoogleDriveClient.CreateGoogleDriveService(GetCredentials());
-
             FolderId = folderId;
-            FolderName = GetFolderName(folderId);
+        }
+
+        /// <summary>
+        /// Initializes the Google Drive service and folder name.
+        /// </summary>
+        public async Task InitializeAsync()
+        {
+            if (!_Initialized)
+            {
+                _GoogleDriveClient.CreateGoogleDriveService(await GetCredentials());
+                FolderName = await GetFolderName(FolderId);
+                _Initialized = true;
+            }
         }
 
         /// <summary>
@@ -58,13 +69,13 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Gets the name of the given folder id.
         /// </summary>
-        private string GetFolderName(string folderId)
+        private async Task<string> GetFolderName(string folderId)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder name for folder id {folderId}");
 
             string folderName = string.Empty;
 
-            (IList<Google.Apis.Drive.v3.Data.File> driveFolders, bool hasErrored) = _GoogleDriveClient.GetFolders();
+            (IList<Google.Apis.Drive.v3.Data.File> driveFolders, bool hasErrored) = await _GoogleDriveClient.GetFolders();
 
             HasErrored = hasErrored;
 
@@ -106,9 +117,9 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Generates credentials from the specified json file.
         /// </summary>
-        private UserCredential GetCredentials()
+        private async Task<UserCredential> GetCredentials()
         {
-            (UserCredential credential, bool hasErrored) = _CredentialProvider.GetCredentials();
+            (UserCredential credential, bool hasErrored) = await _CredentialProvider.GetCredentials();
 
             HasErrored = hasErrored;
 
@@ -123,16 +134,18 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Obtains all the files and folders of the specified directory.
         /// </summary>
-        public List<FileModel> GetData()
+        public async Task<List<FileModel>> GetData()
         {
+            await InitializeAsync();
+
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file(s) under folder {FolderName ?? FolderId}");
 
             FolderStore = new List<KeyValuePair<string, string>>();
 
             List<FileModel> googleDrive = new List<FileModel>();
-            (string[] folderIds, string[] folderNames) = GetFolders(FolderId);
+            (string[] folderIds, string[] folderNames) = await GetFolders(FolderId);
 
-            googleDrive = GetFiles(FolderId, FolderId, FolderName);
+            googleDrive = await GetFiles(FolderId, FolderId, FolderName);
 
             string pathIds = FolderId;
             string path = FolderName;
@@ -142,7 +155,7 @@ namespace GoogleDriveSync.Services
                 pathIds += $@"\{folderIds[i]}";
                 path += $@"\{folderNames[i]}";
 
-                TraverseFolders(googleDrive, folderIds[i], pathIds, path);
+                await TraverseFolders(googleDrive, folderIds[i], pathIds, path);
 
                 pathIds = pathIds.Replace($@"\{folderIds[i]}", "");
                 path = path.Replace($@"\{folderNames[i]}", "");
@@ -156,14 +169,14 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Obtains all the folders under a given folder.
         /// </summary>
-        private (string[], string[]) GetFolders(string folderId)
+        private async Task<(string[], string[])> GetFolders(string folderId)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder information for folder(s) under folder {folderId}");
 
             string[] folderIds = Array.Empty<string>();
             string[] folderNames = Array.Empty<string>();
 
-            (IList<Google.Apis.Drive.v3.Data.File> driveFolders, bool hasErrored) = _GoogleDriveClient.GetFolders(folderId);
+            (IList<Google.Apis.Drive.v3.Data.File> driveFolders, bool hasErrored) = await _GoogleDriveClient.GetFolders(folderId);
 
             HasErrored = hasErrored;
 
@@ -199,13 +212,13 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Obtains all the files under a given folder.
         /// </summary>
-        private List<FileModel> GetFiles(string folderId, string pathIds, string path)
+        private async Task<List<FileModel>> GetFiles(string folderId, string pathIds, string path)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file information for file(s) under folder {folderId}");
 
             List<FileModel> googleDrive = new List<FileModel>();
 
-            (IList<Google.Apis.Drive.v3.Data.File> driveFiles, bool hasErrored) = _GoogleDriveClient.GetFiles(folderId);
+            (IList<Google.Apis.Drive.v3.Data.File> driveFiles, bool hasErrored) = await _GoogleDriveClient.GetFiles(folderId);
 
             HasErrored = hasErrored;
 
@@ -254,18 +267,18 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Loops through all folders and sub folders to obtain all files.
         /// </summary>
-        private void TraverseFolders(List<FileModel> googleDrive, string folderId, string pathIds, string path)
+        private async Task TraverseFolders(List<FileModel> googleDrive, string folderId, string pathIds, string path)
         {
-            (string[] folderIds, string[] folderNames) = GetFolders(folderId);
+            (string[] folderIds, string[] folderNames) = await GetFolders(folderId);
 
-            googleDrive.AddRange(GetFiles(folderId, pathIds, path));
+            googleDrive.AddRange(await GetFiles(folderId, pathIds, path));
 
             for (int i = 0; i < folderIds.Length; i++)
             {
                 pathIds += $@"\{folderIds[i]}";
                 path += $@"\{folderNames[i]}";
 
-                TraverseFolders(googleDrive, folderIds[i], pathIds, path);
+                await TraverseFolders(googleDrive, folderIds[i], pathIds, path);
 
                 pathIds = pathIds.Replace($@"\{folderIds[i]}", "");
                 path = path.Replace($@"\{folderNames[i]}", "");
@@ -275,11 +288,11 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Creates a folder under the specified folder.
         /// </summary>
-        private string CreateFolder(string folderName, string parent)
+        private async Task<string> CreateFolder(string folderName, string parent)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Creating {folderName} folder in Google Drive");
 
-            (Google.Apis.Drive.v3.Data.File folder, bool hasErrored) = _GoogleDriveClient.CreateFolder(folderName, parent);
+            (Google.Apis.Drive.v3.Data.File folder, bool hasErrored) = await _GoogleDriveClient.CreateFolder(folderName, parent);
 
             HasErrored = hasErrored;
 
@@ -301,7 +314,7 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Checks if the required folders exist.
         /// </summary>
-        private string CheckFolders(string[] folders)
+        private async Task<string> CheckFolders(string[] folders)
         {
             string parent = AppSettingsModel.DriveFolder;
 
@@ -314,7 +327,7 @@ namespace GoogleDriveSync.Services
                 {
                     _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"{folders[x]} folder not found in Google Drive");
 
-                    string newFolderId = CreateFolder(folders[x], parent);
+                    string newFolderId = await CreateFolder(folders[x], parent);
 
                     if (x != (folders.Length - 1))
                     {
@@ -334,15 +347,15 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Uploads a new file.
         /// </summary>
-        public void CreateFile(FileModel file)
+        public async Task CreateFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Uploading {file.Name}.{file.Type} to Google Drive");
 
-            string folderParent = CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
+            string folderParent = await CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
             string folderStoreValue = $"{GoogleDriveFunction.RemoveStringCharacters(file.Path, new char[] { '\\' }, "Right")} ({folderParent})";
             string parent = FolderStore.Find(c => c.Value == folderStoreValue).Key ?? AppSettingsModel.DriveFolder;
 
-            (IUploadProgress requestStatus, bool hasErrored) = _GoogleDriveClient.CreateFile(file, parent);
+            (IUploadProgress requestStatus, bool hasErrored) = await _GoogleDriveClient.CreateFile(file, parent);
 
             HasErrored = hasErrored;
 
@@ -365,11 +378,11 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Modifies the existing file.
         /// </summary>
-        public void UpdateFile(FileModel file)
+        public async Task UpdateFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Updating {file.Name}.{file.Type} in Google Drive");
 
-            (IUploadProgress requestStatus, bool hasErrored) = _GoogleDriveClient.UpdateFile(file);
+            (IUploadProgress requestStatus, bool hasErrored) = await _GoogleDriveClient.UpdateFile(file);
 
             HasErrored = hasErrored;
 
@@ -392,17 +405,17 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Changes the location of the file.
         /// </summary>
-        public void MoveFile(FileModel file)
+        public async Task MoveFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Moving {file.Name}.{file.Type} in Google Drive");
 
-            string folderParent = CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
+            string folderParent = await CheckFolders(file.Path.Remove(0, file.Path.IndexOf(',') + 1).Split('\\'));
             string folderStoreValue = $"{GoogleDriveFunction.RemoveStringCharacters(file.Path, new char[] { ',', '\\' }, "Right")} ({folderParent})";
 
             string oldParent = GoogleDriveFunction.RemoveStringCharacters(file.PathIds, new char[] { '\\' }, "Right");
             string newParent = FolderStore.Find(c => c.Value == folderStoreValue).Key ?? AppSettingsModel.DriveFolder;
 
-            (IUploadProgress requestStatus, bool hasErrored) = _GoogleDriveClient.MoveFile(file, oldParent, newParent);
+            (IUploadProgress requestStatus, bool hasErrored) = await _GoogleDriveClient.MoveFile(file, oldParent, newParent);
 
             HasErrored = hasErrored;
 
@@ -425,7 +438,7 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Downloads the file.
         /// </summary>
-        public void DownloadFile(FileModel file)
+        public async Task DownloadFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Downloading {file.Name}.{file.Type} to Local Drive");
 
@@ -433,7 +446,7 @@ namespace GoogleDriveSync.Services
 
             _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Path: {filePath}");
 
-            bool hasErrored = _GoogleDriveClient.DownloadFile(file, filePath);
+            bool hasErrored = await _GoogleDriveClient.DownloadFile(file, filePath);
 
             HasErrored = hasErrored;
 
@@ -446,12 +459,12 @@ namespace GoogleDriveSync.Services
         /// <summary>
         /// Removes the file.
         /// </summary>
-        public void DeleteFile(FileModel file)
+        public async Task DeleteFile(FileModel file)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Deleting {file.Name}.{file.Type} from Google Drive");
 
-            bool hasErrored = _GoogleDriveClient.DeleteFile(file);
-            
+            bool hasErrored = await _GoogleDriveClient.DeleteFile(file);
+
             HasErrored = hasErrored;
 
             if (HasErrored)

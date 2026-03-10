@@ -8,6 +8,6 @@ namespace GitHubScraper.Implementations
         /// <summary>
         /// Returns the text in a given file.
         /// </summary>
-        public string ReadAllText(string path) => File.ReadAllText(path);
+        public Task<string> ReadAllTextAsync(string path) => File.ReadAllTextAsync(path);
     }
 }

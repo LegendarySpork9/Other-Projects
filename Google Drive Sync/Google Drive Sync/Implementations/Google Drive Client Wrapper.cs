@@ -1,4 +1,4 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+// Copyright © - Unpublished - Toby Hunter
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;
@@ -11,6 +11,8 @@ using GoogleDriveSync.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GoogleDriveSync.Implementations
 {
@@ -49,7 +51,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Gets the folders or sub folders in Google Drive or the specified folder.
         /// </summary>
-        public (IList<Google.Apis.Drive.v3.Data.File>, bool) GetFolders(string folderId = null)
+        public async Task<(IList<Google.Apis.Drive.v3.Data.File>, bool)> GetFolders(string folderId = null)
         {
             bool hasErrored = false;
 
@@ -73,7 +75,7 @@ namespace GoogleDriveSync.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Search Query");
                 _Logger.LogMessage(StandardValues.LoggerValues.Info, "Sending Request");
 
-                response = request.Execute();
+                response = await request.ExecuteAsync();
             }
 
             catch (Exception ex)
@@ -99,7 +101,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Gets all the files under a given folder.
         /// </summary>
-        public (IList<Google.Apis.Drive.v3.Data.File>, bool) GetFiles(string folderId)
+        public async Task<(IList<Google.Apis.Drive.v3.Data.File>, bool)> GetFiles(string folderId)
         {
             bool hasErrored = false;
 
@@ -114,7 +116,7 @@ namespace GoogleDriveSync.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Search Query");
                 _Logger.LogMessage(StandardValues.LoggerValues.Info, "Sending Request");
 
-                response = request.Execute();
+                response = await request.ExecuteAsync();
             }
 
             catch (Exception ex)
@@ -131,7 +133,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Creates a folder under the specified folder.
         /// </summary>
-        public (Google.Apis.Drive.v3.Data.File, bool) CreateFolder(string folderName, string parent)
+        public async Task<(Google.Apis.Drive.v3.Data.File, bool)> CreateFolder(string folderName, string parent)
         {
             bool hasErrored = false;
 
@@ -154,7 +156,7 @@ namespace GoogleDriveSync.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Create Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = createRequest.Execute();
+                response = await createRequest.ExecuteAsync();
             }
 
             catch (Exception ex)
@@ -171,7 +173,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Uploads a new file.
         /// </summary>
-        public (IUploadProgress, bool) CreateFile(FileModel file, string parent)
+        public async Task<(IUploadProgress, bool)> CreateFile(FileModel file, string parent)
         {
             bool hasErrored = false;
 
@@ -199,7 +201,7 @@ namespace GoogleDriveSync.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Create Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                requestStatus = createRequest.Upload();
+                requestStatus = await createRequest.UploadAsync();
 
                 fileStream.Close();
 
@@ -220,7 +222,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Modifies the existing file.
         /// </summary>
-        public (IUploadProgress, bool) UpdateFile(FileModel file)
+        public async Task<(IUploadProgress, bool)> UpdateFile(FileModel file)
         {
             bool hasErrored = false;
 
@@ -245,7 +247,7 @@ namespace GoogleDriveSync.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Create Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                requestStatus = updateRequest.Upload();
+                requestStatus = await updateRequest.UploadAsync();
 
                 fileStream.Close();
 
@@ -266,7 +268,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Changes the location of the file.
         /// </summary>
-        public (IUploadProgress, bool) MoveFile(FileModel file, string oldParent, string newParent)
+        public async Task<(IUploadProgress, bool)> MoveFile(FileModel file, string oldParent, string newParent)
         {
             bool hasErrored = false;
 
@@ -293,7 +295,7 @@ namespace GoogleDriveSync.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Google Drive Create Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                requestStatus = moveRequest.Upload();
+                requestStatus = await moveRequest.UploadAsync();
 
                 fileStream.Close();
 
@@ -314,7 +316,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Downloads the file.
         /// </summary>
-        public bool DownloadFile(FileModel file, string filePath)
+        public async Task<bool> DownloadFile(FileModel file, string filePath)
         {
             FolderFunction _folderFunction = new FolderFunction(_FileSystem);
 
@@ -353,7 +355,7 @@ namespace GoogleDriveSync.Implementations
                     }
                 };
 
-                downloadRequest.Download(stream);
+                await downloadRequest.DownloadAsync(stream, CancellationToken.None);
             }
 
             catch (Exception ex)
@@ -370,7 +372,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Removes the file.
         /// </summary>
-        public bool DeleteFile(FileModel file)
+        public async Task<bool> DeleteFile(FileModel file)
         {
             bool hasErrored = false;
 
@@ -380,7 +382,7 @@ namespace GoogleDriveSync.Implementations
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                string result = deleteRequest.Execute();
+                string result = await deleteRequest.ExecuteAsync();
 
                 if (string.IsNullOrWhiteSpace(result))
                 {

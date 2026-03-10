@@ -115,10 +115,10 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Runs the application.
         /// </summary>
-        public void Run()
+        public async Task Run()
         {
             IDatabaseOptions _options = new DatabaseOptionsProvider();
-            DatabaseService _databaseService = new(_Logger, new SystemClockProvider(), new FileSystemWrapper(), _options, new DatabaseClientWrapper(_options, _Logger));
+            DatabaseService _databaseService = new(_Logger, new SystemClockProvider(), new FileSystemWrapper(), _options, new DatabaseWrapper(_options, _Logger));
             GitHubService _gitHubService = new(_Logger, new GitHubClientWrapper(_Logger, new GitHubOptionsProvider(), new SystemClockProvider()));
             DatabaseFunction _databaseFunction = new(_Logger, new SystemClockProvider());
 
@@ -126,8 +126,8 @@ namespace GitHubScraper.Services
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Running Scraper for {repository}");
 
-                DateTime lastRunDate = _databaseService.GetLastRunDate(repository);
-                List<IssueModel> existingIssues = _databaseService.GetIssues(repository);
+                DateTime lastRunDate = await _databaseService.GetLastRunDate(repository);
+                List<IssueModel> existingIssues = await _databaseService.GetIssues(repository);
 
                 List<IssueModel> issues = _gitHubService.GetIssues(repository, lastRunDate);
                 List<CommitModel> commits = _gitHubService.GetCommits(repository, lastRunDate);
@@ -157,21 +157,21 @@ namespace GitHubScraper.Services
 
                 List<ReleaseModel> releases = _gitHubService.GetReleases(repository, lastRunDate);
 
-                _databaseService.OutputIssues(repository, issues);
-                _databaseService.OutputCommits(repository, commits);
-                _databaseService.OutputPullRequests(repository, pullRequests);
-                
+                await _databaseService.OutputIssues(repository, issues);
+                await _databaseService.OutputCommits(repository, commits);
+                await _databaseService.OutputPullRequests(repository, pullRequests);
+
                 foreach (WorkflowModel workflow in workflows)
                 {
-                    _databaseService.OutputWorkflowRuns(repository, workflow);
+                    await _databaseService.OutputWorkflowRuns(repository, workflow);
                 }
 
-                _databaseService.OutputReleases(repository, releases);
+                await _databaseService.OutputReleases(repository, releases);
 
                 List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates(repository, _databaseFunction.FilterIssues(repository, issues, existingIssues), existingIssues);
 
-                _databaseService.LogIssueAggregates(repository, issueAggregates);
-                _databaseService.LogRun(repository, issues.Count, commits.Count, pullRequests.Count, totalWorkflowRuns, releases.Count);
+                await _databaseService.LogIssueAggregates(repository, issueAggregates);
+                await _databaseService.LogRun(repository, issues.Count, commits.Count, pullRequests.Count, totalWorkflowRuns, releases.Count);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Ran Scraper for {repository}");
             }

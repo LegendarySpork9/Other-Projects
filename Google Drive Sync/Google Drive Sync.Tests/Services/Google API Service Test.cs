@@ -1,4 +1,4 @@
-﻿// Copyright © - 14/05/2025 - Toby Hunter
+// Copyright © - 14/05/2025 - Toby Hunter
 using GoogleDriveSync.Abstractions;
 using GoogleDriveSync.Models;
 using GoogleDriveSync.Services;
@@ -7,11 +7,22 @@ using Moq;
 namespace GoogleDriveSync.Tests.Services
 {
     [TestClass]
+    [DoNotParallelize]
     public class GoogleAPIServiceTest
     {
         private readonly Mock<ILoggerService> _MockLogger = new();
         private readonly Mock<ICredentialProvider> _MockCredentialProvider = new();
         private readonly Mock<IUserNotifier> _MockUserNotifier = new();
+
+        /// <summary>
+        /// Resets the static state before each test.
+        /// </summary>
+        [TestInitialize]
+        public void Setup()
+        {
+            AppSettingsModel.IgnoreFolders = [];
+            AppSettingsModel.IgnoreFiles = [];
+        }
 
         /// <summary>
         /// Checks whether the GetHasErrored method returns the expected value.
@@ -32,7 +43,7 @@ namespace GoogleDriveSync.Tests.Services
         /// Checks whether the GetData method returns the expected list.
         /// </summary>
         [TestMethod]
-        public void TestGetData()
+        public async Task TestGetData()
         {
             string root = "bbe016edbc66f26f71ba7d8c445af164c2f305421f62ac4261f6122ab8b08ead";
 
@@ -51,13 +62,13 @@ namespace GoogleDriveSync.Tests.Services
             };
 
             Mock<IGoogleDriveClient> _mockGoogleDriveClient = new();
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).Returns(([mockFolder], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).Returns(([], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).Returns(([mockFile], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).ReturnsAsync(([mockFolder], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).ReturnsAsync(([], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).ReturnsAsync(([mockFile], false));
 
             GoogleAPIService _googleAPI = new(_MockLogger.Object, _MockCredentialProvider.Object, _mockGoogleDriveClient.Object, _MockUserNotifier.Object, root);
 
-            List<FileModel> files = _googleAPI.GetData();
+            List<FileModel> files = await _googleAPI.GetData();
 
             Assert.AreEqual(1, files.Count);
 
@@ -72,7 +83,7 @@ namespace GoogleDriveSync.Tests.Services
         /// Checks whether the GetData method returns the expected list.
         /// </summary>
         [TestMethod]
-        public void TestGetDataSubFolder()
+        public async Task TestGetDataSubFolder()
         {
             string root = "bbe016edbc66f26f71ba7d8c445af164c2f305421f62ac4261f6122ab8b08ead";
 
@@ -105,14 +116,14 @@ namespace GoogleDriveSync.Tests.Services
             };
 
             Mock<IGoogleDriveClient> _mockGoogleDriveClient = new();
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).Returns(([mockFolder], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).Returns(([mockFolderSub], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).Returns(([mockFile], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(mockFolderSub.Id)).Returns(([mockFile2], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).ReturnsAsync(([mockFolder], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).ReturnsAsync(([mockFolderSub], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).ReturnsAsync(([mockFile], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(mockFolderSub.Id)).ReturnsAsync(([mockFile2], false));
 
             GoogleAPIService _googleAPI = new(_MockLogger.Object, _MockCredentialProvider.Object, _mockGoogleDriveClient.Object, _MockUserNotifier.Object, root);
 
-            List<FileModel> files = _googleAPI.GetData();
+            List<FileModel> files = await _googleAPI.GetData();
 
             Assert.AreEqual(2, files.Count);
 
@@ -133,7 +144,7 @@ namespace GoogleDriveSync.Tests.Services
         /// Checks whether the GetData method returns the expected list.
         /// </summary>
         [TestMethod]
-        public void TestGetDataSubFolderEmpty()
+        public async Task TestGetDataSubFolderEmpty()
         {
             string root = "bbe016edbc66f26f71ba7d8c445af164c2f305421f62ac4261f6122ab8b08ead";
 
@@ -159,14 +170,14 @@ namespace GoogleDriveSync.Tests.Services
             };
 
             Mock<IGoogleDriveClient> _mockGoogleDriveClient = new();
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).Returns(([mockFolder], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).Returns(([mockFolderSub], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).Returns(([mockFile], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(mockFolderSub.Id)).Returns(([], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).ReturnsAsync(([mockFolder], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).ReturnsAsync(([mockFolderSub], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).ReturnsAsync(([mockFile], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(mockFolderSub.Id)).ReturnsAsync(([], false));
 
             GoogleAPIService _googleAPI = new(_MockLogger.Object, _MockCredentialProvider.Object, _mockGoogleDriveClient.Object, _MockUserNotifier.Object, root);
 
-            List<FileModel> files = _googleAPI.GetData();
+            List<FileModel> files = await _googleAPI.GetData();
 
             Assert.AreEqual(1, files.Count);
 
@@ -181,7 +192,7 @@ namespace GoogleDriveSync.Tests.Services
         /// Checks whether the GetData method returns the expected list.
         /// </summary>
         [TestMethod]
-        public void TestGetDataExcludedFile()
+        public async Task TestGetDataExcludedFile()
         {
             string root = "bbe016edbc66f26f71ba7d8c445af164c2f305421f62ac4261f6122ab8b08ead";
 
@@ -210,13 +221,13 @@ namespace GoogleDriveSync.Tests.Services
             AppSettingsModel.IgnoreFiles = [excludedFile.Name];
 
             Mock<IGoogleDriveClient> _mockGoogleDriveClient = new();
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).Returns(([mockFolder], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).Returns(([], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).Returns(([mockFile, excludedFile], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).ReturnsAsync(([mockFolder], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).ReturnsAsync(([], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).ReturnsAsync(([mockFile, excludedFile], false));
 
             GoogleAPIService _googleAPI = new(_MockLogger.Object, _MockCredentialProvider.Object, _mockGoogleDriveClient.Object, _MockUserNotifier.Object, root);
 
-            List<FileModel> files = _googleAPI.GetData();
+            List<FileModel> files = await _googleAPI.GetData();
 
             Assert.AreEqual(1, files.Count);
 
@@ -231,7 +242,7 @@ namespace GoogleDriveSync.Tests.Services
         /// Checks whether the GetData method returns the expected list.
         /// </summary>
         [TestMethod]
-        public void TestGetDataExcludedFolder()
+        public async Task TestGetDataExcludedFolder()
         {
             string root = "bbe016edbc66f26f71ba7d8c445af164c2f305421f62ac4261f6122ab8b08ead";
 
@@ -259,13 +270,13 @@ namespace GoogleDriveSync.Tests.Services
             AppSettingsModel.IgnoreFolders = [excludedSub.Name];
 
             Mock<IGoogleDriveClient> _mockGoogleDriveClient = new();
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).Returns(([mockFolder], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).Returns(([excludedSub], false));
-            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).Returns(([mockFile], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(null)).ReturnsAsync(([mockFolder], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFolders(root)).ReturnsAsync(([excludedSub], false));
+            _mockGoogleDriveClient.Setup(gdc => gdc.GetFiles(root)).ReturnsAsync(([mockFile], false));
 
             GoogleAPIService _googleAPI = new(_MockLogger.Object, _MockCredentialProvider.Object, _mockGoogleDriveClient.Object, _MockUserNotifier.Object, root);
 
-            List<FileModel> files = _googleAPI.GetData();
+            List<FileModel> files = await _googleAPI.GetData();
 
             Assert.AreEqual(1, files.Count);
 

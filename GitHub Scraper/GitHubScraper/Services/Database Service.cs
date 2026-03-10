@@ -33,7 +33,7 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Gets the last time the application was run for the given repository.
         /// </summary>
-        public DateTime GetLastRunDate(string repository)
+        public async Task<DateTime> GetLastRunDate(string repository)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the last run date for repository {repository}");
 
@@ -41,7 +41,7 @@ namespace GitHubScraper.Services
 
             try
             {
-                string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\GetLastRunDate.sql");
+                string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\GetLastRunDate.sql");
                 SqlParameter[] parameters =
                 [
                     new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = repository }
@@ -78,7 +78,7 @@ namespace GitHubScraper.Services
         /// <summary>
         ///  Gets the existing issues for the given repository.
         /// </summary>
-        public List<IssueModel> GetIssues(string repository)
+        public async Task<List<IssueModel>> GetIssues(string repository)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the existing issues for repository {repository}");
 
@@ -86,7 +86,7 @@ namespace GitHubScraper.Services
 
             try
             {
-                string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\GetIssues.sql");
+                string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\GetIssues.sql");
                 SqlParameter[] parameters =
                 [
                     new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = repository }
@@ -130,7 +130,7 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Outputs the issues to the database.
         /// </summary>
-        public void OutputIssues(string repository, List<IssueModel> issues)
+        public async Task OutputIssues(string repository, List<IssueModel> issues)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {issues.Count} issue(s) for repository {repository}");
 
@@ -143,7 +143,7 @@ namespace GitHubScraper.Services
 
                 try
                 {
-                    string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputIssue.sql");
+                    string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\OutputIssue.sql");
                     SqlParameter[] parameters =
                     [
                         new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = issue.Repository },
@@ -198,7 +198,7 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Outputs the commits to the database.
         /// </summary>
-        public void OutputCommits(string repository, List<CommitModel> commits)
+        public async Task OutputCommits(string repository, List<CommitModel> commits)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {commits.Count} commit(s) for repository {repository}");
 
@@ -211,7 +211,7 @@ namespace GitHubScraper.Services
 
                 try
                 {
-                    string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputCommit.sql");
+                    string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\OutputCommit.sql");
                     SqlParameter[] parameters =
                     [
                         new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = commit.Repository },
@@ -262,7 +262,7 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Outputs the pull requests to the database.
         /// </summary>
-        public void OutputPullRequests(string repository, List<PullRequestModel> pullRequests)
+        public async Task OutputPullRequests(string repository, List<PullRequestModel> pullRequests)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {pullRequests.Count} pull request(s) for repository {repository}");
 
@@ -275,7 +275,7 @@ namespace GitHubScraper.Services
 
                 try
                 {
-                    string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputPullRequest.sql");
+                    string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\OutputPullRequest.sql");
                     SqlParameter[] parameters =
                     [
                         new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = pullRequest.Repository },
@@ -331,7 +331,7 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Outputs the workflow runs to the database.
         /// </summary>
-        public void OutputWorkflowRuns(string repository, WorkflowModel workflow)
+        public async Task OutputWorkflowRuns(string repository, WorkflowModel workflow)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {workflow.WorkflowRuns.Count} workflow run(s) for {workflow.Name} workflow in repository {repository}");
 
@@ -344,7 +344,7 @@ namespace GitHubScraper.Services
 
                 try
                 {
-                    string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputWorkflowRun.sql");
+                    string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\OutputWorkflowRun.sql");
                     SqlParameter[] parameters =
                     [
                         new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = workflowRun.RepositoryName },
@@ -400,7 +400,7 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Outputs the releases to the database.
         /// </summary>
-        public void OutputReleases(string repository, List<ReleaseModel> releases)
+        public async Task OutputReleases(string repository, List<ReleaseModel> releases)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {releases.Count} release(s) for repository {repository}");
 
@@ -413,7 +413,7 @@ namespace GitHubScraper.Services
 
                 try
                 {
-                    string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputRelease.sql");
+                    string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\OutputRelease.sql");
                     SqlParameter[] parameters =
                     [
                         new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = release.Repository },
@@ -468,7 +468,7 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Updates or inserts the issue aggregate record in the database.
         /// </summary>
-        public void LogIssueAggregates(string repository, List<IssueAggregateModel> issueAggregates)
+        public async Task LogIssueAggregates(string repository, List<IssueAggregateModel> issueAggregates)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging {issueAggregates.Count} issue aggregate(s) for repository {repository}");
 
@@ -481,7 +481,7 @@ namespace GitHubScraper.Services
 
                 try
                 {
-                    string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\LogIssueAggregate.sql");
+                    string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\LogIssueAggregate.sql");
                     SqlParameter[] parameters =
                     [
                         new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = repository },
@@ -528,13 +528,13 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Logs the run to the database.
         /// </summary>
-        public void LogRun(string repository, int issues, int commits, int pullRequests, int workflowRuns, int releases)
+        public async Task LogRun(string repository, int issues, int commits, int pullRequests, int workflowRuns, int releases)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging run for repository {repository}");
 
             try
             {
-                string sql = _FileSystem.ReadAllText($@"{_Options.SQLFiles}\LogRun.sql");
+                string sql = await _FileSystem.ReadAllTextAsync($@"{_Options.SQLFiles}\LogRun.sql");
                 SqlParameter[] parameters =
                 [
                     new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = repository },

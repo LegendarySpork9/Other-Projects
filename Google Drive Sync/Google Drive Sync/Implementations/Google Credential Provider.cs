@@ -1,4 +1,4 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+// Copyright © - Unpublished - Toby Hunter
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Util.Store;
@@ -8,6 +8,7 @@ using GoogleDriveSync.Models;
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GoogleDriveSync.Implementations
 {
@@ -30,7 +31,7 @@ namespace GoogleDriveSync.Implementations
         /// <summary>
         /// Generates credentials from the specified json file.
         /// </summary>
-        public (UserCredential, bool) GetCredentials()
+        public async Task<(UserCredential, bool)> GetCredentials()
         {
             UserCredential credential = null;
             bool hasErrored = false;
@@ -41,13 +42,13 @@ namespace GoogleDriveSync.Implementations
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Opened stream to Google Drive OAuth Credentials");
 
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.FromStream(credentialsStream).Secrets,
                     new[] { DriveService.Scope.Drive },
                     "user",
                     CancellationToken.None,
                     new FileDataStore("token.json", true)
-                ).Result;
+                );
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Generated User Credentials");
             }
