@@ -1,5 +1,5 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Functions;
+using ServerStatusCommon.Functions;
 
 namespace ServerSite.Tests.Common.Functions
 {

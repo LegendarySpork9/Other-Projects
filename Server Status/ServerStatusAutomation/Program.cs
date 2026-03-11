@@ -1,45 +1,51 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteAutomation.Services;
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Functions;
-using ServerSiteCommon.Models;
-using ServerSiteCommon.Services;
+using ServerStatusAutomation.Services;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Functions;
+using ServerStatusCommon.Implementations;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Services;
 using System.Reflection;
 
-namespace ServerSiteAutomation
+namespace ServerStatusAutomation
 {
     internal class Program
     {
-        // Configures the application at startup.
-        static void Main(string[] args)
+        /// <summary>
+        /// Configures the application at startup.
+        /// </summary>
+        static async Task Main(string[] args)
         {
             log4net.Config.XmlConfigurator.Configure();
 
-            LoggerService _loggerService = new();
-            _loggerService.ChangeIdentifier("Automation");
+            ILoggerService _logger = new LoggerServiceWrapper();
+            _logger.ChangeIdentifier("Automation");
+
             SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig($"{Assembly.GetExecutingAssembly().Location}.config"));
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Webhook URL: {sharedSettings.WebhookURL}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient Id: {sharedSettings.RecipientId}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Base URL: {sharedSettings.BaseURL}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Credentials: {sharedSettings.Credentials}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Endpoints: {sharedSettings.Endpoints}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Payload Location: {sharedSettings.PayloadLocation}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Time: {sharedSettings.RefreshTime}");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Webhook URL: {sharedSettings.WebhookURL}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient Id: {sharedSettings.RecipientId}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Base URL: {sharedSettings.BaseURL}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Credentials: {sharedSettings.Credentials}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Payload Location: {sharedSettings.PayloadLocation}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Time: {sharedSettings.RefreshTime}");
 
-            AutomationService _automationService = new(sharedSettings);
-            _automationService.SetLogger(_loggerService);
+            IClock _clock = new SystemClockProvider();
+            APIClientWrapper _apiClient = new(_logger, new FileSystemWrapper(), sharedSettings);
+            APIService _apiService = new(_logger, _apiClient, _clock);
+            AutomationService _automationService = new(_logger, _clock, new HTTPClientWrapper(_logger), _apiService, sharedSettings);
             _automationService.Setup();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
 
-            _automationService.Start();
+            await _automationService.Start();
 
             Console.ReadLine();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
         }
     }
 }

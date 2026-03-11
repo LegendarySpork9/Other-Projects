@@ -1,118 +1,137 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Functions;
-using ServerSiteCommon.Models;
-using ServerSiteCommon.Models.API;
-using ServerSiteCommon.Models.Data;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Functions;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Models.API;
+using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Services;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
-namespace ServerSiteAutomation.Services
+namespace ServerStatusAutomation.Services
 {
     public class AutomationService
     {
-        private LoggerService Logger = new();
-        private readonly APIService APIService;
-        private SharedSettingsModel SharedSettings;
+        private readonly ILoggerService _Logger;
+        private readonly IClock _Clock;
+        private readonly IHTTPClient _HTTPClient;
+        private readonly APIService _APIService;
+        private readonly SharedSettingsModel SharedSettings;
+
         private Timer RefreshTimer;
         private DateTime NextElapse;
 
         // Sets the class's global variables.
-        public AutomationService(SharedSettingsModel sharedSettings)
+        public AutomationService(
+            ILoggerService _logger,
+            IClock _clock,
+            IHTTPClient _httpClient,
+            APIService _apiService,
+            SharedSettingsModel sharedSettings)
         {
+            _Logger = _logger;
+            _Clock = _clock;
+            _HTTPClient = _httpClient;
+            _APIService = _apiService;
             SharedSettings = sharedSettings;
-            APIService = new(sharedSettings);
         }
 
-        // Sets the logger.
-        public void SetLogger(LoggerService _loggerService)
-        {
-            Logger = _loggerService;
-        }
-
-        // Configures the timer and API service logger.
+        /// <summary>
+        /// Configures the timer and API service logger.
+        /// </summary>
         public void Setup()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Automation Service");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Automation Service");
 
             RefreshTimer = new()
             {
                 AutoReset = false
             };
-            RefreshTimer.Elapsed += (sender, e) => TimerElapsed(sender, e);
+            RefreshTimer.Elapsed += async (sender, e) => await TimerElapsed(sender, e);
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {SharedSettings.RefreshTime} minutes");
-
-            APIService.SetLogger(Logger);
-
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Automation Service");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {SharedSettings.RefreshTime} minutes");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Automation Service");
         }
 
         // Performs the first run and starts the timer.
-        public void Start()
+        public async Task Start()
         {
-            Run();
+            TimerFunction _timerFunction = new(_Clock);
 
-            DateTime currentTime = DateTime.UtcNow;
+            await Run();
+
+            DateTime currentTime = _Clock.UtcNow;
             NextElapse = currentTime.AddMinutes(SharedSettings.RefreshTime).AddMilliseconds(-currentTime.Millisecond);
 
-            RefreshTimer.Interval = TimerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
+            RefreshTimer.Interval = _timerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
         // Performs a run then restarts the timer.
-        private void TimerElapsed(object? sender, ElapsedEventArgs e)
+        private async Task TimerElapsed(object? sender, ElapsedEventArgs e)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {APIService.ExpiryTime}");
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {DateTime.UtcNow}");
+            TimerFunction _timerFunction = new(_Clock);
 
-            NextElapse = NextElapse.AddMinutes(SharedSettings.RefreshTime);
+            try
+            {
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {_APIService.ExpiryTime}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {_Clock.UtcNow}");
 
-            Run();
+                NextElapse = NextElapse.AddMinutes(SharedSettings.RefreshTime);
 
-            RefreshTimer.Interval = TimerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
-            RefreshTimer.Start();
+                await Run();
+
+                RefreshTimer.Interval = _timerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
+                RefreshTimer.Start();
+            }
+
+            catch (Exception ex)
+            {
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+            }
         }
 
-        // Runs the status checks.
-        private void Run()
+        /// <summary>
+        /// Runs the status checks.
+        /// </summary>
+        private async Task Run()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Running Automatic Status Checks");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Running Automatic Status Checks");
 
-            List<ServerModel> servers = APIService.GetServers();
-            List<APIStatusModel> pcStatuses = APIService.GetServerStatuses("PC Status");
-            List<APIStatusModel> serverStatuses = APIService.GetServerStatuses("Server Status");
-            List<APIStatusModel> connectionStatuses = APIService.GetServerStatuses("Connection Status");
-            APIAlertsModel alerts = APIService.GetAlerts(1);
+            List<ServerModel> servers = await _APIService.GetServers();
+            List<APIStatusModel> pcStatuses = await _APIService.GetServerStatuses("PC Status");
+            List<APIStatusModel> serverStatuses = await _APIService.GetServerStatuses("Server Status");
+            List<APIStatusModel> connectionStatuses = await _APIService.GetServerStatuses("Connection Status");
+            APIAlertsModel alerts = await _APIService.GetAlerts(1);
 
             foreach (ServerModel server in servers)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking Status for {server.HostName} - {server.Game} ({server.GameVersion})");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking Status for {server.HostName} - {server.Game} ({server.GameVersion})");
 
                 APIStatusModel? pcStatus = pcStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
                 APIStatusModel? serverStatus = serverStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
                 APIStatusModel? connectionStatus = connectionStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
 
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current PC Status: {pcStatus?.Status ?? StandardValues.MissingValues.Status}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Connection Status: {connectionStatus?.Status ?? StandardValues.MissingValues.Status}");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Server Status: {serverStatus?.Status ?? StandardValues.MissingValues.Status}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current PC Status: {pcStatus?.Status ?? StandardValues.MissingValues.Status}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Connection Status: {connectionStatus?.Status ?? StandardValues.MissingValues.Status}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Server Status: {serverStatus?.Status ?? StandardValues.MissingValues.Status}");
 
-                DateTime now = DateTime.UtcNow;
+                DateTime now = _Clock.UtcNow;
                 DateTime refreshPeriod = now.AddMinutes(-SharedSettings.RefreshTime);
 
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Period: {refreshPeriod} -> {now}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Period: {refreshPeriod} -> {now}");
 
                 DateTime? downtime = null;
 
                 if (server.Downtime != null)
                 {
                     TimeSpan time = TimeSpan.Parse(server.Downtime.Time);
-                    downtime = DateTime.UtcNow.Date.Add(time);
-                    downtime = DateTime.SpecifyKind((DateTime)downtime, DateTimeKind.Utc);
+                    downtime = _Clock.UtcNow.Date.Add(time);
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Downtime Period: {downtime} -> {downtime.Value.AddMinutes(10)}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Downtime Period: {downtime} -> {downtime.Value.AddMinutes(10)}");
                 }
 
                 if (pcStatus != null && (pcStatus.DateOccured < refreshPeriod || server.Statuses[0].Status != "Online"))
@@ -121,12 +140,12 @@ namespace ServerSiteAutomation.Services
                     {
                         server.Statuses[0].Status = "Unknown";
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated PC Status to Unknown");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated PC Status to Unknown");
                     }
 
                     if (downtime == null || (pcStatus.DateOccured < downtime || pcStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        AlertsHandler(alerts.Alerts, server, pcStatus.Component, server.Statuses[0].Status);
+                        await AlertsHandler(alerts.Alerts, server, pcStatus.Component, server.Statuses[0].Status);
                     }
 
                     if (pcStatus.DateOccured < refreshPeriod)
@@ -143,9 +162,9 @@ namespace ServerSiteAutomation.Services
                             }
                         };
 
-                        if (APIService.RegisterServerEvent(newStatus))
+                        if (await _APIService.RegisterServerEvent(newStatus))
                         {
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
                         }
                     }
                 }
@@ -156,12 +175,12 @@ namespace ServerSiteAutomation.Services
                     {
                         server.Statuses[1].Status = "Unknown";
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Server Status to Unknown");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Server Status to Unknown");
                     }
 
                     if (downtime == null || (serverStatus.DateOccured < downtime || serverStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        AlertsHandler(alerts.Alerts, server, serverStatus.Component, server.Statuses[1].Status);
+                        await AlertsHandler(alerts.Alerts, server, serverStatus.Component, server.Statuses[1].Status);
                     }
 
                     if (serverStatus.DateOccured < refreshPeriod)
@@ -178,9 +197,9 @@ namespace ServerSiteAutomation.Services
                             }
                         };
 
-                        if (APIService.RegisterServerEvent(newStatus))
+                        if (await _APIService.RegisterServerEvent(newStatus))
                         {
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
                         }
                     }
                 }
@@ -191,12 +210,12 @@ namespace ServerSiteAutomation.Services
                     {
                         server.Statuses[2].Status = "Unknown";
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Connection Status to Unknown");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Connection Status to Unknown");
                     }
 
                     if (downtime == null || (connectionStatus.DateOccured < downtime || connectionStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        AlertsHandler(alerts.Alerts, server, connectionStatus.Component, server.Statuses[2].Status);
+                        await AlertsHandler(alerts.Alerts, server, connectionStatus.Component, server.Statuses[2].Status);
                     }
 
                     if (connectionStatus.DateOccured < refreshPeriod)
@@ -213,24 +232,25 @@ namespace ServerSiteAutomation.Services
                             }
                         };
 
-                        if (APIService.RegisterServerEvent(newStatus))
+                        if (await _APIService.RegisterServerEvent(newStatus))
                         {
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
                         }
                     }
                 }
 
-                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checked Status for {server.HostName} - {server.Game} ({server.GameVersion})");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checked Status for {server.HostName} - {server.Game} ({server.GameVersion})");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Ran Automatic Status Checks");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Ran Automatic Status Checks");
         }
 
-        // Raises an alert if an unresolved one is not found.
-        private void AlertsHandler(List<AlertModel> alerts, ServerModel server, string component, string status)
+        /// <summary>
+        /// Raises an alert if an unresolved one is not found.
+        /// </summary>
+        private async Task AlertsHandler(List<AlertModel> alerts, ServerModel server, string component, string status)
         {
-            DiscordService _discordService = new(SharedSettings);
-            _discordService.SetLogger(Logger);
+            DiscordService _discordService = new(_Logger, _HTTPClient, SharedSettings);
 
             bool alertFound = false;
 
@@ -253,17 +273,17 @@ namespace ServerSiteAutomation.Services
                             GameVersion = server.GameVersion
                         };
 
-                        if (APIService.RegisterAlert(newAlert))
+                        if (await _APIService.RegisterAlert(newAlert))
                         {
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
                         }
 
-                        _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: {status}");
+                        await _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: {status}");
                     }
 
                     else
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Existing Alert Found");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Existing Alert Found");
                     }
 
                     break;
@@ -272,7 +292,7 @@ namespace ServerSiteAutomation.Services
 
             if (!alertFound)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "No Alerts Found in API");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "No Alerts Found in API");
 
                 APINewAlertsModel newAlert = new()
                 {
@@ -285,12 +305,12 @@ namespace ServerSiteAutomation.Services
                     GameVersion = server.GameVersion
                 };
 
-                if (APIService.RegisterAlert(newAlert))
+                if (await _APIService.RegisterAlert(newAlert))
                 {
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
                 }
 
-                _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: {status}");
+                await _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: {status}");
             }
         }
     }

@@ -1,10 +1,11 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Models;
-using ServerSiteCommon.Models.API;
-using ServerSiteCommon.Models.Data;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Models.API;
+using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Services;
 using ServerStatusSite.Converters;
 
 namespace ServerStatusSite.Components.Pages.Alerts
@@ -12,15 +13,18 @@ namespace ServerStatusSite.Components.Pages.Alerts
     public partial class RegisterAlert : ComponentBase
     {
         [Inject]
-        private LoggerService Logger { get; set; }
+        private ILoggerService _Logger { get; set; } = default!;
         [Inject]
-        private APIService APIService { get; set; }
+        private IHTTPClient _HTTPClient { get; set; } = default!;
         [Inject]
-        private SharedSettingsModel SharedSettings { get; set; }
+        private APIService APIService { get; set; } = default!;
         [Inject]
-        private NavigationManager Navigation { get; set; }
+        private SharedSettingsModel SharedSettings { get; set; } = default!;
         [Inject]
-        private UserModel User { get; set; }
+        private NavigationManager Navigation { get; set; } = default!;
+        [Inject]
+        private UserModel User { get; set; } = default!;
+
         private List<ServerModel> Servers = [];
         private List<string> ServersNames = [];
         private string Server { get; set; } = string.Empty;
@@ -29,12 +33,14 @@ namespace ServerStatusSite.Components.Pages.Alerts
         private bool ShowError { get; set; } = false;
         private bool Loading { get; set; } = false;
 
-        // Loads the servers from the API.
-        protected override void OnInitialized()
+        /// <summary>
+        /// Loads the servers from the API.
+        /// </summary>
+        protected override async Task OnInitializedAsync()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Register Alerts Page");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Register Alerts Page");
 
-            Servers = APIService.GetServers();
+            Servers = await APIService.GetServers();
 
             foreach (ServerModel server in Servers)
             {
@@ -42,31 +48,35 @@ namespace ServerStatusSite.Components.Pages.Alerts
             }
         }
 
-        // Returns the css to change the page to dark mode.
+        /// <summary>
+        /// Returns the css to change the page to dark mode.
+        /// </summary>
         public string GetStyle(string component)
         {
-            StyleConverter _styleConverter = new();
-
             return component switch
             {
-                "Form" => _styleConverter.GetFormDarkMode(User.DarkMode),
-                "Input" => _styleConverter.GetInputDarkMode(User.DarkMode),
+                "Form" => StyleConverter.GetFormDarkMode(User.DarkMode),
+                "Input" => StyleConverter.GetInputDarkMode(User.DarkMode),
                 _ => string.Empty
             };
         }
 
-        // Adds an alert to the API.
+        /// <summary>
+        /// Adds an alert to the API.
+        /// </summary>
         private async Task RegisterClick()
         {
-            APIAlertsModel alerts = await APIService.GetAlertsAsync(1);
+            Loading = true;
+            StateHasChanged();
+
+            APIAlertsModel alerts = await APIService.GetAlerts(1);
             AlertModel? alert = alerts.Alerts.Find(c => c.Server == Server && c.Component == Component && c.AlertStatus != "Resolved");
 
             if (alert == null)
             {
-                DiscordService _discordService = new(SharedSettings);
-                _discordService.SetLogger(Logger);
+                DiscordService _discordService = new(_Logger, _HTTPClient, SharedSettings);
 
-                Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Register");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Register");
 
                 string[] gameDetails = Server.Split('(');
                 ServerModel? server = Servers.Find(c => c.Game == gameDetails[0].Trim() && c.GameVersion == gameDetails[1].Replace(")", ""));
@@ -82,21 +92,21 @@ namespace ServerStatusSite.Components.Pages.Alerts
                     GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
                 };
 
-                if (await APIService.RegisterAlertAsync(newAlert))
+                if (await APIService.RegisterAlert(newAlert))
                 {
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
                 }
 
-                Logger.LogMessage(StandardValues.LoggerValues.Info, "Alert Register Complete");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Alert Register Complete");
 
                 if (SharedSettings.RecipientIds.Contains(','))
                 {
-                    await _discordService.SendNotificationAsync(SharedSettings.RecipientIds.Split(',')[0], $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                    await _discordService.SendNotification(SharedSettings.RecipientIds.Split(',')[0], $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
                 }
 
                 else
                 {
-                    await _discordService.SendNotificationAsync(SharedSettings.RecipientIds, $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
+                    await _discordService.SendNotification(SharedSettings.RecipientIds, $"{User.DiscordName} has reported an issue with the {Server} server. {Component}: {ComponentStatus}");
                 }
 
                 Navigation.NavigateTo("/alerts");
@@ -105,6 +115,8 @@ namespace ServerStatusSite.Components.Pages.Alerts
             else
             {
                 ShowError = true;
+                Loading = false;
+                StateHasChanged();
             }
         }
     }

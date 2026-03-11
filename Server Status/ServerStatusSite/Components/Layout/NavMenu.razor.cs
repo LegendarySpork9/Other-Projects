@@ -1,6 +1,6 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerSiteCommon.Models.Data;
+using ServerStatusCommon.Models.Data;
 using ServerStatusSite.Converters;
 
 namespace ServerStatusSite.Components.Layout
@@ -8,7 +8,7 @@ namespace ServerStatusSite.Components.Layout
     public partial class NavMenu
     {
         [Inject]
-        private UserModel User { get; set; }
+        private UserModel User { get; set; } = default!;
 
         // Subscribes the layout to the DarkMode event.
         protected override void OnInitialized()
@@ -19,12 +19,10 @@ namespace ServerStatusSite.Components.Layout
         // Returns the CSS to change the menu to dark mode.
         private string GetStyle(string? component = null)
         {
-            StyleConverter _styleConverter = new();
-
             return component switch
             {
-                "Corner" => _styleConverter.GetTopBarDarkMode(User.DarkMode),
-                _ => _styleConverter.GetNavMenuDarkMode(User.DarkMode)
+                "Corner" => StyleConverter.GetTopBarDarkMode(User.DarkMode),
+                _ => StyleConverter.GetNavMenuDarkMode(User.DarkMode)
             };
         }
 

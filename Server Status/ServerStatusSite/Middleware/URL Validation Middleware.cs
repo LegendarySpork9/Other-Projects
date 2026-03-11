@@ -1,5 +1,5 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Models;
+using ServerStatusCommon.Models;
 
 namespace ServerStatusSite.Middleware
 {
@@ -15,7 +15,9 @@ namespace ServerStatusSite.Middleware
             Next = next;
         }
 
-        // Directs the user to the login page if they come from a link outside the website.
+        /// <summary>
+        /// Directs the user to the login page if they come from a link outside the website.
+        /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
             string referer = context.Request.Headers.Referer.ToString();

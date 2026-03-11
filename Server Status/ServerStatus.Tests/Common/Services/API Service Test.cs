@@ -1,9 +1,10 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Moq;
-using ServerSiteCommon.Functions;
-using ServerSiteCommon.Models.API;
 using ServerSiteCommon.Models.Data;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Functions;
+using ServerStatusCommon.Models.API;
+using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Services;
 using ServerStatusSite.Functions;
 
 namespace ServerSite.Tests.Common.Services

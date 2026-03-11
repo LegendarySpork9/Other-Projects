@@ -1,8 +1,8 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Moq;
-using ServerSiteReporter.Services;
-using ServerSiteCommon.Functions;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Functions;
+using ServerStatusCommon.Services;
+using ServerStatusReporter.Services;
 
 namespace ServerSite.Tests.Reporter.Services
 {

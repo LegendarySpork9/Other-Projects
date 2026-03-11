@@ -1,12 +1,14 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Models.Data;
+using ServerStatusCommon.Models.Data;
 
-namespace ServerSiteCommon.Models.API
+namespace ServerStatusCommon.Models.API
 {
-    // Stores the server alert's API response.
+    /// <summary>
+    /// Stores the server alert's API response.
+    /// </summary>
     public class APIAlertsModel
     {
-        public List<AlertModel> Alerts { get; set; } = new List<AlertModel>();
+        public List<AlertModel> Alerts { get; set; } = [];
         public bool MultiplePages { get; set; } = false;
         public int PageCount { get; set; } = 0;
         public bool APICalled { get; set; } = false;

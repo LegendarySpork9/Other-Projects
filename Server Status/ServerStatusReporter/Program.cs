@@ -1,48 +1,52 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Functions;
-using ServerSiteCommon.Models;
-using ServerSiteCommon.Services;
-using ServerSiteReporter.Models;
-using ServerSiteReporter.Services;
-using System.Configuration;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Functions;
+using ServerStatusCommon.Implementations;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Services;
+using ServerStatusReporter.Implementations;
+using ServerStatusReporter.Models;
+using ServerStatusReporter.Services;
 using System.Reflection;
 
-namespace ServerSiteReporter
+namespace ServerStatusReporter
 {
     internal class Program
     {
         // Configures the application at startup.
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             log4net.Config.XmlConfigurator.Configure();
 
-            LoggerService _loggerService = new();
-            _loggerService.ChangeIdentifier("Reporter");
+            ILoggerService _logger = new LoggerServiceWrapper();
+            _logger.ChangeIdentifier("Reporter");
+
             SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig($"{Assembly.GetExecutingAssembly().Location}.config"));
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Base URL: {sharedSettings.BaseURL}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Credentials: {sharedSettings.Credentials}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Endpoints: {sharedSettings.Endpoints}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"API Payload Location: {sharedSettings.PayloadLocation}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Time: {sharedSettings.RefreshTime}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {AppSettingsModel.HostName}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Games: {ConfigurationManager.AppSettings["Games"]}");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, $"Components: {ConfigurationManager.AppSettings["Components"]}");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Base URL: {sharedSettings.BaseURL}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Credentials: {sharedSettings.Credentials}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Payload Location: {sharedSettings.PayloadLocation}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Time: {sharedSettings.RefreshTime}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {AppSettingsModel.HostName}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Games: {string.Join(',', AppSettingsModel.Games)}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Components: {string.Join(',', AppSettingsModel.Components)}");
 
-            ApplicationService _applicationService = new(sharedSettings);
-            _applicationService.SetLogger(_loggerService);
+            IClock _clock = new SystemClockProvider();
+            APIClientWrapper _apiClient = new(_logger, new FileSystemWrapper(), sharedSettings);
+            APIService _apiService = new(_logger, _apiClient, _clock);
+            ApplicationService _applicationService = new(_logger, _clock, new TCPClientWrapper(_logger), _apiService, sharedSettings);
             _applicationService.Setup();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
 
-            _applicationService.Start();
+            await _applicationService.Start();
 
             Console.ReadLine();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Converters
+namespace ServerStatusCommon.Converters
 {
-    public class StandardValues
+    public static class StandardValues
     {
-        // Standard Logger Values.
+        /// <summary>
+        /// Standard Logger Values.
+        /// </summary>
         public static class LoggerValues
         {
             public const string Debug = "Debug";
@@ -12,7 +14,9 @@ namespace ServerSiteCommon.Converters
             public const string Warning = "Warn";
         }
 
-        // Standard Missing Values.
+        /// <summary>
+        /// Standard Missing Values.
+        /// </summary>
         public static class MissingValues
         {
             public const string DT = "01/01/1900 00:00:00";
@@ -27,24 +31,24 @@ namespace ServerSiteCommon.Converters
             public const string ResponseContent = "\"{\\\"information\\\":\\\"ResponseContentNotFound\\\"}\"";
             public const string RelatedContent = "\"{\\\"information\\\":\\\"RelatedContentNotFound\\\"}\"";
 
-            public const string AuthEndpoint = "/authorisation";
+            public const string AuthEndpoint = "/auth/token";
             public const string BearerToken = "BearerTokenNotObtained";
 
             public const string UserEndpoint = "/user";
             public const string Username = "UsernameNotObtained";
             public const string Password = "PasswordNotObtained";
 
-            public const string SettingsEndpoint = "/settings";
+            public const string SettingsEndpoint = "/usersettings";
             public const string SettingStringValue = "ValueNotFound";
             public const string SettingBoolValue = "false";
 
-            public const string ServerEndpoint = "/servers";
+            public const string ServerEndpoint = "/serverstatus/serverinformation";
 
-            public const string StatusEndpoint = "/status";
+            public const string StatusEndpoint = "/serverstatus/serverevent?";
             public const string Component = "PC";
             public const string Status = "Offline";
 
-            public const string AlertEndpoint = "/alerts";
+            public const string AlertEndpoint = "/serverstatus/serveralert";
             public const string Reporter = "ReporterNotFound";
             public const string AlertStatus = "Reported";
         }

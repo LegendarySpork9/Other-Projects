@@ -1,7 +1,7 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using FluentAssertions;
-using ServerSiteCommon.Functions;
-using ServerSiteCommon.Models;
+using ServerStatusCommon.Functions;
+using ServerStatusCommon.Models;
 using System.Configuration;
 
 namespace ServerSite.Tests.Common.Functions

@@ -1,12 +1,25 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Functions
+using ServerStatusCommon.Abstractions;
+
+namespace ServerStatusCommon.Functions
 {
-    public static class TimerFunction
+    public class TimerFunction
     {
-        // Calculates the timer duration.
-        public static TimeSpan GetTimerInterval(DateTime nextElapse)
+        private readonly IClock _Clock;
+
+        // Sets the class's global variables.
+        public TimerFunction(
+            IClock _clock)
         {
-            TimeSpan interval = nextElapse - DateTime.UtcNow;
+            _Clock = _clock;
+        }
+
+        /// <summary>
+        /// Calculates the timer duration.
+        /// </summary>
+        public TimeSpan GetTimerInterval(DateTime nextElapse)
+        {
+            TimeSpan interval = nextElapse - _Clock.UtcNow;
 
             if (interval < TimeSpan.Zero)
             {

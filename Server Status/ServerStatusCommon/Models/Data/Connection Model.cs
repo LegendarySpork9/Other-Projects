@@ -1,7 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Models.Data
+namespace ServerStatusCommon.Models.Data
 {
-    // Stores the connection data.
+    /// <summary>
+    /// Stores the connection data.
+    /// </summary>
     public class ConnectionModel
     {
         public string IPAddress { get; set; }

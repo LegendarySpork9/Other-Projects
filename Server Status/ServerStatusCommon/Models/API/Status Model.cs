@@ -1,7 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Models.API
+namespace ServerStatusCommon.Models.API
 {
-    // Stores the server events's API response.
+    /// <summary>
+    /// Stores the server events's API response.
+    /// </summary>
     public class APIStatusModel
     {
         public string Component { get; set; }

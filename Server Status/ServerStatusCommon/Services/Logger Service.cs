@@ -1,20 +1,24 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using log4net;
 
-namespace ServerSiteCommon.Services
+namespace ServerStatusCommon.Services
 {
     public class LoggerService
     {
         private readonly ILog Logger = LogManager.GetLogger("Logs");
         private string Identifier = "System";
 
-        // Updates the value of the Identifier variable.
+        /// <summary>
+        /// Updates the value of the Identifier variable.
+        /// </summary>
         public void ChangeIdentifier(string value)
         {
             Identifier = value;
         }
 
-        // Sends a meessage to the specified logs.
+        /// <summary>
+        /// Sends a meessage to the specified logs.
+        /// </summary>
         public void LogMessage(string level, string message)
         {
             switch (level)

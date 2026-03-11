@@ -1,5 +1,5 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
-namespace GitHubScraper.Abstractions
+namespace ServerStatusCommon.Abstractions
 {
     /// <summary>
     /// Interface for the file system operations.

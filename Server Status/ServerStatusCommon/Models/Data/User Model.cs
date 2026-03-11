@@ -1,7 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Models.Data
+namespace ServerStatusCommon.Models.Data
 {
-    // Stores the user data and DarkMode event
+    /// <summary>
+    /// Stores the user data and DarkMode event
+    /// </summary>
     public class UserModel
     {
         public event Action? OnDarkModeChanged;

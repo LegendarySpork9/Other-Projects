@@ -4,19 +4,20 @@ using System.Text;
 
 namespace ServerStatusSite.Functions
 {
-    public class HashFunction
+    public static class HashFunction
     {
-        // Converts the given string to its hashed value.
-        public string HashString(string value)
+        /// <summary>
+        /// Converts the given string to its hashed value.
+        /// </summary>
+        public static string HashString(string value)
         {
             string hashString = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(value))
             {
-                StringBuilder hashedValue = new StringBuilder();
-                SHA512 shaHash = SHA512.Create();
+                StringBuilder hashedValue = new();
 
-                byte[] hashBytes = shaHash.ComputeHash(Encoding.UTF8.GetBytes(value));
+                byte[] hashBytes = SHA512.HashData(Encoding.UTF8.GetBytes(value));
 
                 for (int i = 0; i < hashBytes.Length; i++)
                 {

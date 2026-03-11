@@ -1,9 +1,10 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Models;
-using ServerSiteCommon.Models.Data;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Services;
 using ServerStatusSite.Converters;
 
 namespace ServerStatusSite.Components.Pages.Alerts
@@ -11,24 +12,29 @@ namespace ServerStatusSite.Components.Pages.Alerts
     public partial class EditAlert : ComponentBase
     {
         [Inject]
-        private LoggerService Logger { get; set; }
+        private ILoggerService _Logger { get; set; } = default!;
         [Inject]
-        private APIService APIService { get; set; }
+        private IHTTPClient _HTTPClient { get; set; } = default!;
         [Inject]
-        private SharedSettingsModel SharedSettings { get; set; }
+        private NavigationManager Navigation { get; set; } = default!;
         [Inject]
-        private NavigationManager Navigation { get; set; }
+        private APIService APIService { get; set; } = default!;
         [Inject]
-        private UserModel User { get; set; }
+        private SharedSettingsModel SharedSettings { get; set; } = default!;
+        [Inject]
+        private UserModel User { get; set; } = default!;
+
         private AlertModel Alert { get; set; } = new();
         private int AlertId { get; set; } = 0;
         private bool Loading { get; set; } = false;
 
-        // Gets the data about the given alert.
-        protected override void OnInitialized()
+        /// <summary>
+        /// Gets the data about the given alert.
+        /// </summary>
+        protected override async Task OnInitializedAsync()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Edit Alerts Page");
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Url: {Navigation.Uri}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Edit Alerts Page");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Url: {Navigation.Uri}");
 
             Uri uri = Navigation.ToAbsoluteUri(Navigation.Uri);
             var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
@@ -37,48 +43,52 @@ namespace ServerStatusSite.Components.Pages.Alerts
             {
                 AlertId = int.Parse(alertId.ToString() ?? "0");
 
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {AlertId}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {AlertId}");
             }
 
-            Alert = APIService.GetAlert(AlertId);
+            Alert = await APIService.GetAlert(AlertId);
         }
 
-        // Returns the CSS to change the page to dark mode.
+        /// <summary>
+        /// Returns the CSS to change the page to dark mode.
+        /// </summary>
         public string GetStyle(string component)
         {
-            StyleConverter _styleConverter = new();
-
             return component switch
             {
-                "Form" => _styleConverter.GetFormDarkMode(User.DarkMode),
-                "Input" => _styleConverter.GetInputDarkMode(User.DarkMode),
+                "Form" => StyleConverter.GetFormDarkMode(User.DarkMode),
+                "Input" => StyleConverter.GetInputDarkMode(User.DarkMode),
                 _ => string.Empty
             };
         }
 
-        // Updates the alert data then sends the user back to the alerts page. 
+        /// <summary>
+        /// Updates the alert data then sends the user back to the alerts page. 
+        /// </summary>
         private async Task SaveClick()
         {
-            DiscordService _discordService = new(SharedSettings);
-            _discordService.SetLogger(Logger);
+            Loading = true;
+            StateHasChanged();
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Save");
+            DiscordService _discordService = new(_Logger, _HTTPClient, SharedSettings);
+
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Alert Save");
 
             if (await APIService.UpdateAlert(AlertId, Alert.AlertStatus))
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Status Updated");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Status Updated");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Alert Save Complete");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Alert Save Complete");
 
             if (SharedSettings.RecipientIds.Contains(','))
             {
-                await _discordService.SendNotificationAsync(SharedSettings.RecipientIds.Split(',')[1], $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
+                await _discordService.SendNotification(SharedSettings.RecipientIds.Split(',')[1], $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
             }
 
             else
             {
-                await _discordService.SendNotificationAsync(SharedSettings.RecipientIds, $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
+                await _discordService.SendNotification(SharedSettings.RecipientIds, $"{User.DiscordName} has updated the alert for {Alert.Server} - {Alert.Component} to the status {Alert.AlertStatus}.");
             }
 
             Navigation.NavigateTo("/alerts");

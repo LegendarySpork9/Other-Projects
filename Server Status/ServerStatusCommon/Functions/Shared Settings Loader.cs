@@ -1,21 +1,25 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Models;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Services;
 using System.Configuration;
 using System.Reflection;
 
-namespace ServerSiteCommon.Functions
+namespace ServerStatusCommon.Functions
 {
     public static class SharedSettingsLoader
     {
-        // Loads the given configuration file.
+        /// <summary>
+        /// Loads the given configuration file.
+        /// </summary>
         public static Configuration LoadConfig(string config) => ConfigurationManager.OpenMappedExeConfiguration(new ()
             {
                 ExeConfigFilename = config
     },ConfigurationUserLevel.None);
 
-        // Loads the app settings dynamically from the App.config.
+        /// <summary>
+        /// Loads the app settings dynamically from the App.config.
+        /// </summary>
         public static SharedSettingsModel LoadSettingsFromConfig(Configuration config)
         {
             LoggerService _logger = new();

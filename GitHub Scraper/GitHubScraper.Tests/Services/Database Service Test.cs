@@ -23,7 +23,7 @@ namespace GitHubScraper.Tests.Services
         public void Setup()
         {
             Date = new(2026, 03, 05, 00, 00, 00, DateTimeKind.Utc);
-            _MockFileSystem.Setup(fs => fs.ReadAllTextAsync(It.IsAny<string>())).ReturnsAsync("select 1");
+            _MockFileSystem.Setup(fs => fs.ReadAllText(It.IsAny<string>())).ReturnsAsync("select 1");
             _MockOptions.Setup(o => o.ConnectionString).Returns("This is a connection string");
             _MockOptions.Setup(o => o.SQLFiles).Returns(@"C:\SQL");
         }

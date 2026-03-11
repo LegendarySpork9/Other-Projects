@@ -1,8 +1,8 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Moq;
-using ServerSiteAutomation.Services;
-using ServerSiteCommon.Functions;
-using ServerSiteCommon.Services;
+using ServerStatusAutomation.Services;
+using ServerStatusCommon.Functions;
+using ServerStatusCommon.Services;
 
 namespace ServerSite.Tests.Automation.Services
 {

@@ -1,7 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Models.API
+namespace ServerStatusCommon.Models.API
 {
-    // Stores the body data for the server alert post.
+    /// <summary>
+    /// Stores the body data for the server alert post.
+    /// </summary>
     public class APINewAlertsModel
     {
         public string Reporter { get; set; }

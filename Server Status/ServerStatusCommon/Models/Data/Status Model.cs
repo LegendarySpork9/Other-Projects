@@ -1,7 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Models.Data
+namespace ServerStatusCommon.Models.Data
 {
-    // Stores the status data.
+    /// <summary>
+    /// Stores the status data.
+    /// </summary>
     public class StatusModel
     {
         public string Status { get; set; }

@@ -1,8 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Models.Data;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Services;
 using ServerStatusSite.Converters;
 
 namespace ServerStatusSite.Components.Pages
@@ -10,50 +11,55 @@ namespace ServerStatusSite.Components.Pages
     public partial class Account : ComponentBase
     {
         [Inject]
-        private LoggerService Logger { get; set; }
+        private ILoggerService _Logger { get; set; } = default!;
         [Inject]
-        private APIService APIService { get; set; }
-        [Inject] 
-        private UserModel User { get; set; }
+        private APIService APIService { get; set; } = default!;
+        [Inject]
+        private UserModel User { get; set; } = default!;
+
         private string Username { get; set; } = string.Empty;
         private string Password { get; set; } = string.Empty;
         private string DiscordName { get; set; } = string.Empty;
         private bool DarkMode { get; set; }
         private bool Loading { get; set; } = false;
 
-        // Loads the user data of the logged in user.
+        /// <summary>
+        /// Loads the user data of the logged in user.
+        /// </summary>
         protected override void OnInitialized()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Home Page");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Home Page");
 
             Username = User.Username;
             Password = User.Password;
             DiscordName = User.DiscordName ?? User.Username;
             DarkMode = User.DarkMode;
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Username: {Username}");
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Password: {Password}");
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Discord: {DiscordName}");
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Dark Mode: {DarkMode}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Username: {Username}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Password: {Password}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Discord: {DiscordName}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Dark Mode: {DarkMode}");
         }
 
-        // Returns the CSS to change the page to dark mode.
+        /// <summary>
+        /// Returns the CSS to change the page to dark mode.
+        /// </summary>
         public string GetStyle(string component)
         {
-            StyleConverter _styleConverter = new();
-
             return component switch
             {
-                "Form" => _styleConverter.GetFormDarkMode(User.DarkMode),
-                "Input" => _styleConverter.GetInputDarkMode(User.DarkMode),
+                "Form" => StyleConverter.GetFormDarkMode(User.DarkMode),
+                "Input" => StyleConverter.GetInputDarkMode(User.DarkMode),
                 _ => string.Empty
             };
         }
 
-        // Updates the user data.
+        /// <summary>
+        /// Updates the user data.
+        /// </summary>
         private async Task SaveClick()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting User Save");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting User Save");
 
             Loading = true;
             StateHasChanged();
@@ -64,7 +70,7 @@ namespace ServerStatusSite.Components.Pages
                 
                 if (await APIService.UpdateUser(User))
                 {
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Username Updated");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Username Updated");
                 }
             }
 
@@ -74,7 +80,7 @@ namespace ServerStatusSite.Components.Pages
 
                 if (await APIService.UpdateUser(User))
                 {
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Password Updated");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Password Updated");
                 }
             }
 
@@ -82,11 +88,11 @@ namespace ServerStatusSite.Components.Pages
             {
                 User.DiscordName = DiscordName;
 
-                int userSettingsId = APIService.GetUserSettingId(User.UserId, "DiscordName");
+                int userSettingsId = await APIService.GetUserSettingId(User.UserId, "DiscordName");
 
                 if (await APIService.UpdateUserSettings(userSettingsId, DiscordName))
                 {
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Discord Updated");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Discord Updated");
                 }
             }
 
@@ -94,15 +100,15 @@ namespace ServerStatusSite.Components.Pages
             {
                 User.DarkMode = DarkMode;
 
-                int userSettingsId = APIService.GetUserSettingId(User.UserId, "DarkMode");
+                int userSettingsId = await APIService.GetUserSettingId(User.UserId, "DarkMode");
 
                 if (await APIService.UpdateUserSettings(userSettingsId, DarkMode.ToString()))
                 {
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Discord Updated");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Discord Updated");
                 }
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "User Save Complete");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "User Save Complete");
 
             Loading = false;
         }

@@ -1,7 +1,7 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
-using GitHubScraper.Abstractions;
+using ServerStatusCommon.Abstractions;
 
-namespace GitHubScraper.Implementations
+namespace ServerStatusCommon.Implementations
 {
     public class FileSystemWrapper : IFileSystem
     {
