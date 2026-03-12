@@ -538,7 +538,7 @@ namespace ServerStatusCommon.Implementations
 
             try
             {
-                string url = BuildURL("/users");
+                string url = BuildURL("/serverstatus/serverevent");
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
 

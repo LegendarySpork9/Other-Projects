@@ -4,21 +4,27 @@ using ServerStatusCommon.Functions;
 using ServerStatusCommon.Models;
 using System.Configuration;
 
-namespace ServerSite.Tests.Common.Functions
+namespace ServerStatus.Tests.Common.Functions
 {
     [TestClass]
     public class SharedSettingsLoaderTest
     {
-        // Checks the LoadConfig method returns the correct configuration.
+        /// <summary>
+        /// Checks the LoadConfig method returns the correct configuration.
+        /// </summary>
         [TestMethod]
         public void TestLoadConfig()
         {
             Configuration result = SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\Test.config"));
 
             Assert.IsTrue(result.AppSettings.Settings.Count == 2);
+            Assert.AreEqual("This is a test", result.AppSettings.Settings["TestSetting"].Value);
+            Assert.AreEqual("Second test incoming", result.AppSettings.Settings["TestSettingTwo"].Value);
         }
 
-        // Checks the LoadConfig method fails to return a configuration.
+        /// <summary>
+        /// Checks the LoadConfig method fails to return a configuration.
+        /// </summary>
         [TestMethod]
         public void TestLoadConfigFail()
         {
@@ -27,7 +33,9 @@ namespace ServerSite.Tests.Common.Functions
             Assert.IsTrue(result.AppSettings.Settings.Count == 0);
         }
 
-        // Checks the LoadSettingsFromConfig method outputs all settings in the config.
+        /// <summary>
+        /// Checks the LoadSettingsFromConfig method outputs all settings in the config.
+        /// </summary>
         [TestMethod]
         public void TestLoadSettingsFromConfigAutomation()
         {
@@ -37,7 +45,6 @@ namespace ServerSite.Tests.Common.Functions
                 RecipientId = "test",
                 BaseURL = "https://localhost/api",
                 Credentials = "Basic TestCreds",
-                Endpoints = "Authorisation:/authorise",
                 PayloadLocation = "C:\\Server Status Site\\Payload",
                 RefreshTime = 5
             };
@@ -47,7 +54,9 @@ namespace ServerSite.Tests.Common.Functions
             result.Should().BeEquivalentTo(expectedSharedSettings);
         }
 
-        // Checks the LoadSettingsFromConfig method outputs all settings in the config.
+        /// <summary>
+        /// Checks the LoadSettingsFromConfig method outputs all settings in the config.
+        /// </summary>
         [TestMethod]
         public void TestLoadSettingsFromConfigReporter()
         {
@@ -55,7 +64,6 @@ namespace ServerSite.Tests.Common.Functions
             {
                 BaseURL = "https://localhost/api",
                 Credentials = "Basic TestCreds",
-                Endpoints = "Authorisation:/authorise",
                 PayloadLocation = "C:\\Server Status Site\\Payload",
                 RefreshTime = 5
             };

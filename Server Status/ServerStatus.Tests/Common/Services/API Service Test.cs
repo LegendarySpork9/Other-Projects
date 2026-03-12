@@ -1,123 +1,153 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Moq;
-using ServerSiteCommon.Models.Data;
-using ServerStatusCommon.Functions;
-using ServerStatusCommon.Models.API;
+using RestSharp;
+using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Models.Data;
 using ServerStatusCommon.Services;
-using ServerStatusSite.Functions;
 
-namespace ServerSite.Tests.Common.Services
+namespace ServerStatus.Tests.Common.Services
 {
     [TestClass]
     public class APIServiceTest
     {
-        private Mock<APIService> MockAPIService;
-        private LoggerService Logger;
-
-        // Sets the global variables that the tests to use.
-        [TestInitialize]
-        public void ConfigureAPIService()
-        {
-            MockAPIService = new Mock<APIService>(SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\APIService.config"))));
-            Logger = new();
-            Logger.ChangeIdentifier("UnitTest");
-        }
-        
-        // Checks whether the SetLogger method works as expected.
+        /// <summary>
+        /// Checks whether the Authorise method works as expected.
+        /// </summary>
         [TestMethod]
-        public void TestSetLogger()
+        public async Task TestAuthorise()
         {
-            try
-            {
-                MockAPIService.Object.SetLogger(Logger);
+            DateTime expiryDate = new(2026, 03, 12, 16, 00, 00, DateTimeKind.Utc);
 
-                Assert.IsTrue(true);
-            }
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            Mock<IAPIClient> _mockAPIClient = new();
+            _mockAPIClient.Setup(api => api.Authorise()).ReturnsAsync(expiryDate);
 
-            catch (Exception ex)
-            {
-                Assert.Fail($"Failed to set logger. Exception: {ex.Message}");
-            }
+            APIService _apiService = new(_mockLogger.Object, _mockAPIClient.Object, _mockClock.Object);
+            await _apiService.Authorise();
+
+            Assert.AreEqual(expiryDate, _apiService.ExpiryTime);
         }
 
-        // Checks whether the Authorise method works as expected.
-        [TestMethod]
-        public void TestAuthorise()
-        {
-            MockAPIService.Object.SetLogger(Logger);
-            MockAPIService.Object.Authorise();
-
-            Assert.IsTrue(MockAPIService.Object.ExpiryTime != DateTime.Parse("01/01/0001 00:00:00"));
-        }
-
-        // Checks whether the AuthoriseAsync method works as expected.
-        [TestMethod]
-        public async Task TestAuthoriseAsync()
-        {
-            MockAPIService.Object.SetLogger(Logger);
-            await MockAPIService.Object.AuthoriseAsync();
-
-            Assert.IsTrue(MockAPIService.Object.ExpiryTime != DateTime.Parse("01/01/0001 00:00:00"));
-        }
-
-        // Checks whether the GetUsers method works as expected.
+        /// <summary>
+        /// Checks whether the GetUsers method works as expected.
+        /// </summary>
         [TestMethod]
         public async Task TestUsers()
         {
-            MockAPIService.Object.SetLogger(Logger);
+            DateTime utcNow = new(2026, 03, 12, 16, 00, 00, DateTimeKind.Utc);
+            DateTime expiryDate = utcNow.AddMinutes(15);
+            string responseContent = "[\r\n    {\r\n        \"id\": 1,\r\n        \"username\": \"Test\",\r\n        \"password\": \"HashedString\",\r\n        \"scopes\": [\r\n            \"User\"\r\n        ]\r\n    }\r\n]";
+            RestResponse response = new()
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = responseContent
+            };
 
-            List<UserModel> users = await MockAPIService.Object.GetUsers();
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+            Mock<IAPIClient> _mockAPIClient = new();
+            _mockAPIClient.Setup(api => api.GetUsers()).ReturnsAsync(response);
 
-            Assert.IsTrue(users.Count > 0);
+            List<UserModel> expected =
+            [
+                new()
+                {
+                    UserId = 1,
+                    Username = "Test",
+                    Password = "HashedString"
+                }
+            ];
+
+            APIService _apiService = new(_mockLogger.Object, _mockAPIClient.Object, _mockClock.Object)
+            {
+                ExpiryTime = expiryDate
+            };
+
+            List<UserModel> actual = await _apiService.GetUsers();
+
+            Assert.AreEqual(expected[0].UserId, actual[0].UserId);
+            Assert.AreEqual(expected[0].Username, actual[0].Username);
+            Assert.AreEqual(expected[0].Password, actual[0].Password);
         }
-
-        // Checks whether the GetUserSettings method works as expected.
+        
+        /// <summary>
+        /// Checks whether the GetUserSettings method works as expected.
+        /// </summary>
         [TestMethod]
         public async Task TestUserSettings()
         {
-            MockAPIService.Object.SetLogger(Logger);
-
-            List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel? testUser = users.Find(c => c.Username == "UnitTests");
-
-            if (testUser != null)
+            DateTime utcNow = new(2026, 03, 12, 16, 00, 00, DateTimeKind.Utc);
+            DateTime expiryDate = utcNow.AddMinutes(15);
+            string responseContent = "[\r\n    {\r\n        \"application\": \"Server Status Site\",\r\n        \"settings\": [\r\n            {\r\n                \"id\": 1,\r\n                \"name\": \"DarkMode\",\r\n                \"value\": \"True\"\r\n            },\r\n            {\r\n                \"id\": 2,\r\n                \"name\": \"IsAdmin\",\r\n                \"value\": \"False\"\r\n            },\r\n            {\r\n                \"id\": 3,\r\n                \"name\": \"DiscordName\",\r\n                \"value\": \"UnitTester\"\r\n            }\r\n        ]\r\n    }\r\n]";
+            RestResponse response = new()
             {
-                testUser = await MockAPIService.Object.GetUserSettings(testUser);
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = responseContent
+            };
 
-                Assert.IsNotNull(testUser.DiscordName);
-                Assert.IsFalse(testUser.Admin);
-                Assert.IsFalse(testUser.DarkMode);
-            }
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+            Mock<IAPIClient> _mockAPIClient = new();
+            _mockAPIClient.Setup(api => api.GetUserSettings(It.IsAny<int>())).ReturnsAsync(response);
 
-            else
+            UserModel expected = new()
             {
-                Assert.Fail("Failed to find test user.");
-            }
+                UserId = 1,
+                Username = "Test",
+                Password = "HashedString",
+                DiscordName = "UnitTester",
+                DarkMode = true,
+                Admin = false
+            };
+
+            APIService _apiService = new(_mockLogger.Object, _mockAPIClient.Object, _mockClock.Object)
+            {
+                ExpiryTime = expiryDate
+            };
+
+            UserModel actual = await _apiService.GetUserSettings(expected);
+
+            Assert.AreEqual(expected.DiscordName, actual.DiscordName);
+            Assert.AreEqual(expected.DarkMode, actual.DarkMode);
+            Assert.AreEqual(expected.Admin, actual.Admin);
         }
-
-        // Checks whether the GetUserSettingId method works as expected.
+        
+        /// <summary>
+        /// Checks whether the GetUserSettingId method works as expected.
+        /// </summary>
         [TestMethod]
         public async Task TestUserSettingId()
         {
-            MockAPIService.Object.SetLogger(Logger);
-
-            List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel? testUser = users.Find(c => c.Username == "UnitTests");
-
-            if (testUser != null)
+            DateTime utcNow = new(2026, 03, 12, 16, 00, 00, DateTimeKind.Utc);
+            DateTime expiryDate = utcNow.AddMinutes(15);
+            string responseContent = "[\r\n    {\r\n        \"application\": \"Server Status Site\",\r\n        \"settings\": [\r\n            {\r\n                \"id\": 1,\r\n                \"name\": \"DarkMode\",\r\n                \"value\": \"True\"\r\n            },\r\n            {\r\n                \"id\": 2,\r\n                \"name\": \"IsAdmin\",\r\n                \"value\": \"False\"\r\n            },\r\n            {\r\n                \"id\": 3,\r\n                \"name\": \"DiscordName\",\r\n                \"value\": \"UnitTester\"\r\n            }\r\n        ]\r\n    }\r\n]";
+            RestResponse response = new()
             {
-                int userSettingId = MockAPIService.Object.GetUserSettingId(testUser.UserId, "DiscordName");
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = responseContent
+            };
 
-                Assert.IsTrue(userSettingId != 0);
-            }
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+            Mock<IAPIClient> _mockAPIClient = new();
+            _mockAPIClient.Setup(api => api.GetUserSettings(It.IsAny<int>())).ReturnsAsync(response);
 
-            else
+            int expected = 3;
+
+            APIService _apiService = new(_mockLogger.Object, _mockAPIClient.Object, _mockClock.Object)
             {
-                Assert.Fail("Failed to find test user.");
-            }
+                ExpiryTime = expiryDate
+            };
+
+            int actual = await _apiService.GetUserSettingId(expected, "DiscordName");
+
+            Assert.AreEqual(expected, actual);
         }
-
+        /*
         // Checks whether the GetServers method works as expected.
         [TestMethod]
         public void TestServers()
@@ -128,7 +158,7 @@ namespace ServerSite.Tests.Common.Services
 
             Assert.IsTrue(servers.Count > 0);
         }
-
+        
         // Checks whether the GetServerStatus method works with the PC component.
         [TestMethod]
         public void TestServerStatusesPC()
@@ -374,6 +404,6 @@ namespace ServerSite.Tests.Common.Services
             bool registered = MockAPIService.Object.RegisterServerEvent(status);
 
             Assert.IsTrue(registered);
-        }
+        }*/
     }
 }

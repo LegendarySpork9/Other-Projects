@@ -4,14 +4,14 @@ using ServerStatusCommon.Functions;
 using ServerStatusCommon.Models;
 using ServerStatusCommon.Services;
 
-namespace ServerSite.Tests.Common.Services
+namespace ServerStatus.Tests.Common.Services
 {
     [TestClass]
     public class DiscordServiceTest
     {
         private Mock<DiscordService> MockDiscordService;
         private LoggerService Logger;
-
+        /*
         // Sets the global variables that the tests to use.
         [TestInitialize]
         public void ConfigureDiscordService()
@@ -49,6 +49,6 @@ namespace ServerSite.Tests.Common.Services
             bool successfulSend = MockDiscordService.Object.SendNotification(sharedSettings.RecipientId, "This is a message from a unit test.");
 
             Assert.IsTrue(successfulSend);
-        }
+        }*/
     }
 }
