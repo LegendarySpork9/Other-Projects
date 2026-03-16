@@ -27,7 +27,7 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetIssues method returns a list of issues.
         /// </summary>
         [TestMethod]
-        public void TestGetIssues()
+        public async Task TestGetIssues()
         {
             List<IssueModel> mockIssue =
             [
@@ -56,11 +56,11 @@ namespace GitHubScraper.Tests.Services
             ];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetIssues(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockIssue);
+            _mockGitHubClient.Setup(ghc => ghc.GetIssues(It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(mockIssue);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List <IssueModel> issues = _gitHubService.GetIssues("Unit-Test", _MockClock.Object.DefaultDate);
+            List <IssueModel> issues = await _gitHubService.GetIssues("Unit-Test", _MockClock.Object.DefaultDate);
 
             Assert.IsTrue(issues.Count > 0);
             Assert.AreEqual(mockIssue[0].Id, issues[0].Id);
@@ -70,25 +70,68 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetIssues method returns an empty list of issues.
         /// </summary>
         [TestMethod]
-        public void TestGetIssuesEmpty()
+        public async Task TestGetIssuesEmpty()
         {
             List<IssueModel> mockIssue = [];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetIssues(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockIssue);
+            _mockGitHubClient.Setup(ghc => ghc.GetIssues(It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(mockIssue);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<IssueModel> issues = _gitHubService.GetIssues("Unit-Test", Date);
+            List<IssueModel> issues = await _gitHubService.GetIssues("Unit-Test", Date);
 
             Assert.AreEqual(0, issues.Count);
+        }
+
+        /// <summary>
+        /// Checks whether the GetBranches method returns a list of branches.
+        /// </summary>
+        [TestMethod]
+        public async Task TestGetBranches()
+        {
+            List<BranchModel> mockBranch =
+            [
+                new()
+                {
+                    Name = "main"
+                }
+            ];
+
+            Mock<IGitHubClient> _mockGitHubClient = new();
+            _mockGitHubClient.Setup(ghc => ghc.GetBranches(It.IsAny<string>())).ReturnsAsync(mockBranch);
+
+            GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
+
+            List<BranchModel> branches = await _gitHubService.GetBranches("Unit-Test");
+
+            Assert.IsTrue(branches.Count > 0);
+            Assert.AreEqual(mockBranch[0].Name, branches[0].Name);
+        }
+
+        /// <summary>
+        /// Checks whether the GetBranches method returns an empty list of branches.
+        /// </summary>
+        [TestMethod]
+        public async Task TestGetBranchesEmpty()
+        {
+            List<BranchModel> mockBranch = [];
+
+            Mock<IGitHubClient> _mockGitHubClient = new();
+            _mockGitHubClient.Setup(ghc => ghc.GetBranches(It.IsAny<string>())).ReturnsAsync(mockBranch);
+
+            GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
+
+            List<BranchModel> branches = await _gitHubService.GetBranches("Unit-Test");
+
+            Assert.AreEqual(0, branches.Count);
         }
 
         /// <summary>
         /// Checks whether the GetCommits method returns a list of commits.
         /// </summary>
         [TestMethod]
-        public void TestGetCommits()
+        public async Task TestGetCommits()
         {
             List<CommitModel> mockCommit =
             [
@@ -112,11 +155,11 @@ namespace GitHubScraper.Tests.Services
             ];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetCommits(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockCommit);
+            _mockGitHubClient.Setup(ghc => ghc.GetCommits(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>())).ReturnsAsync(mockCommit);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<CommitModel> commits = _gitHubService.GetCommits("Unit-Test", _MockClock.Object.DefaultDate);
+            List<CommitModel> commits = await _gitHubService.GetCommits("Unit-Test", _MockClock.Object.DefaultDate, "main");
 
             Assert.IsTrue(commits.Count > 0);
             Assert.AreEqual(mockCommit[0].Sha, commits[0].Sha);
@@ -126,16 +169,16 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetCommits method returns an empty list of commits.
         /// </summary>
         [TestMethod]
-        public void TestGetCommitsEmpty()
+        public async Task TestGetCommitsEmpty()
         {
             List<CommitModel> mockCommit = [];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetCommits(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockCommit);
+            _mockGitHubClient.Setup(ghc => ghc.GetCommits(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<string>())).ReturnsAsync(mockCommit);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<CommitModel> commits = _gitHubService.GetCommits("Unit-Test", Date);
+            List<CommitModel> commits = await _gitHubService.GetCommits("Unit-Test", Date, "main");
 
             Assert.AreEqual(0, commits.Count);
         }
@@ -144,7 +187,7 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetPullRequests method returns a list of pull requests.
         /// </summary>
         [TestMethod]
-        public void TestGetPullRequests()
+        public async Task TestGetPullRequests()
         {
             List<PullRequestModel> mockPullRequest =
             [
@@ -175,11 +218,11 @@ namespace GitHubScraper.Tests.Services
             ];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetPullRequests(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockPullRequest);
+            _mockGitHubClient.Setup(ghc => ghc.GetPullRequests(It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(mockPullRequest);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<PullRequestModel> pullRequests = _gitHubService.GetPullRequests("Unit-Test", _MockClock.Object.DefaultDate);
+            List<PullRequestModel> pullRequests = await _gitHubService.GetPullRequests("Unit-Test", _MockClock.Object.DefaultDate);
 
             Assert.IsTrue(pullRequests.Count > 0);
             Assert.AreEqual(mockPullRequest[0].Id, pullRequests[0].Id);
@@ -189,16 +232,16 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetPullRequests method returns an empty list of pull requests.
         /// </summary>
         [TestMethod]
-        public void TestGetPullRequestsEmpty()
+        public async Task TestGetPullRequestsEmpty()
         {
             List<PullRequestModel> mockPullRequest = [];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetPullRequests(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockPullRequest);
+            _mockGitHubClient.Setup(ghc => ghc.GetPullRequests(It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(mockPullRequest);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<PullRequestModel> pullRequests = _gitHubService.GetPullRequests("Unit-Test", _MockClock.Object.DefaultDate);
+            List<PullRequestModel> pullRequests = await _gitHubService.GetPullRequests("Unit-Test", _MockClock.Object.DefaultDate);
 
             Assert.AreEqual(0, pullRequests.Count);
         }
@@ -207,7 +250,7 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetWorkflowRuns method returns a list of workflow runs.
         /// </summary>
         [TestMethod]
-        public void TestGetWorkflowRuns()
+        public async Task TestGetWorkflowRuns()
         {
             List<WorkflowRunModel> mockWorkflowRun =
             [
@@ -230,11 +273,11 @@ namespace GitHubScraper.Tests.Services
             ];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetWorkflowRuns(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockWorkflowRun);
+            _mockGitHubClient.Setup(ghc => ghc.GetWorkflowRuns(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(mockWorkflowRun);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<WorkflowRunModel> workflowRuns = _gitHubService.GetWorkflowRuns("Unit-Test", "Test Workflow", _MockClock.Object.DefaultDate);
+            List<WorkflowRunModel> workflowRuns = await _gitHubService.GetWorkflowRuns("Unit-Test", "Test Workflow", _MockClock.Object.DefaultDate);
 
             Assert.IsTrue(workflowRuns.Count > 0);
             Assert.AreEqual(mockWorkflowRun[0].Id, workflowRuns[0].Id);
@@ -244,16 +287,16 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetWorkflowRuns method returns an empty list of workflow runs.
         /// </summary>
         [TestMethod]
-        public void TestGetWorkflowRunsEmpty()
+        public async Task TestGetWorkflowRunsEmpty()
         {
             List<WorkflowRunModel> mockWorkflowRun = [];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetWorkflowRuns(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockWorkflowRun);
+            _mockGitHubClient.Setup(ghc => ghc.GetWorkflowRuns(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(mockWorkflowRun);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<WorkflowRunModel> workflowRuns = _gitHubService.GetWorkflowRuns("Unit-Test", "Test Workflow", _MockClock.Object.DefaultDate);
+            List<WorkflowRunModel> workflowRuns = await _gitHubService.GetWorkflowRuns("Unit-Test", "Test Workflow", _MockClock.Object.DefaultDate);
 
             Assert.AreEqual(0, workflowRuns.Count);
         }
@@ -262,7 +305,7 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetReleases method returns a list of releases.
         /// </summary>
         [TestMethod]
-        public void TestGetReleases()
+        public async Task TestGetReleases()
         {
             List<ReleaseModel> mockRelease =
             [
@@ -290,11 +333,11 @@ namespace GitHubScraper.Tests.Services
             ];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetReleases(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockRelease);
+            _mockGitHubClient.Setup(ghc => ghc.GetReleases(It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(mockRelease);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<ReleaseModel> releases = _gitHubService.GetReleases("Unit-Test", _MockClock.Object.DefaultDate);
+            List<ReleaseModel> releases = await _gitHubService.GetReleases("Unit-Test", _MockClock.Object.DefaultDate);
 
             Assert.IsTrue(releases.Count > 0);
             Assert.AreEqual(mockRelease[0].Id, releases[0].Id);
@@ -304,16 +347,16 @@ namespace GitHubScraper.Tests.Services
         /// Checks whether the GetReleases method returns an empty list of releases.
         /// </summary>
         [TestMethod]
-        public void TestGetReleasesEmpty()
+        public async Task TestGetReleasesEmpty()
         {
             List<ReleaseModel> mockRelease = [];
 
             Mock<IGitHubClient> _mockGitHubClient = new();
-            _mockGitHubClient.Setup(ghc => ghc.GetReleases(It.IsAny<string>(), It.IsAny<DateTime>()).Result).Returns(mockRelease);
+            _mockGitHubClient.Setup(ghc => ghc.GetReleases(It.IsAny<string>(), It.IsAny<DateTime>())).ReturnsAsync(mockRelease);
 
             GitHubService _gitHubService = new(_MockLogger.Object, _mockGitHubClient.Object);
 
-            List<ReleaseModel> releases = _gitHubService.GetReleases("Unit-Test", _MockClock.Object.DefaultDate);
+            List<ReleaseModel> releases = await _gitHubService.GetReleases("Unit-Test", _MockClock.Object.DefaultDate);
 
             Assert.AreEqual(0, releases.Count);
         }

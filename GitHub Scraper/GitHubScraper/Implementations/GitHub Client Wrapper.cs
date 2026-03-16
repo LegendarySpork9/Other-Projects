@@ -99,9 +99,79 @@ namespace GitHubScraper.Implementations
         }
 
         /// <summary>
+        /// Returns a list of the branches for the repository.
+        /// </summary>
+        public async Task<List<BranchModel>> GetBranches(string repository)
+        {
+            List<BranchModel> branches = [];
+            int page = 1;
+
+            try
+            {
+                string url = BuildURL("/branches", repository, null);
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+
+                RestClient client = new(url);
+                client.AddDefaultHeader("Authorization", $"Bearer {_Options.BearerToken}");
+
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+
+                while (true)
+                {
+                    RestRequest request = new()
+                    {
+                        Method = Method.Get
+                    };
+                    request.AddParameter("page", page);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page: {page}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+
+                    RestResponse response = await client.ExecuteAsync(request);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                    {
+                        List<BranchModel> apiBranches = JsonConvert.DeserializeObject<List<BranchModel>>(response.Content) ?? [];
+
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Branches Returned: {apiBranches.Count}");
+
+                        if (apiBranches.Count > 0)
+                        {
+                            branches.AddRange(apiBranches);
+                            page++;
+                        }
+
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+            }
+
+            return branches;
+        }
+
+        /// <summary>
         /// Returns a list of the commits for the repository.
         /// </summary>
-        public async Task<List<CommitModel>> GetCommits(string repository, DateTime lastRunDate)
+        public async Task<List<CommitModel>> GetCommits(string repository, DateTime lastRunDate, string sha)
         {
             List<CommitModel> commits = [];
             int page = 1;
@@ -109,6 +179,7 @@ namespace GitHubScraper.Implementations
             try
             {
                 string url = BuildURL("/commits", repository, lastRunDate);
+                url += $"&sha={Uri.EscapeDataString(sha)}";
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
 
