@@ -1,6 +1,6 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Moq;
-using ServerStatusCommon.Functions;
+using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Models;
 using ServerStatusCommon.Services;
 
@@ -9,46 +9,33 @@ namespace ServerStatus.Tests.Common.Services
     [TestClass]
     public class DiscordServiceTest
     {
-        private Mock<DiscordService> MockDiscordService;
-        private LoggerService Logger;
-        /*
-        // Sets the global variables that the tests to use.
-        [TestInitialize]
-        public void ConfigureDiscordService()
-        {
-            MockDiscordService = new Mock<DiscordService>(SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\DiscordService.config"))));
-            Logger = new();
-            Logger.ChangeIdentifier("UnitTest");
-        }
-
-        // Checks whether the SetLogger method works as expected.
+        /// <summary>
+        /// Checks whether the SendNotification method works as expected.
+        /// </summary>
         [TestMethod]
-        public void TestSetLogger()
+        public async Task TestSendNotification()
         {
-            try
+            SharedSettingsModel sharedSettings = new()
             {
-                MockDiscordService.Object.SetLogger(Logger);
+                SendAlerts = true,
+                WebhookURL = "This is a webhook",
+                RecipientId = "4f84bf84bf84b8f74bf7348fb4"
+            };
 
-                Assert.IsTrue(true);
-            }
-
-            catch (Exception ex)
+            HttpResponseMessage response = new()
             {
-                Assert.Fail($"Failed to set logger. Exception: {ex.Message}");
-            }
-        }
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
 
-        // Checks whether the SendNotification method works as expected.
-        [TestMethod]
-        public void TestSendNotification()
-        {
-            MockDiscordService.Object.SetLogger(Logger);
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IHTTPClient> _mockHTTPClient = new();
+            _mockHTTPClient.Setup(http => http.Send(It.IsAny<HttpRequestMessage>())).ReturnsAsync(response);
 
-            SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\DiscordService.config")));
+            DiscordService _discordService = new(_mockLogger.Object, _mockHTTPClient.Object, sharedSettings);
 
-            bool successfulSend = MockDiscordService.Object.SendNotification(sharedSettings.RecipientId, "This is a message from a unit test.");
+            bool successfulSend = await _discordService.SendNotification(sharedSettings.RecipientId, "This is a message from a unit test.");
 
             Assert.IsTrue(successfulSend);
-        }*/
+        }
     }
 }

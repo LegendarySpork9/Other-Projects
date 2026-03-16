@@ -311,7 +311,7 @@ namespace ServerStatusCommon.Services
                 await Authorise();
             }
 
-            List<ServerModel> servers = [new()];
+            List<ServerModel> servers = [];
 
             try
             {

@@ -5,7 +5,6 @@ using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Models.API;
 using ServerStatusCommon.Models.Data;
 using ServerStatusCommon.Services;
-using ServerStatusSite.Components.Pages.Alerts;
 
 namespace ServerStatus.Tests.Common.Services
 {
@@ -402,11 +401,11 @@ namespace ServerStatus.Tests.Common.Services
         
         // Checks whether the GetAlert method works as expected.
         [TestMethod]
-        public void TestGetAlert()
+        public async Task TestGetAlert()
         {
             DateTime utcNow = new(2026, 03, 12, 16, 00, 00, DateTimeKind.Utc);
             DateTime expiryDate = utcNow.AddMinutes(15);
-            string responseContent = "{\r\n    \"entries\": [\r\n        {\r\n            \"alertId\": 1,\r\n            \"reporter\": \"UnitTester\",\r\n            \"component\": \"component\",\r\n            \"componentStatus\": \"Offline\",\r\n            \"alertStatus\": \"Reported\",\r\n            \"alertDate\": \"2025-06-14T15:39:21.337Z\",\r\n            \"server\": {\r\n                \"hostName\": \"LocalHost\",\r\n                \"game\": \"Minecraft\",\r\n                \"gameVersion\": \"1.7.10\"\r\n            }\r\n        }\r\n    ],\r\n    \"entryCount\": 1,\r\n    \"pageNumber\": 1,\r\n    \"pageSize\": 25,\r\n    \"totalPageCount\": 1,\r\n    \"totalCount\": 1\r\n}";
+            string responseContent = "{\r\n    \"alertId\": 1,\r\n    \"reporter\": \"UnitTester\",\r\n    \"component\": \"component\",\r\n    \"componentStatus\": \"Offline\",\r\n    \"alertStatus\": \"Reported\",\r\n    \"alertDate\": \"2025-06-14T15:39:21.337Z\",\r\n    \"server\": {\r\n        \"hostName\": \"LocalHost\",\r\n        \"game\": \"Minecraft\",\r\n        \"gameVersion\": \"1.7.10\"\r\n    }\r\n}";
             RestResponse response = new()
             {
                 StatusCode = System.Net.HttpStatusCode.OK,
@@ -417,26 +416,17 @@ namespace ServerStatus.Tests.Common.Services
             Mock<IClock> _mockClock = new();
             _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
             Mock<IAPIClient> _mockAPIClient = new();
-            _mockAPIClient.Setup(api => api.GetAlerts(It.IsAny<int>())).ReturnsAsync(response);
+            _mockAPIClient.Setup(api => api.GetAlert(It.IsAny<int>())).ReturnsAsync(response);
 
-            APIAlertsModel expected = new()
+            AlertModel expected = new()
             {
-                Alerts =
-                [
-                    new()
-                    {
-                        Id = 1,
-                        Occured = new(2025, 06, 14, 15, 39, 21, DateTimeKind.Utc),
-                        Server = "Minecraft (1.7.10)",
-                        Reporter = "UnitTester",
-                        Component = "component",
-                        ComponentStatus = "Offline",
-                        AlertStatus = "Reported"
-                    }
-                ],
-                MultiplePages = false,
-                PageCount = 1,
-                APICalled = true
+                Id = 1,
+                Occured = new(2025, 06, 14, 15, 39, 21, DateTimeKind.Utc),
+                Server = "Minecraft (1.7.10)",
+                Reporter = "UnitTester",
+                Component = "component",
+                ComponentStatus = "Offline",
+                AlertStatus = "Reported"
             };
 
             APIService _apiService = new(_mockLogger.Object, _mockAPIClient.Object, _mockClock.Object)
@@ -444,105 +434,107 @@ namespace ServerStatus.Tests.Common.Services
                 ExpiryTime = expiryDate
             };
 
-            APIAlertsModel actual = await _apiService.GetAlerts(1);
+            AlertModel actual = await _apiService.GetAlert(1);
 
-            Assert.AreEqual(expected.Alerts[0].Reporter, actual.Alerts[0].Reporter);
-            Assert.AreEqual(expected.Alerts[0].Server, actual.Alerts[0].Server);
-            Assert.AreEqual(expected.Alerts[0].Occured, actual.Alerts[0].Occured);
-            Assert.AreEqual(expected.Alerts[0].Component, actual.Alerts[0].Component);
-            Assert.AreEqual(expected.Alerts[0].ComponentStatus, actual.Alerts[0].ComponentStatus);
-            Assert.AreEqual(expected.Alerts[0].AlertStatus, actual.Alerts[0].AlertStatus);
+            Assert.AreEqual(expected.Reporter, actual.Reporter);
+            Assert.AreEqual(expected.Server, actual.Server);
+            Assert.AreEqual(expected.Occured, actual.Occured);
+            Assert.AreEqual(expected.Component, actual.Component);
+            Assert.AreEqual(expected.ComponentStatus, actual.ComponentStatus);
+            Assert.AreEqual(expected.AlertStatus, actual.AlertStatus);
         }
-        /*
-        // Checks whether the UpdateAlert method works as expected.
+        
+        /// <summary>
+        /// Checks whether the UpdateAlert method works as expected.
+        /// </summary>
         [TestMethod]
         public async Task TestUpdateAlert()
         {
-            MockAPIService.Object.SetLogger(Logger);
-
-            APIAlertsModel alerts = await MockAPIService.Object.GetAlertsAsync(1);
-            AlertModel alert = MockAPIService.Object.GetAlert(alerts.Alerts[0].Id);
-
-            if (alert.Id > 0)
+            DateTime utcNow = new(2026, 03, 12, 16, 00, 00, DateTimeKind.Utc);
+            DateTime expiryDate = utcNow.AddMinutes(15);
+            string responseContent = "{\r\n    \"alertId\": 1,\r\n    \"reporter\": \"UnitTester\",\r\n    \"component\": \"component\",\r\n    \"componentStatus\": \"Offline\",\r\n    \"alertStatus\": \"Investigating\",\r\n    \"alertDate\": \"2025-06-14T15:39:21.337Z\",\r\n    \"server\": {\r\n        \"hostName\": \"LocalHost\",\r\n        \"game\": \"Minecraft\",\r\n        \"gameVersion\": \"1.7.10\"\r\n    }\r\n}";
+            RestResponse response = new()
             {
-                if (alert.AlertStatus == "Reported")
-                {
-                    alert.AlertStatus = "Investigating";
-                }
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = responseContent
+            };
 
-                else
-                {
-                    alert.AlertStatus = "Reported";
-                }
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+            Mock<IAPIClient> _mockAPIClient = new();
+            _mockAPIClient.Setup(api => api.UpdateAlert(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(response);
 
-                bool updated = await MockAPIService.Object.UpdateAlert(alert.Id, alert.AlertStatus);
-
-                Assert.IsTrue(updated);
-            }
-
-            else
+            APIService _apiService = new(_mockLogger.Object, _mockAPIClient.Object, _mockClock.Object)
             {
-                Assert.Fail("Failed to find an alert.");
-            }
+                ExpiryTime = expiryDate
+            };
+
+            bool updated = await _apiService.UpdateAlert(1, "Investigating");
+
+            Assert.IsTrue(updated);
         }
-
-        // Checks whether the RegisterAlert method works as expected.
+        
+        /// <summary>
+        /// Checks whether the RegisterAlert method works as expected.
+        /// </summary>
         [TestMethod]
         public async Task TestRegisterAlert()
         {
-            MockAPIService.Object.SetLogger(Logger);
-
-            List<UserModel> users = await MockAPIService.Object.GetUsers();
-            UserModel? testUser = users.Find(c => c.Username == "UnitTests");
-
-            if (testUser != null)
+            DateTime utcNow = new(2026, 03, 12, 16, 00, 00, DateTimeKind.Utc);
+            DateTime expiryDate = utcNow.AddMinutes(15);
+            string responseContent = "{\r\n    \"alertId\": 1,\r\n    \"reporter\": \"UnitTester\",\r\n    \"component\": \"component\",\r\n    \"componentStatus\": \"Offline\",\r\n    \"alertStatus\": \"Reported\",\r\n    \"alertDate\": \"2025-06-14T15:39:21.337Z\",\r\n    \"server\": {\r\n        \"hostName\": \"LocalHost\",\r\n        \"game\": \"Minecraft\",\r\n        \"gameVersion\": \"1.7.10\"\r\n    }\r\n}";
+            RestResponse response = new()
             {
-                testUser = await MockAPIService.Object.GetUserSettings(testUser);
-
-                APINewAlertsModel alert = new()
-                {
-                    Reporter = testUser.DiscordName,
-                    Component = "PC Status",
-                    ComponentStatus = "Unknown",
-                    AlertStatus = "Reported",
-                    HostName = "Test PC",
-                    Game = "TestGame",
-                    GameVersion = "1.0.0"
-                };
-
-                bool registered = await MockAPIService.Object.RegisterAlertAsync(alert);
-
-                Assert.IsTrue(registered);
-            }
-
-            else
-            {
-                Assert.Fail("Failed to find test user.");
-            }
-        }
-
-        // Checks whether the RegisterServerEvent method works as expected.
-        [TestMethod]
-        public void TestRegisterServerEvent()
-        {
-            MockAPIService.Object.SetLogger(Logger);
-
-            APIStatusModel status = new()
-            {
-                Component = "PC Status",
-                Status = "Unknown",
-                DateOccured = DateTime.UtcNow,
-                Server = new()
-                {
-                    HostName = "Test PC",
-                    Game = "TestGame",
-                    GameVersion = "1.0.0"
-                }
+                StatusCode = System.Net.HttpStatusCode.Created,
+                Content = responseContent
             };
 
-            bool registered = MockAPIService.Object.RegisterServerEvent(status);
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+            Mock<IAPIClient> _mockAPIClient = new();
+            _mockAPIClient.Setup(api => api.RegisterAlert(It.IsAny<APINewAlertsModel>())).ReturnsAsync(response);
+
+            APIService _apiService = new(_mockLogger.Object, _mockAPIClient.Object, _mockClock.Object)
+            {
+                ExpiryTime = expiryDate
+            };
+
+            bool registered = await _apiService.RegisterAlert(new());
 
             Assert.IsTrue(registered);
-        }*/
+        }
+        
+        /// <summary>
+        /// Checks whether the RegisterServerEvent method works as expected.
+        /// </summary>
+        [TestMethod]
+        public async Task TestRegisterServerEvent()
+        {
+            DateTime utcNow = new(2026, 03, 12, 16, 00, 00, DateTimeKind.Utc);
+            DateTime expiryDate = utcNow.AddMinutes(15);
+            string responseContent = "{\r\n    \"component\": \"component\",\r\n    \"componentStatus\": \"Offline\",\r\n    \"dateOccured\": \"2025-06-14T15:39:21.337Z\",\r\n    \"server\": {\r\n        \"hostName\": \"LocalHost\",\r\n        \"game\": \"Minecraft\",\r\n        \"gameVersion\": \"1.7.10\"\r\n    }\r\n}";
+            RestResponse response = new()
+            {
+                StatusCode = System.Net.HttpStatusCode.Created,
+                Content = responseContent
+            };
+
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+            Mock<IAPIClient> _mockAPIClient = new();
+            _mockAPIClient.Setup(api => api.RegisterServerEvent(It.IsAny<APIStatusModel>())).ReturnsAsync(response);
+
+            APIService _apiService = new(_mockLogger.Object, _mockAPIClient.Object, _mockClock.Object)
+            {
+                ExpiryTime = expiryDate
+            };
+
+            bool registered = await _apiService.RegisterServerEvent(new());
+
+            Assert.IsTrue(registered);
+        }
     }
 }
