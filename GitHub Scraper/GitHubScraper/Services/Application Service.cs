@@ -1,4 +1,4 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 using GitHubScraper.Abstractions;
 using GitHubScraper.Converters;
 using GitHubScraper.Functions;
@@ -117,10 +117,11 @@ namespace GitHubScraper.Services
         /// </summary>
         public async Task Run()
         {
+            IClock _clock = new SystemClockProvider();
             IDatabaseOptions _options = new DatabaseOptionsProvider();
-            DatabaseService _databaseService = new(_Logger, new SystemClockProvider(), new FileSystemWrapper(), _options, new DatabaseWrapper(_options, _Logger));
-            GitHubService _gitHubService = new(_Logger, new GitHubClientWrapper(_Logger, new GitHubOptionsProvider(), new SystemClockProvider()));
-            DatabaseFunction _databaseFunction = new(_Logger, new SystemClockProvider());
+            DatabaseService _databaseService = new(_Logger, _clock, new FileSystemWrapper(), _options, new DatabaseWrapper(_options, _Logger));
+            GitHubService _gitHubService = new(_Logger, new GitHubClientWrapper(_Logger, new GitHubOptionsProvider(), _clock));
+            DatabaseFunction _databaseFunction = new(_Logger, _clock);
 
             foreach (string repository in AppSettingsModel.Repositories)
             {

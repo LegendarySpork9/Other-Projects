@@ -1,4 +1,4 @@
-// Copyright © - Unpublished - Toby Hunter
+// Copyright © - 16/03/2026 - Toby Hunter
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;

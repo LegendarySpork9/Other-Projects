@@ -89,7 +89,7 @@ namespace GoogleDriveSync.Services
                 {
                     foreach (string folderPath in folders)
                     {
-                        if (!AppSettingsModel.IgnoreFolders.Contains(LocalDriveConverter.GetObjectName(folderPath)))
+                        if (AppSettingsModel.IgnoreFolders == null || !AppSettingsModel.IgnoreFolders.Contains(LocalDriveConverter.GetObjectName(folderPath)))
                         {
                             folderPaths = folderPaths.Append(folderPath).ToArray();
                             folderNames = folderNames.Append(LocalDriveConverter.GetObjectName(folderPath)).ToArray();
@@ -133,7 +133,7 @@ namespace GoogleDriveSync.Services
                 {
                     foreach (string filePath in filePaths)
                     {
-                        if (!AppSettingsModel.IgnoreFiles.Contains(LocalDriveConverter.GetObjectName(filePath)) && !filePath.Contains("~$e"))
+                        if (AppSettingsModel.IgnoreFiles == null || !AppSettingsModel.IgnoreFiles.Contains(LocalDriveConverter.GetObjectName(filePath)) && !filePath.Contains("~$e"))
                         {
                             (DateTime created, DateTime modified, bool hidden) = GetFileInformation(filePath);
 

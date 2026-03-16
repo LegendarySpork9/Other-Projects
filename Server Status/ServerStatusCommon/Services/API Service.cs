@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
-using ServerStatusCommon.Models;
 using ServerStatusCommon.Models.API;
 using ServerStatusCommon.Models.Data;
 

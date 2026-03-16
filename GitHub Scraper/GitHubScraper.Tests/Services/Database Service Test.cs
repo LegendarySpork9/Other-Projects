@@ -1,4 +1,4 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 using GitHubScraper.Abstractions;
 using GitHubScraper.Models;
 using GitHubScraper.Services;

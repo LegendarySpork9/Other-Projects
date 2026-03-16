@@ -10,13 +10,17 @@ namespace ServerStatusSite.Components.Layout
         [Inject]
         public UserModel User { get; set; } = default!;
 
-        // Subscribes the layout to the DarkMode event.
+        /// <summary>
+        /// Subscribes the layout to the DarkMode event.
+        /// </summary>
         protected override void OnInitialized()
         {
             User.OnDarkModeChanged += StateHasChanged;
         }
 
-        // Returns the CSS to change the layout to dark mode.
+        /// <summary>
+        /// Returns the CSS to change the layout to dark mode.
+        /// </summary>
         private string GetStyle(string component)
         {
             return component switch
@@ -28,7 +32,9 @@ namespace ServerStatusSite.Components.Layout
             };
         }
 
-        // Unsubscribes the layout from the DarkMode event.
+        /// <summary>
+        /// Unsubscribes the layout from the DarkMode event.
+        /// </summary>
         public void Dispose()
         {
             User.OnDarkModeChanged -= StateHasChanged;

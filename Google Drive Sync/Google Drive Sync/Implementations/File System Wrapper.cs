@@ -1,4 +1,4 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 using GoogleDriveSync.Abstractions;
 using System;
 using System.IO;

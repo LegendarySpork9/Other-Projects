@@ -191,7 +191,7 @@ namespace GoogleDriveSync.Services
 
                 foreach (Google.Apis.Drive.v3.Data.File folder in driveFolders)
                 {
-                    if (!AppSettingsModel.IgnoreFolders.Contains(folder.Name))
+                    if (AppSettingsModel.IgnoreFolders == null || !AppSettingsModel.IgnoreFolders.Contains(folder.Name))
                     {
                         folderIds = folderIds.Append(folder.Id).ToArray();
                         folderNames = folderNames.Append(folder.Name).ToArray();
@@ -233,7 +233,7 @@ namespace GoogleDriveSync.Services
 
                 foreach (Google.Apis.Drive.v3.Data.File file in driveFiles)
                 {
-                    if (!AppSettingsModel.IgnoreFiles.Contains(file.Name))
+                    if (AppSettingsModel.IgnoreFiles == null || !AppSettingsModel.IgnoreFiles.Contains(file.Name))
                     {
                         string[] nameSplit = file.Name.Split('.');
 

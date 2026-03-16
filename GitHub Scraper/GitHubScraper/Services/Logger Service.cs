@@ -1,4 +1,4 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 using log4net;
 
 namespace GitHubScraper.Services

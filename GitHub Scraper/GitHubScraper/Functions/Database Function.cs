@@ -1,4 +1,4 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 using GitHubScraper.Abstractions;
 using GitHubScraper.Converters;
 using GitHubScraper.Models;
@@ -8,15 +8,15 @@ namespace GitHubScraper.Functions
     public class DatabaseFunction
     {
         private readonly ILoggerService _Logger;
-        private readonly IClock Clock;
+        private readonly IClock _Clock;
 
         // Sets the class's global variables.
         public DatabaseFunction(
-            ILoggerService logger,
-            IClock clock)
+            ILoggerService _logger,
+            IClock _clock)
         {
-            _Logger = logger;
-            Clock = clock;
+            _Logger = _logger;
+            _Clock = _clock;
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace GitHubScraper.Functions
 
                 return [new IssueAggregateModel
                 {
-                    Date = Clock.UtcNow.Date,
+                    Date = _Clock.UtcNow.Date,
                     Created = 0,
                     Solved = 0
                 }];
@@ -85,7 +85,7 @@ namespace GitHubScraper.Functions
 
             List<IssueAggregateModel> issueAggregates = [];
             DateTime start = sortedIssueAggregates.First().Date;
-            DateTime end = Clock.UtcNow.Date;
+            DateTime end = _Clock.UtcNow.Date;
 
             for (DateTime date = start; date <= end; date = date.AddDays(1))
             {
