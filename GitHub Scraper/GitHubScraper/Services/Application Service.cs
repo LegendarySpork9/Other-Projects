@@ -130,9 +130,22 @@ namespace GitHubScraper.Services
                 DateTime lastRunDate = await _databaseService.GetLastRunDate(repository);
                 List<IssueModel> existingIssues = await _databaseService.GetIssues(repository);
 
-                List<IssueModel> issues = _gitHubService.GetIssues(repository, lastRunDate);
-                List<CommitModel> commits = _gitHubService.GetCommits(repository, lastRunDate);
-                List<PullRequestModel> pullRequests = _gitHubService.GetPullRequests(repository, lastRunDate);
+                List<IssueModel> issues = await _gitHubService.GetIssues(repository, lastRunDate);
+                List<BranchModel> branches = await _gitHubService.GetBranches(repository);
+                List<CommitModel> commits = [];
+
+                foreach (BranchModel branch in branches)
+                {
+                    List<CommitModel> branchCommits = await _gitHubService.GetCommits(repository, lastRunDate, branch.Name);
+
+                    if (branchCommits.Count > 0)
+                    {
+                        commits.AddRange(branchCommits);
+                    }
+                }
+
+                commits = [.. commits.DistinctBy(c => c.Sha).OrderBy(c => c.Commit.Committer.Date)];
+                List<PullRequestModel> pullRequests = await _gitHubService.GetPullRequests(repository, lastRunDate);
                 List<WorkflowModel> workflows = [];
 
                 int totalWorkflowRuns = 0;
@@ -141,7 +154,7 @@ namespace GitHubScraper.Services
                 {
                     foreach (string workflow in AppSettingsModel.Workflows)
                     {
-                        List<WorkflowRunModel> workflowRuns = _gitHubService.GetWorkflowRuns(repository, workflow, lastRunDate);
+                        List<WorkflowRunModel> workflowRuns = await _gitHubService.GetWorkflowRuns(repository, workflow, lastRunDate);
 
                         if (workflowRuns.Count > 0)
                         {
@@ -156,7 +169,7 @@ namespace GitHubScraper.Services
                     }
                 }
 
-                List<ReleaseModel> releases = _gitHubService.GetReleases(repository, lastRunDate);
+                List<ReleaseModel> releases = await _gitHubService.GetReleases(repository, lastRunDate);
 
                 await _databaseService.OutputIssues(repository, issues);
                 await _databaseService.OutputCommits(repository, commits);

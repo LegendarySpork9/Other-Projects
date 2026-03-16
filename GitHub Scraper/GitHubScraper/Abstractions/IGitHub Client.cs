@@ -10,7 +10,8 @@ namespace GitHubScraper.Abstractions
     public interface IGitHubClient
     {
         Task<List<IssueModel>> GetIssues(string repository, DateTime lastRunDate);
-        Task<List<CommitModel>> GetCommits(string repository, DateTime lastRunDate);
+        Task<List<BranchModel>> GetBranches(string repository);
+        Task<List<CommitModel>> GetCommits(string repository, DateTime lastRunDate, string sha);
         Task<List<PullRequestModel>> GetPullRequests(string repository, DateTime lastRunDate);
         Task<List<WorkflowRunModel>> GetWorkflowRuns(string repository, string workflow, DateTime lastRunDate);
         Task<List<ReleaseModel>> GetReleases(string repository, DateTime lastRunDate);

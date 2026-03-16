@@ -126,6 +126,18 @@ namespace GitHubScraper.Tests.Converters
         }
 
         /// <summary>
+        /// Tests whether the GetQuery method returns the correct value when given "/branches".
+        /// </summary>
+        [TestMethod]
+        public void TestGetQueryBranches()
+        {
+            string expected = "?per_page=100";
+            string actual = GitHubConverter.GetQuery("/branches");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
         /// Tests whether the GetQuery method returns the correct value when given "/commits".
         /// </summary>
         [TestMethod]

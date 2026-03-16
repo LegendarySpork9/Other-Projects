@@ -24,11 +24,11 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Returns a list of the issues for the repository.
         /// </summary>
-        public List<IssueModel> GetIssues(string repository, DateTime lastRunDate)
+        public async Task<List<IssueModel>> GetIssues(string repository, DateTime lastRunDate)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching issues from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
-            List<IssueModel> issues = _GitHubClient.GetIssues(repository, lastRunDate).Result;
+            List<IssueModel> issues = await _GitHubClient.GetIssues(repository, lastRunDate);
             TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filtering out pull requests in favour of pull request endpoint data");
@@ -80,13 +80,26 @@ namespace GitHubScraper.Services
         }
 
         /// <summary>
+        /// Returns a list of the branches for the repository.
+        /// </summary>
+        public async Task<List<BranchModel>> GetBranches(string repository)
+        {
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching branches from GitHub for {repository} repository");
+
+            List<BranchModel> branches = await _GitHubClient.GetBranches(repository);
+
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {branches.Count} branch(s) from GitHub for {repository} repository");
+            return branches;
+        }
+
+        /// <summary>
         /// Returns a list of the commits for the repository.
         /// </summary>
-        public List<CommitModel> GetCommits(string repository, DateTime lastRunDate)
+        public async Task<List<CommitModel>> GetCommits(string repository, DateTime lastRunDate, string sha)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching commits from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching commits from GitHub for {repository} repository, {sha} branch from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
-            List<CommitModel> commits = _GitHubClient.GetCommits(repository, lastRunDate).Result;
+            List<CommitModel> commits = await _GitHubClient.GetCommits(repository, lastRunDate, sha);
 
             foreach (CommitModel commit in commits)
             {
@@ -98,18 +111,18 @@ namespace GitHubScraper.Services
                 _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filled blanks for commit {commit.Sha}");
             }
 
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {commits.Count} commit(s) from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetched {commits.Count} commit(s) from GitHub for {repository} repository, {sha} branch from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
             return [.. commits.OrderBy(c => c.Commit.Committer.Date)];
         }
 
         /// <summary>
         /// Returns a list of the pull requests for the repository.
         /// </summary>
-        public List<PullRequestModel> GetPullRequests(string repository, DateTime lastRunDate)
+        public async Task<List<PullRequestModel>> GetPullRequests(string repository, DateTime lastRunDate)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching pull requests from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
-            List<PullRequestModel> pullRequests = _GitHubClient.GetPullRequests(repository, lastRunDate).Result;
+            List<PullRequestModel> pullRequests = await _GitHubClient.GetPullRequests(repository, lastRunDate);
             TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
             foreach (PullRequestModel pullRequest in pullRequests)
@@ -161,11 +174,11 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Returns a list of the workflow runs for the repository and workflow.
         /// </summary>
-        public List<WorkflowRunModel> GetWorkflowRuns(string repository, string workflow, DateTime lastRunDate)
+        public async Task<List<WorkflowRunModel>> GetWorkflowRuns(string repository, string workflow, DateTime lastRunDate)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching workflow runs from GitHub for {workflow} workflow in {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
-            List<WorkflowRunModel> workflowRuns = _GitHubClient.GetWorkflowRuns(repository, workflow, lastRunDate).Result;
+            List<WorkflowRunModel> workflowRuns = await _GitHubClient.GetWorkflowRuns(repository, workflow, lastRunDate);
             TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
             foreach (WorkflowRunModel workflowRun in workflowRuns)
@@ -203,11 +216,11 @@ namespace GitHubScraper.Services
         /// <summary>
         /// Returns a list of the releases for the repository.
         /// </summary>
-        public List<ReleaseModel> GetReleases(string repository, DateTime lastRunDate)
+        public async Task<List<ReleaseModel>> GetReleases(string repository, DateTime lastRunDate)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Fetching releases from GitHub for {repository} repository from {lastRunDate:dd/MM/yyyy HH:mm:ss}");
 
-            List<ReleaseModel> releases = _GitHubClient.GetReleases(repository, lastRunDate).Result;
+            List<ReleaseModel> releases = await _GitHubClient.GetReleases(repository, lastRunDate);
 
             foreach (ReleaseModel release in releases)
             {
