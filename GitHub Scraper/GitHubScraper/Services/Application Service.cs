@@ -144,7 +144,7 @@ namespace GitHubScraper.Services
                     }
                 }
 
-                commits = [.. commits.OrderBy(c => c.Commit.Committer.Date)];
+                commits = [.. commits.DistinctBy(c => c.Sha).OrderBy(c => c.Commit.Committer.Date)];
                 List<PullRequestModel> pullRequests = await _gitHubService.GetPullRequests(repository, lastRunDate);
                 List<WorkflowModel> workflows = [];
 
