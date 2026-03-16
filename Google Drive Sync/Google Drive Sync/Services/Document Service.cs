@@ -1,35 +1,54 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
+using GoogleDriveSync.Abstractions;
 using GoogleDriveSync.Converters;
 using GoogleDriveSync.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace GoogleDriveSync.Services
 {
     public class DocumentService
     {
-        LoggerService Logger = new LoggerService();
+        private readonly ILoggerService _Logger;
+        private readonly IFileSystem _FileSystem;
+        private readonly IFileMetadata _FileMetadata;
+        private readonly IUserNotifier _UserNotifier;
+
         private readonly string FolderPath;
         private readonly string FolderName;
         private bool HasErrored = false;
 
-        // Sets the class's global variables.
-        public DocumentService(string folder)
+        /// <summary>
+        /// Sets the class's global variables.
+        /// </summary>
+        public DocumentService(
+            ILoggerService _logger,
+            IFileSystem _fileSystem,
+            IFileMetadata _fileMetadata,
+            IUserNotifier _userNotifier,
+            string folder)
         {
+            _Logger = _logger;
+            _FileSystem = _fileSystem;
+            _FileMetadata = _fileMetadata;
+            _UserNotifier = _userNotifier;
             FolderPath = folder;
             FolderName = folder.Remove(0, folder.LastIndexOf('\\') + 1);
         }
 
-        // Returns the value of the HasErrored variable.
+        /// <summary>
+        /// Returns the value of the HasErrored variable.
+        /// </summary>
         public bool GetHasErrored() => HasErrored;
 
-        // Obtains all the files and folders of the specified directory.
+        /// <summary>
+        /// Obtains all the files and folders of the specified directory.
+        /// </summary>
         public List<FileModel> GetData()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder(s) and file(s) under folder {FolderName}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder(s) and file(s) under folder {FolderName}");
 
             List<FileModel> localDrive = new List<FileModel>();
             (string[] folderPaths, string[] folderNames) = GetFolders(FolderPath);
@@ -47,36 +66,36 @@ namespace GoogleDriveSync.Services
                 path = path.Replace($@"\{folderNames[i]}", "");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {localDrive.Count} file(s) under folder {FolderName}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {localDrive.Count} file(s) under folder {FolderName}");
 
             return localDrive;
         }
 
-        // Obtains all the folders under a given folder.
+        /// <summary>
+        /// Obtains all the folders under a given folder.
+        /// </summary>
         private (string[], string[]) GetFolders(string folder)
         {
-            LocalDriveConverter _localDriveConverter = new LocalDriveConverter();
-
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder information for folder(s) under folder {_localDriveConverter.GetObjectName(folder)}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining folder information for folder(s) under folder {LocalDriveConverter.GetObjectName(folder)}");
 
             string[] folderPaths = Array.Empty<string>();
             string[] folderNames = Array.Empty<string>();
 
             try
             {
-                string[] folders = Directory.GetDirectories(folder);
+                string[] folders = _FileSystem.GetDirectories(folder);
 
                 if (folders.Length > 0)
                 {
                     foreach (string folderPath in folders)
                     {
-                        if (!AppSettingsModel.IgnoreFolders.Contains(_localDriveConverter.GetObjectName(folderPath)))
+                        if (AppSettingsModel.IgnoreFolders == null || !AppSettingsModel.IgnoreFolders.Contains(LocalDriveConverter.GetObjectName(folderPath)))
                         {
                             folderPaths = folderPaths.Append(folderPath).ToArray();
-                            folderNames = folderNames.Append(_localDriveConverter.GetObjectName(folderPath)).ToArray();
+                            folderNames = folderNames.Append(LocalDriveConverter.GetObjectName(folderPath)).ToArray();
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {_localDriveConverter.GetObjectName(folderPath)}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Path: {folderPath}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Name: {LocalDriveConverter.GetObjectName(folderPath)}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Folder Path: {folderPath}");
                         }
                     }
                 }
@@ -86,39 +105,39 @@ namespace GoogleDriveSync.Services
             {
                 HasErrored = true;
 
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the sub folders from the Local Drive under folder {_localDriveConverter.GetObjectName(folder)}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the sub folders from the Local Drive under folder {LocalDriveConverter.GetObjectName(folder)}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
 
-                MessageBox.Show($"An error occured when trying to get the sub folders from the Local Drive under folder {_localDriveConverter.GetObjectName(folder)}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _UserNotifier.ShowMessage($"An error occured when trying to get the sub folders from the Local Drive under folder {LocalDriveConverter.GetObjectName(folder)}", "Warning");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {folderPaths.Length} folder(s) under folder {_localDriveConverter.GetObjectName(folder)}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {folderPaths.Length} folder(s) under folder {LocalDriveConverter.GetObjectName(folder)}");
 
             return (folderPaths, folderNames);
         }
 
-        // Obtains all the files under a given folder.
+        /// <summary>
+        /// Obtains all the files under a given folder.
+        /// </summary>
         private List<FileModel> GetFiles(string folder, string path)
         {
-            LocalDriveConverter _localDriveConverter = new LocalDriveConverter();
-
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file information for file(s) under folder {_localDriveConverter.GetObjectName(folder)}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file information for file(s) under folder {LocalDriveConverter.GetObjectName(folder)}");
 
             List<FileModel> localDrive = new List<FileModel>();
 
             try
             {
-                string[] filePaths = Directory.GetFiles(folder);
+                string[] filePaths = _FileSystem.GetFiles(folder);
 
                 if (filePaths.Length > 0)
                 {
                     foreach (string filePath in filePaths)
                     {
-                        if (!AppSettingsModel.IgnoreFiles.Contains(_localDriveConverter.GetObjectName(filePath)) && !filePath.Contains("~$e"))
+                        if (AppSettingsModel.IgnoreFiles == null || !AppSettingsModel.IgnoreFiles.Contains(LocalDriveConverter.GetObjectName(filePath)) && !filePath.Contains("~$e"))
                         {
                             (DateTime created, DateTime modified, bool hidden) = GetFileInformation(filePath);
 
-                            string[] nameSplit = _localDriveConverter.GetObjectName(filePath).Split('.');
+                            string[] nameSplit = LocalDriveConverter.GetObjectName(filePath).Split('.');
 
                             localDrive.Add(new FileModel()
                             {
@@ -131,13 +150,13 @@ namespace GoogleDriveSync.Services
                                 LastModified = modified
                             });
 
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Id: {filePath}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Name: {nameSplit[0]}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Type: {nameSplit[1]}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path: {path}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hidden: {hidden}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created Date: {created}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Modified Date: {modified}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Id: {filePath}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Name: {nameSplit[0]}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"File Type: {nameSplit[1]}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Path: {path}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Hidden: {hidden}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Created Date: {created}");
+                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Modified Date: {modified}");
                         }
                     }
                 }
@@ -145,42 +164,34 @@ namespace GoogleDriveSync.Services
 
             catch (Exception ex)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the files from the Local Drive under folder {_localDriveConverter.GetObjectName(folder)}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"An error occured when trying to get the files from the Local Drive under folder {LocalDriveConverter.GetObjectName(folder)}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
 
-                MessageBox.Show($"An error occured when trying to get the files from the Local Drive under folder {_localDriveConverter.GetObjectName(folder)}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _UserNotifier.ShowMessage($"An error occured when trying to get the files from the Local Drive under folder {LocalDriveConverter.GetObjectName(folder)}", "Warning");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {localDrive.Count} file(s) under folder {_localDriveConverter.GetObjectName(folder)}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained {localDrive.Count} file(s) under folder {LocalDriveConverter.GetObjectName(folder)}");
 
             return localDrive;
         }
 
-        // Obtains specific information about the file.
+        /// <summary>
+        /// Obtains specific information about the file.
+        /// </summary>
         private (DateTime, DateTime, bool) GetFileInformation(string file)
         {
-            LocalDriveConverter _localDriveConverter = new LocalDriveConverter();
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file information for file {LocalDriveConverter.GetObjectName(file)}");
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining file information for file {_localDriveConverter.GetObjectName(file)}");
+            (DateTime created, DateTime modified, bool hidden) = _FileMetadata.GetFileInformation(file);
 
-            FileInfo info = new FileInfo(file);
-            FileAttributes attributes = info.Attributes;
-
-            DateTime created = info.CreationTime;
-            DateTime modified = info.LastWriteTime;
-            bool hidden = false;
-
-            if ((attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-            {
-                hidden = true;
-            }
-
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained file information for file {_localDriveConverter.GetObjectName(file)}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained file information for file {LocalDriveConverter.GetObjectName(file)}");
 
             return (created, modified, hidden);
         }
 
-        // Loops through all folders and sub folders to obtain all files.
+        /// <summary>
+        /// Loops through all folders and sub folders to obtain all files.
+        /// </summary>
         private void TraverseFolders(List<FileModel> localDrive, string folder, string path)
         {
             (string[] folderPaths, string[] folderNames) = GetFolders(folder);
@@ -197,33 +208,39 @@ namespace GoogleDriveSync.Services
             }
         }
 
-        // Delets the given file.
-        public void DeleteFile(string file) => File.Delete(file);
+        /// <summary>
+        /// Delets the given file.
+        /// </summary>
+        public void DeleteFile(string file) => _FileSystem.DeleteFile(file);
 
-        // Unblocks the given file.
+        /// <summary>
+        /// Unblocks the given file.
+        /// </summary>
         public void UnblockFile(string file)
         {
             string adsPath = $"{file}:Zone.Identifier";
 
-            if (File.Exists(adsPath))
+            if (_FileSystem.FileExists(adsPath))
             {
-                File.Delete(adsPath);
+                _FileSystem.DeleteFile(adsPath);
             }
         }
 
-        // Hides the given file if it was already hidden.
+        /// <summary>
+        /// Hides the given file if it was already hidden.
+        /// </summary>
         public void HideFile(string file, bool hidden)
         {
-            if (File.Exists(file))
+            if (_FileSystem.FileExists(file))
             {
                 if (hidden)
                 {
-                    File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.Hidden);
+                    _FileSystem.SetAttributes(file, _FileSystem.GetAttributes(file) | FileAttributes.Hidden);
                 }
 
                 else
                 {
-                    File.SetAttributes(file, File.GetAttributes(file) & ~FileAttributes.Hidden);
+                    _FileSystem.SetAttributes(file, _FileSystem.GetAttributes(file) & ~FileAttributes.Hidden);
                 }
             }
         }

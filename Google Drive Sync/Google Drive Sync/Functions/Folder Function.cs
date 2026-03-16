@@ -1,18 +1,32 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
+using GoogleDriveSync.Abstractions;
 using System.IO;
 
 namespace GoogleDriveSync.Functions
 {
-    internal class FolderFunction
+    public class FolderFunction
     {
-        // Creates the local directory if it is not present.
+        private readonly IFileSystem _FileSystem;
+
+        /// <summary>
+        /// Sets the class's global variables.
+        /// </summary>
+        public FolderFunction(
+            IFileSystem _fileSystem)
+        {
+            _FileSystem = _fileSystem;
+        }
+
+        /// <summary>
+        /// Creates the local directory if it is not present.
+        /// </summary>
         public void CheckPath(string filePath)
         {
             string fileDirectory = Path.GetDirectoryName(filePath);
 
-            if (!Directory.Exists(fileDirectory))
+            if (!_FileSystem.DirectoryExists(fileDirectory))
             {
-                Directory.CreateDirectory(fileDirectory);
+                _FileSystem.CreateDirectory(fileDirectory);
             }
         }
     }

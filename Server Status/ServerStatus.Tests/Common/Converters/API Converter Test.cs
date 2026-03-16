@@ -1,51 +1,105 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using Moq;
-using ServerSiteCommon.Converters;
+using ServerStatusCommon.Converters;
 
-namespace ServerSite.Tests.Common.Converters
+namespace ServerStatus.Tests.Common.Converters
 {
-    // Checks the GetStatusClass method output with each option.
     [TestClass]
     public class APIConverterTest
     {
+        /// <summary>
+        /// Checks whether the GetQuery method returns the correct output for the given value.
+        /// </summary>
         [TestMethod]
-        public void TestStatusClassOnline()
+        public void TestGetQuery()
         {
-            Mock<APIConverter> _mockAPIConverter = new();
+            string expected = string.Empty;
+            string actual = APIConverter.GetQuery("/endpoint");
 
-            string result = _mockAPIConverter.Object.GetStatusClass("Online");
-
-            Assert.IsTrue(result == "online");
+            Assert.AreEqual(expected, actual);
         }
 
+        /// <summary>
+        /// Checks whether the GetQuery method returns the correct output for the given value.
+        /// </summary>
         [TestMethod]
-        public void TestStatusClassOffline()
+        public void TestGetQueryUserSettings()
         {
-            Mock<APIConverter> _mockAPIConverter = new();
+            string expected = "?application=Server Status Site";
+            string actual = APIConverter.GetQuery("/usersettings");
 
-            string result = _mockAPIConverter.Object.GetStatusClass("Offline");
-
-            Assert.IsTrue(result == "offline");
+            Assert.AreEqual(expected, actual);
         }
 
+        /// <summary>
+        /// Checks whether the GetQuery method returns the correct output for the given value.
+        /// </summary>
         [TestMethod]
-        public void TestStatusClassUnknown()
+        public void TestGetQueryServerInformation()
         {
-            Mock<APIConverter> _mockAPIConverter = new();
+            string expected = "?isActive=true";
+            string actual = APIConverter.GetQuery("/serverstatus/serverinformation");
 
-            string result = _mockAPIConverter.Object.GetStatusClass("Unknown");
-
-            Assert.IsTrue(result == "unknown");
+            Assert.AreEqual(expected, actual);
         }
 
+        /// <summary>
+        /// Checks whether the GetQuery method returns the correct output for the given value.
+        /// </summary>
         [TestMethod]
-        public void TestStatusClassOther()
+        public void TestGetQueryServerEvent()
         {
-            Mock<APIConverter> _mockAPIConverter = new();
+            string expected = "?component={component}";
+            string actual = APIConverter.GetQuery("/serverstatus/serverevent");
 
-            string result = _mockAPIConverter.Object.GetStatusClass("Active");
+            Assert.AreEqual(expected, actual);
+        }
 
-            Assert.IsTrue(result == "unknown");
+        /// <summary>
+        /// Checks whether the GetStatusClass method returns the correct output for the given value.
+        /// </summary>
+        [TestMethod]
+        public void TestGetStatusClassOnline()
+        {
+            string expected = "online";
+            string actual = APIConverter.GetStatusClass("Online");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Checks whether the GetStatusClass method returns the correct output for the given value.
+        /// </summary>
+        [TestMethod]
+        public void TestGetStatusClassOffline()
+        {
+            string expected = "offline";
+            string actual = APIConverter.GetStatusClass("Offline");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Checks whether the GetStatusClass method returns the correct output for the given value.
+        /// </summary>
+        [TestMethod]
+        public void TestGetStatusClassUnknown()
+        {
+            string expected = "unknown";
+            string actual = APIConverter.GetStatusClass("Unknown");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Checks whether the GetStatusClass method returns the correct output for the given value.
+        /// </summary>
+        [TestMethod]
+        public void TestGetStatusClassOther()
+        {
+            string expected = "unknown";
+            string actual = APIConverter.GetStatusClass("Active");
+
+            Assert.AreEqual(expected, actual);
         }
     }
 }

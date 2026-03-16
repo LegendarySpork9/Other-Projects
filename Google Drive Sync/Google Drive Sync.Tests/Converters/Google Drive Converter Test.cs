@@ -1,120 +1,143 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
 using GoogleDriveSync.Converters;
-using Moq;
 
 namespace GoogleDriveSync.Tests.Converters
 {
     [TestClass]
     public class GoogleDriveConverterTest
     {
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        #region GetMimeType
+
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypeText()
+        public void TestGetMimeTypeText()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "text/plain";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".txt");
+            string actual = GoogleDriveConverter.GetMimeType(".txt");
 
-            Assert.AreEqual("text/plain", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypePDF()
+        public void TestGetMimeTypePDF()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "application/pdf";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".pdf");
+            string actual = GoogleDriveConverter.GetMimeType(".pdf");
 
-            Assert.AreEqual("application/pdf", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypeDoc()
+        public void TestGetMimeTypeDoc()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "application/msword";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".doc");
+            string actual = GoogleDriveConverter.GetMimeType(".doc");
 
-            Assert.AreEqual("application/msword", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypeDocx()
+        public void TestGetMimeTypeDocx()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".docx");
+            string actual = GoogleDriveConverter.GetMimeType(".docx");
 
-            Assert.AreEqual("application/vnd.openxmlformats-officedocument.wordprocessingml.document", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypeXLS()
+        public void TestGetMimeTypeXLS()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "application/vnd.ms-excel";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".xls");
+            string actual = GoogleDriveConverter.GetMimeType(".xls");
 
-            Assert.AreEqual("application/vnd.ms-excel", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypeXLSX()
+        public void TestGetMimeTypeXLSX()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".xlsx");
+            string actual = GoogleDriveConverter.GetMimeType(".xlsx");
 
-            Assert.AreEqual("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypePNG()
+        public void TestGetMimeTypePNG()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "image/png";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".png");
+            string actual = GoogleDriveConverter.GetMimeType(".png");
 
-            Assert.AreEqual("image/png", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypeJPEG()
+        public void TestGetMimeTypeJPEG()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "image/jpeg";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".jpeg");
+            string actual = GoogleDriveConverter.GetMimeType(".jpeg");
 
-            Assert.AreEqual("image/jpeg", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetMimeType method returns the correct value with the given input.
+        /// <summary>
+        /// Checks whether the GetMimeType method returns the correct value with the given input.
+        /// </summary>
         [TestMethod]
-        public void TestMimeTypeDefault()
+        public void TestGetMimeTypeDefault()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = "application/octet-stream";
 
-            string mimeType = _mockGoogleDriveConverter.Object.GetMimeType(".xml");
+            string actual = GoogleDriveConverter.GetMimeType(".xml");
 
-            Assert.AreEqual("application/octet-stream", mimeType);
+            Assert.AreEqual(expected, actual);
         }
 
-        // Checks whether the GetFilePath method returns the expected file location. 
+        #endregion
+
+        /// <summary>
+        /// Checks whether the GetFilePath method returns the expected file location. 
+        /// </summary>
         [TestMethod]
-        public void TestFilePath()
+        public void TestGetFilePath()
         {
-            Mock<GoogleDriveConverter> _mockGoogleDriveConverter = new();
+            string expected = @"C:\GDSTests\Book Tests\Test.txt";
 
-            string filePath = _mockGoogleDriveConverter.Object.GetFilePath("C:\\GDSTests", "Book Tests", "Test.txt");
+            string actual = GoogleDriveConverter.GetFilePath(@"C:\GDSTests", "Book Tests", "Test.txt");
 
-            Assert.AreEqual("C:\\GDSTests\\Book Tests\\Test.txt", filePath);
+            Assert.AreEqual(expected, actual);
         }
     }
 }

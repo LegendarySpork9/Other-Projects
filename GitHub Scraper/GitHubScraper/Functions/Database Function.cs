@@ -1,167 +1,136 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
+using GitHubScraper.Abstractions;
 using GitHubScraper.Converters;
 using GitHubScraper.Models;
-using GitHubScraper.Services;
 
 namespace GitHubScraper.Functions
 {
     public class DatabaseFunction
     {
-        // Creates the issue aggregates.
+        private readonly ILoggerService _Logger;
+        private readonly IClock _Clock;
+
+        // Sets the class's global variables.
+        public DatabaseFunction(
+            ILoggerService _logger,
+            IClock _clock)
+        {
+            _Logger = _logger;
+            _Clock = _clock;
+        }
+
+        /// <summary>
+        /// Creates the issue aggregates.
+        /// </summary>
         public List<IssueAggregateModel> CreateAggregates(string repository, List<IssueModel> issues, List<IssueModel> existingIssues)
         {
-            LoggerService _logger = new();
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Creating aggregates for repository {repository}");
 
-            _logger.LogMessage(StandardValues.LoggerValues.Info, $"Creating aggregates for repository {repository}");
-
-            List<IssueAggregateModel> issueAggregates = [];
-
-            issues = FilterIssues(repository, issues, existingIssues);
+            Dictionary<DateTime, IssueAggregateModel> issueAggregatesDictionary = [];
+            Dictionary<long, IssueModel> existingIssuesDictionary = existingIssues.ToDictionary(i => i.Id);
 
             foreach (IssueModel issue in issues)
             {
-                IssueModel? existingIssue = existingIssues.Find(c => c.Id == issue.Id);
-
-                DateTime createdDate = issue.Created_At.Date.ToUniversalTime();
-                int index = -1;
+                existingIssuesDictionary.TryGetValue(issue.Id, out IssueModel? existingIssue);
 
                 if (existingIssue == null || issue.Created_At != existingIssue.Created_At)
                 {
-                    index = issueAggregates.FindIndex(ia => ia.Date == createdDate);
+                    DateTime createdDate = issue.Created_At.Date;
 
-                    if (index != -1)
+                    if (!issueAggregatesDictionary.TryGetValue(createdDate, out IssueAggregateModel? issueAggregate))
                     {
-                        issueAggregates[index].Created += 1;
-                    }
-
-                    else
-                    {
-                        issueAggregates.Add(new()
+                        issueAggregate = new IssueAggregateModel
                         {
-                            Date = createdDate,
-                            Created = 1,
-                            Solved = 0
-                        });
+                            Date = createdDate
+                        };
+
+                        issueAggregatesDictionary[createdDate] = issueAggregate;
                     }
+
+                    issueAggregate.Created++;
                 }
 
-                if (issue.Closed_At != null && (existingIssue == null || issue.Closed_At != existingIssue.Closed_At))
+                if (issue.Closed_At is DateTimeOffset && (existingIssue == null || issue.Closed_At != existingIssue.Closed_At))
                 {
-                    DateTime date = (DateTime)issue.Closed_At;
-                    DateTime closedDate = date.Date.ToUniversalTime();
+                    DateTime closedDate = issue.Closed_At.Value.Date;
 
-                    index = issueAggregates.FindIndex(ia => ia.Date == closedDate);
-
-                    if (index != -1)
+                    if (!issueAggregatesDictionary.TryGetValue(closedDate, out IssueAggregateModel? issueAggregate))
                     {
-                        issueAggregates[index].Solved += 1;
-                    }
-
-                    else
-                    {
-                        issueAggregates.Add(new()
+                        issueAggregate = new IssueAggregateModel
                         {
-                            Date = closedDate,
-                            Created = 0,
-                            Solved = 1
-                        });
+                            Date = closedDate
+                        };
+
+                        issueAggregatesDictionary[closedDate] = issueAggregate;
                     }
+
+                    issueAggregate.Solved++;
                 }
             }
 
-            issueAggregates = [.. issueAggregates.OrderBy(ia => ia.Date)];
+            List<IssueAggregateModel> sortedIssueAggregates = [.. issueAggregatesDictionary.Values.OrderBy(iad => iad.Date)];
 
-            if (issueAggregates.Count > 0)
+            if (sortedIssueAggregates.Count == 0)
             {
-                DateTime previousdate = issueAggregates[0].Date;
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"1 aggregate created");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Created aggregates for repository {repository}");
 
-                for (int index = 1; index < issueAggregates.Count; index++)
+                return [new IssueAggregateModel
                 {
-                    int days = (issueAggregates[index].Date - previousdate).Days;
-
-                    if (days != 1)
-                    {
-                        issueAggregates.Insert(index, new()
-                        {
-                            Date = previousdate.AddDays(1),
-                            Created = 0,
-                            Solved = 0
-                        });
-
-                        index -= 1;
-                    }
-
-                    else
-                    {
-                        previousdate = issueAggregates[index].Date;
-                    }
-                }
-
-                while (true)
-                {
-                    if (previousdate != DateTime.UtcNow.Date)
-                    {
-                        issueAggregates.Add(new()
-                        {
-                            Date = previousdate.AddDays(1),
-                            Created = 0,
-                            Solved = 0
-                        });
-
-                        previousdate = previousdate.AddDays(1);
-                    }
-
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-            else
-            {
-                issueAggregates.Add(new()
-                {
-                    Date = DateTime.UtcNow.Date,
+                    Date = _Clock.UtcNow.Date,
                     Created = 0,
                     Solved = 0
-                });
+                }];
             }
 
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"{issueAggregates.Count} aggregate(s) created");
-            _logger.LogMessage(StandardValues.LoggerValues.Info, $"Created aggregates for repository {repository}");
+            List<IssueAggregateModel> issueAggregates = [];
+            DateTime start = sortedIssueAggregates.First().Date;
+            DateTime end = _Clock.UtcNow.Date;
+
+            for (DateTime date = start; date <= end; date = date.AddDays(1))
+            {
+                if (issueAggregatesDictionary.TryGetValue(date, out IssueAggregateModel? issueAggregate))
+                {
+                    issueAggregates.Add(issueAggregate);
+                }
+
+                else
+                {
+                    issueAggregates.Add(new IssueAggregateModel
+                    {
+                        Date = date,
+                        Created = 0,
+                        Solved = 0
+                    });
+                }
+            }
+
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{issueAggregates.Count} aggregate(s) created");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Created aggregates for repository {repository}");
             return issueAggregates;
         }
 
-        // Filters out existing issues from the given list of issues.
-        private List<IssueModel> FilterIssues(string repository, List<IssueModel> issues, List<IssueModel> existingIssues)
+        /// <summary>
+        /// Filters out existing issues from the given list of issues.
+        /// </summary>
+        public List<IssueModel> FilterIssues(string repository, List<IssueModel> issues, List<IssueModel> existingIssues)
         {
-            LoggerService _logger = new();
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filtering issues for repository {repository}");
 
-            _logger.LogMessage(StandardValues.LoggerValues.Info, $"Filtering issues for repository {repository}");
+            Dictionary<long, IssueModel> existingIssuesDictionary = existingIssues.ToDictionary(i => i.Id);
 
-            List<IssueModel> removedIssues = [];
-
-            foreach (IssueModel issue in issues)
+            int removedIssues = issues.RemoveAll(i =>
             {
-                IssueModel? existingIssue = existingIssues.Find(c => c.Id == issue.Id);
-
-                if (existingIssue != null)
+                if (!existingIssuesDictionary.TryGetValue(i.Id, out IssueModel? existingIssue))
                 {
-                    if (issue.Created_At == existingIssue.Created_At && issue.Closed_At == existingIssue.Closed_At)
-                    {
-                        removedIssues.Add(issue);
-                    }
+                    return false;
                 }
-            }
 
-            foreach (IssueModel issue in removedIssues)
-            {
-                issues.Remove(issue);
-            }
+                return i.Created_At == existingIssue.Created_At && i.Closed_At == existingIssue.Closed_At;
+            });
 
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"{removedIssues.Count} issue(s) removed");
-            _logger.LogMessage(StandardValues.LoggerValues.Info, $"Filtered issues for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{removedIssues} issue(s) removed");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Filtered issues for repository {repository}");
             return issues;
         }
     }

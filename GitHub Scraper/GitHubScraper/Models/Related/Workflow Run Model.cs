@@ -1,7 +1,9 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 namespace GitHubScraper.Models.Related
 {
-    // Stores information about the workflow run.
+    /// <summary>
+    /// Stores information about the workflow run.
+    /// </summary>
     public class WorkflowRunModel
     {
         public string? RepositoryName { get; set; }
@@ -13,7 +15,7 @@ namespace GitHubScraper.Models.Related
         public required string Event { get; set; }
         public required string Status { get; set; }
         public required string Conclusion { get; set; }
-        public required DateTime Created_At { get; set; }
-        public required DateTime Updated_At { get; set; }
+        public required DateTimeOffset Created_At { get; set; }
+        public required DateTimeOffset Updated_At { get; set; }
     }
 }

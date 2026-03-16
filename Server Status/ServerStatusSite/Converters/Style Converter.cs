@@ -1,10 +1,12 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 namespace ServerStatusSite.Converters
 {
-    // Returns the CSS to change the component to dark mode.
-    public class StyleConverter
+    public static class StyleConverter
     {
-        public string GetTopBarDarkMode(bool darkMode)
+        /// <summary>
+        /// Returns the CSS to change the component to dark mode.
+        /// </summary>
+        public static string GetTopBarDarkMode(bool darkMode)
         {
             return darkMode switch
             {
@@ -13,7 +15,10 @@ namespace ServerStatusSite.Converters
             };
         }
 
-        public string GetTopNavLinkDarkMode(bool darkMode)
+        /// <summary>
+        /// Returns the CSS to change the component to dark mode.
+        /// </summary>
+        public static string GetTopNavLinkDarkMode(bool darkMode)
         {
             return darkMode switch
             {
@@ -22,7 +27,10 @@ namespace ServerStatusSite.Converters
             };
         }
 
-        public string GetBodyDarkMode(bool darkMode)
+        /// <summary>
+        /// Returns the CSS to change the component to dark mode.
+        /// </summary>
+        public static string GetBodyDarkMode(bool darkMode)
         {
             return darkMode switch
             {
@@ -31,7 +39,10 @@ namespace ServerStatusSite.Converters
             };
         }
 
-        public string GetNavMenuDarkMode(bool darkMode)
+        /// <summary>
+        /// Returns the CSS to change the component to dark mode.
+        /// </summary>
+        public static string GetNavMenuDarkMode(bool darkMode)
         {
             return darkMode switch
             {
@@ -40,7 +51,10 @@ namespace ServerStatusSite.Converters
             };
         }
 
-        public string GetTableDarkMode(bool darkMode)
+        /// <summary>
+        /// Returns the CSS to change the component to dark mode.
+        /// </summary>
+        public static string GetTableDarkMode(bool darkMode)
         {
             return darkMode switch
             {
@@ -49,7 +63,10 @@ namespace ServerStatusSite.Converters
             };
         }
 
-        public string GetFormDarkMode(bool darkMode)
+        /// <summary>
+        /// Returns the CSS to change the component to dark mode.
+        /// </summary>
+        public static string GetFormDarkMode(bool darkMode)
         {
             return darkMode switch
             {
@@ -58,7 +75,10 @@ namespace ServerStatusSite.Converters
             };
         }
 
-        public string GetInputDarkMode(bool darkMode)
+        /// <summary>
+        /// Returns the CSS to change the component to dark mode.
+        /// </summary>
+        public static string GetInputDarkMode(bool darkMode)
         {
             return darkMode switch
             {
@@ -67,7 +87,10 @@ namespace ServerStatusSite.Converters
             };
         }
 
-        public string GetTableRowDarkMode(bool darkMode)
+        /// <summary>
+        /// Returns the CSS to change the component to dark mode.
+        /// </summary>
+        public static string GetTableRowDarkMode(bool darkMode)
         {
             return darkMode switch
             {

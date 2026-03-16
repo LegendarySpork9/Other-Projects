@@ -1,8 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Models.Data;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Services;
 using ServerStatusSite.Functions;
 
 namespace ServerStatusSite.Components.Pages
@@ -10,27 +11,30 @@ namespace ServerStatusSite.Components.Pages
     public partial class Login : ComponentBase
     {
         [Inject]
-        private LoggerService Logger { get; set; }
+        private ILoggerService _Logger { get; set; } = default!;
         [Inject]
-        private APIService APIService { get; set; }
+        private APIService APIService { get; set; } = default!;
         [Inject]
-        private IHttpContextAccessor HttpContextAccessor { get; set; }
+        private IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
         [Inject]
-        private NavigationManager Navigation { get; set; }
+        private NavigationManager Navigation { get; set; } = default!;
         [Inject]
-        private UserModel User { get; set; }
+        private UserModel User { get; set; } = default!;
+
         private string ReturnUrl { get; set; } = "/";
         private bool ShowError { get; set; } = false;
         private bool Loading { get; set; } = false;
 
-        // Captures the URL the user was trying to access and sets the API logger.
+        /// <summary>
+        /// Captures the URL the user was trying to access and sets the API _Logger.
+        /// </summary>
         protected override void OnInitialized()
         {
             if (HttpContextAccessor != null && HttpContextAccessor.HttpContext != null && HttpContextAccessor.HttpContext.Connection != null && HttpContextAccessor.HttpContext.Connection.RemoteIpAddress != null)
             {
-                Logger.ChangeIdentifier(HttpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString());
-                Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Login Page");
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Url: {Navigation.Uri}");
+                _Logger.ChangeIdentifier(HttpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString());
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Login Page");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Url: {Navigation.Uri}");
 
                 Uri uri = Navigation.ToAbsoluteUri(Navigation.Uri);
                 var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
@@ -39,41 +43,41 @@ namespace ServerStatusSite.Components.Pages
                 {
                     ReturnUrl = returnUrl.ToString() ?? "/";
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Return Url: {ReturnUrl}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Return Url: {ReturnUrl}");
                 }
 
-                APIService.SetLogger(Logger);
+                APIService.SetLogger(_Logger);
             }
         }
 
-        // Checks the user details and sends the user to the return URL.
+        /// <summary>
+        /// Checks the user details and sends the user to the return URL.
+        /// </summary>
         private async Task LoginClick()
         {
-            HashFunction _hasFunction = new();
-
             Loading = true;
             StateHasChanged();
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Login");
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Username: {User.Username}");
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Password: {User.Password}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Attempting Login");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Username: {User.Username}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Password: {User.Password}");
 
-            await APIService.AuthoriseAsync();
+            await APIService.Authorise();
             List<UserModel> users = await APIService.GetUsers();
-            UserModel? user = users.Find(c => c.Username == User.Username && c.Password == _hasFunction.HashString(User.Password));
+            UserModel? user = users.Find(c => c.Username == User.Username && c.Password == HashFunction.HashString(User.Password));
 
             if (user != null)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Login Successful.");
-                Logger.ChangeIdentifier(user.Username);
-                APIService.SetLogger(Logger);
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Login Successful.");
+                _Logger.ChangeIdentifier(user.Username);
+                APIService.SetLogger(_Logger);
                 User.UpdateModel(await APIService.GetUserSettings(user));
                 Navigation.NavigateTo(ReturnUrl);
             }
 
             else
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Info, "Login Failed.");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Login Failed.");
                 ShowError = true;
             }
 

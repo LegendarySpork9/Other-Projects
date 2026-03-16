@@ -1,11 +1,13 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 namespace GitHubScraper.Models.Related
 {
-    // Stores information about the user.
+    /// <summary>
+    /// Stores information about the user.
+    /// </summary>
     public class UserModel
     {
         public string? Login { get; set; }
         public string? Name { get; set; }
-        public DateTime? Date { get; set; }
+        public DateTimeOffset? Date { get; set; }
     }
 }

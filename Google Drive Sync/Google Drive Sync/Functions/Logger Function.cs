@@ -1,10 +1,14 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
+using Google.Apis.Drive.v3.Data;
+
 namespace GoogleDriveSync.Functions
 {
-    public class LoggerFunction
+    public static class LoggerFunction
     {
-        // Returns a sting of the meta data for a Google Drive file.
-        public string FormatFileMetaData(Google.Apis.Drive.v3.Data.File fileMetaData, string method)
+        /// <summary>
+        /// Returns a sting of the meta data for a Google Drive file.
+        /// </summary>
+        public static string FormatFileMetaData(File fileMetaData, string method)
         {
             string formattedFMD = string.Empty;
 

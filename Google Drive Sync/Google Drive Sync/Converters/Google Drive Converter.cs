@@ -1,10 +1,12 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
 namespace GoogleDriveSync.Converters
 {
-    public class GoogleDriveConverter
+    public static class GoogleDriveConverter
     {
-        // Returns the google drive file type.
-        public string GetMimeType(string fileType)
+        /// <summary>
+        /// Returns the google drive file type.
+        /// </summary>
+        public static string GetMimeType(string fileType)
         {
             switch (fileType)
             {
@@ -20,7 +22,9 @@ namespace GoogleDriveSync.Converters
             }
         }
 
-        // Returns the full file path of a file.
-        public string GetFilePath(string root, string sourcePath, string file) => $@"{root}\{sourcePath}\{file}";
+        /// <summary>
+        /// Returns the full file path of a file.
+        /// </summary>
+        public static string GetFilePath(string root, string sourcePath, string file) => $@"{root}\{sourcePath}\{file}";
     }
 }

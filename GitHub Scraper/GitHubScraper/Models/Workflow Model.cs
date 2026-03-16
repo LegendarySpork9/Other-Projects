@@ -1,9 +1,11 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 using GitHubScraper.Models.Related;
 
 namespace GitHubScraper.Models
 {
-    // Stores information about the workflow.
+    /// <summary>
+    /// Stores information about the workflow.
+    /// </summary>
     public class WorkflowModel
     {
         public required string Name { get; set; }

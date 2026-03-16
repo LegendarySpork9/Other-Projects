@@ -1,33 +1,36 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Models;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Models;
 using System.Text;
 
-namespace ServerSiteCommon.Services
+namespace ServerStatusCommon.Services
 {
     public class DiscordService
     {
-        private LoggerService Logger { get; set; }
-        private SharedSettingsModel SharedSettings { get; set; }
+        private readonly ILoggerService _Logger;
+        private readonly IHTTPClient _HTTPClient;
+        private readonly SharedSettingsModel SharedSettings;
 
         // Sets the class's global variables.
-        public DiscordService(SharedSettingsModel sharedSettings)
+        public DiscordService(
+            ILoggerService _logger,
+            IHTTPClient _httpClient,
+            SharedSettingsModel sharedSettings)
         {
+            _Logger = _logger;
+            _HTTPClient = _httpClient;
             SharedSettings = sharedSettings;
         }
 
-        // Sets the logger.
-        public void SetLogger(LoggerService _loggerService)
-        {
-            Logger = _loggerService;
-        }
-
-        // Sends a message to the given webhook URL.
-        public bool SendNotification(string recipientId, string message)
+        /// <summary>
+        /// Sends a message to the given webhook URL.
+        /// </summary>
+        public async Task<bool> SendNotification(string recipientId, string message)
         {
             if (SharedSettings.SendAlerts)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Info, "Sending Notification to Discord");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Sending Notification to Discord");
 
                 bool successfulSend = false;
 
@@ -35,109 +38,43 @@ namespace ServerSiteCommon.Services
                 {
                     string url = SharedSettings.WebhookURL + "?wait=true";
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient: {recipientId}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Message: {message}");
-
-                    HttpClient client = new();
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Client");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient: {recipientId}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Message: {message}");
 
                     string payload = "{\"content\": \"<@&" + recipientId + "> " + message + "\"}";
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Payload: {payload}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Payload: {payload}");
 
                     HttpContent content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Content");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Content");
 
                     HttpRequestMessage request = new(HttpMethod.Post, url)
                     {
                         Content = content
                     };
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Request Message");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Request Message");
 
-                    HttpResponseMessage response = client.Send(request);
+                    HttpResponseMessage? response = await _HTTPClient.Send(request);
 
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         successfulSend = true;
 
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
                     }
                 }
 
                 catch (Exception ex)
                 {
-                    Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                    Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
                 }
 
-                Logger.LogMessage(StandardValues.LoggerValues.Info, "Sent Notification to Discord");
-                return successfulSend;
-            }
-
-            return true;
-        }
-
-        // Sends a message to the given webhook URL.
-        public async Task<bool> SendNotificationAsync(string recipientId, string message)
-        {
-            if (SharedSettings.SendAlerts)
-            {
-                Logger.LogMessage(StandardValues.LoggerValues.Info, "Sending Notification to Discord");
-
-                bool successfulSend = false;
-
-                try
-                {
-                    string url = SharedSettings.WebhookURL + "?wait=true";
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient: {recipientId}");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Message: {message}");
-
-                    HttpClient client = new();
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Client");
-
-                    string payload = "{\"content\": \"<@&" + recipientId + "> " + message + "\"}";
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Payload: {payload}");
-
-                    HttpContent content = new StringContent(payload, Encoding.UTF8, "application/json");
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Content");
-
-                    HttpRequestMessage request = new(HttpMethod.Post, url)
-                    {
-                        Content = content
-                    };
-
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Request Message");
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
-
-                    HttpResponseMessage response = await client.SendAsync(request);
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        successfulSend = true;
-
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content}");
-                    }
-                }
-
-                catch (Exception ex)
-                {
-                    Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                    Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                }
-
-                Logger.LogMessage(StandardValues.LoggerValues.Info, "Sent Notification to Discord");
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Sent Notification to Discord");
                 return successfulSend;
             }
 

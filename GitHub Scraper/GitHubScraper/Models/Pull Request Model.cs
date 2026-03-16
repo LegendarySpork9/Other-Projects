@@ -1,9 +1,11 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 using GitHubScraper.Models.Related;
 
 namespace GitHubScraper.Models
 {
-    // Stores information about the pull request.
+    /// <summary>
+    /// Stores information about the pull request.
+    /// </summary>
     public class PullRequestModel
     {
         public string? Repository { get; set; }
@@ -13,10 +15,10 @@ namespace GitHubScraper.Models
         public required UserModel Assignee { get; set; }
         public string? Type { get; set; }
         public required string State { get; set; }
-        public required DateTime Created_At { get; set; }
-        public required DateTime Updated_At { get; set; }
-        public DateTime? Closed_At { get; set; }
-        public DateTime? Merged_At { get; set; }
+        public required DateTimeOffset Created_At { get; set; }
+        public required DateTimeOffset Updated_At { get; set; }
+        public DateTimeOffset? Closed_At { get; set; }
+        public DateTimeOffset? Merged_At { get; set; }
         public required List<LabelModel> Labels { get; set; } = [];
     }
 }

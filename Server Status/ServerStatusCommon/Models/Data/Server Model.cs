@@ -1,7 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Models.Data
+namespace ServerStatusCommon.Models.Data
 {
-    // Stores the server data.
+    /// <summary>
+    /// Stores the server data.
+    /// </summary>
     public class ServerModel
     {
         public string HostName { get; set; }

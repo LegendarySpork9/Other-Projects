@@ -1,4 +1,5 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
+using GitHubScraper.Abstractions;
 using GitHubScraper.Converters;
 using GitHubScraper.Models;
 using GitHubScraper.Models.Related;
@@ -8,648 +9,560 @@ namespace GitHubScraper.Services
 {
     public class DatabaseService
     {
-        private readonly LoggerService Logger = new();
+        private readonly ILoggerService _Logger;
+        private readonly IClock _Clock;
+        private readonly IFileSystem _FileSystem;
+        private readonly IDatabaseOptions _Options;
+        private readonly IDatabase _Database;
 
-        // Gets the last time the application was run for the given repository.
-        public DateTime GetLastRunDate(string repository)
+        // Sets the class's global variables.
+        public DatabaseService(
+            ILoggerService _logger,
+            IClock _clock,
+            IFileSystem _fileSystem,
+            IDatabaseOptions _options,
+            IDatabase _database)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the last run date for repository {repository}");
+            _Logger = _logger;
+            _Clock = _clock;
+            _FileSystem = _fileSystem;
+            _Options = _options;
+            _Database = _database;
+        }
 
-            DateTime lastRunDate = DateTime.Parse("01/01/1900").ToUniversalTime();
+        /// <summary>
+        /// Gets the last time the application was run for the given repository.
+        /// </summary>
+        public async Task<DateTime> GetLastRunDate(string repository)
+        {
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the last run date for repository {repository}");
+
+            DateTime lastRunDate = _Clock.DefaultDate;
 
             try
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\GetLastRunDate.sql");
+                SqlParameter[] parameters =
+                [
+                    new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = repository }
+                ];
+
+                (DateTime result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
                 {
-                    connection.Open();
+                    return DateTime.SpecifyKind(dataReader.GetDateTime(0), DateTimeKind.Utc);
+                }, parameters).Result;
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
+                if (ex != null)
+                {
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to obtain the last run date for repository {repository}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                }
 
-                    using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\GetLastRunDate.sql"), connection))
-                    {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
-
-                        command.Parameters.Add(new SqlParameter("@repository", repository));
-
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                        using (SqlDataReader dataReader = command.ExecuteReader())
-                        {
-                            while (dataReader.Read())
-                            {
-                                lastRunDate = dataReader.GetDateTime(0).ToUniversalTime();
-                            }
-
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Last Run Date: {lastRunDate:dd/MM/yyyy HH:mm:ss}");
-                        }
-
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained the last run date for repository {repository}");
-                    }
+                if (result != default)
+                {
+                    lastRunDate = result;
                 }
             }
 
             catch (Exception ex)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to obtain the last run date for repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to obtain the last run date for repository {repository}. Error Message: {ex.Message}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
 
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Last Run Date: {lastRunDate:dd/MM/yyyy HH:mm:ss}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained the last run date for repository {repository}");
             return lastRunDate;
         }
 
-        // Gets the existing issues for the given repository.
-        public List<IssueModel> GetIssues(string repository)
+        /// <summary>
+        ///  Gets the existing issues for the given repository.
+        /// </summary>
+        public async Task<List<IssueModel>> GetIssues(string repository)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the existing issues for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtaining the existing issues for repository {repository}");
 
             List<IssueModel> existingIssues = [];
 
             try
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\GetIssues.sql");
+                SqlParameter[] parameters =
+                [
+                    new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = repository }
+                ];
+
+                (existingIssues, Exception? ex) = _Database.Query(sql, dataReader =>
                 {
-                    connection.Open();
+                    DateTime createdDate = DateTime.SpecifyKind(dataReader.GetDateTime(1), DateTimeKind.Utc);
+                    DateTime updatedDate = DateTime.SpecifyKind(dataReader.GetDateTime(2), DateTimeKind.Utc);
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
-
-                    using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\GetIssues.sql"), connection))
+                    return new IssueModel
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
+                        Id = dataReader.GetInt64(0),
+                        Number = 0,
+                        Title = "UnLoaded",
+                        State = "UnLoaded",
+                        Created_At = createdDate,
+                        Closed_At = updatedDate,
+                        Labels = []
+                    };
+                }, parameters).Result;
 
-                        command.Parameters.Add(new SqlParameter("@repository", repository));
-
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                        using (SqlDataReader dataReader = command.ExecuteReader())
-                        {
-                            while (dataReader.Read())
-                            {
-                                existingIssues.Add(new()
-                                {
-                                    Id = dataReader.GetInt64(0),
-                                    Number = 0,
-                                    Title = "UnLoaded",
-                                    State = "UnLoaded",
-                                    Created_At = dataReader.GetDateTime(1),
-                                    Closed_At = dataReader.GetDateTime(2),
-                                    Labels = []
-                                });
-                            }
-
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{existingIssues.Count} existsing issue(s)");
-                        }
-
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained the existing issues for repository {repository}");
-                    }
+                if (ex != null)
+                {
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to obtain the existing issues for repository {repository}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
                 }
             }
 
             catch (Exception ex)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to obtain the existing issues for repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to obtain the existing issues for repository {repository}. Error Message: {ex.Message}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
 
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{existingIssues.Count} existsing issue(s)");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Obtained the existing issues for repository {repository}");
             return existingIssues;
         }
 
-        // Outputs the issues to the database.
-        public void OutputIssues(string repository, List<IssueModel> issues)
+        /// <summary>
+        /// Outputs the issues to the database.
+        /// </summary>
+        public async Task OutputIssues(string repository, List<IssueModel> issues)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {issues.Count} issue(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {issues.Count} issue(s) for repository {repository}");
 
             List<IssueModel> successful = [];
             List<IssueModel> errored = [];
 
-            try
+            foreach (IssueModel issue in issues)
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting issue {issue.Number}");
+
+                try
                 {
-                    connection.Open();
+                    string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputIssue.sql");
+                    SqlParameter[] parameters =
+                    [
+                        new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = issue.Repository },
+                        new SqlParameter("@issueId", System.Data.SqlDbType.BigInt) { Value = issue.Id },
+                        new SqlParameter("@number", System.Data.SqlDbType.Int) { Value = issue.Number },
+                        new SqlParameter("@title", System.Data.SqlDbType.VarChar) { Value = issue.Title },
+                        new SqlParameter("@assignee", System.Data.SqlDbType.VarChar) { Value = issue.Assignee?.Login ?? "Unassigned" },
+                        new SqlParameter("@type", System.Data.SqlDbType.VarChar) { Value = issue.Type ?? "Undefined" },
+                        new SqlParameter("@status", System.Data.SqlDbType.VarChar) { Value = issue.State },
+                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = issue.Created_At.UtcDateTime },
+                        new SqlParameter("@dateSolved", System.Data.SqlDbType.DateTime) { Value = issue.Closed_At?.UtcDateTime ?? _Clock.DefaultDate }
+                    ];
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
-
-                    foreach (IssueModel issue in issues)
+                    (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting issue {issue.Number}");
+                        return dataReader.GetInt32(0);
+                    }, parameters).Result;
 
-                        try
-                        {
-                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\OutputIssue.sql"), connection))
-                            {
-                                int result = -1;
+                    if (ex != null)
+                    {
+                        errored.Add(issue);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output issue {issue.Number}. Error Message: {ex.Message}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                    }
 
-                                command.Parameters.Add(new SqlParameter("@repository", issue.Repository));
-                                command.Parameters.Add(new SqlParameter("@issueId", issue.Id));
-                                command.Parameters.Add(new SqlParameter("@number", issue.Number));
-                                command.Parameters.Add(new SqlParameter("@title", issue.Title));
-                                command.Parameters.Add(new SqlParameter("@assignee", issue.Assignee?.Login ?? "Unassigned"));
-                                command.Parameters.Add(new SqlParameter("@type", issue.Type ?? "Undefined"));
-                                command.Parameters.Add(new SqlParameter("@status", issue.State));
-                                command.Parameters.Add(new SqlParameter("@dateCreated", issue.Created_At));
-                                command.Parameters.Add(new SqlParameter("@dateSolved", issue.Closed_At ?? DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime()));
+                    if (result == 0)
+                    {
+                        successful.Add(issue);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                                using (SqlDataReader dataReader = command.ExecuteReader())
-                                {
-                                    while (dataReader.Read())
-                                    {
-                                        result = dataReader.GetInt32(0);
-                                    }
-                                }
-
-                                if (result == 0)
-                                {
-                                    successful.Add(issue);
-                                }
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted issue {issue.Number}");
-                            }
-                        }
-
-                        catch (Exception ex)
-                        {
-                            errored.Add(issue);
-
-                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output issue {issue.Number}. Error Message: {ex.Message}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
-                        }
+                        _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted issue {issue.Number}");
                     }
                 }
-            }
 
-            catch (Exception ex)
-            {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output the issue(s) for repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                catch (Exception ex)
+                {
+                    errored.Add(issue);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output issue {issue.Number}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                }
             }
 
             if (issues.Count > 0)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issues.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issues.Count) * 100}%) output errored");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issues.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issues.Count) * 100}%) output errored");
             }
             
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {issues.Count} issue(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {issues.Count} issue(s) for repository {repository}");
         }
 
-        // Outputs the commits to the database.
-        public void OutputCommits(string repository, List<CommitModel> commits)
+        /// <summary>
+        /// Outputs the commits to the database.
+        /// </summary>
+        public async Task OutputCommits(string repository, List<CommitModel> commits)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {commits.Count} commit(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {commits.Count} commit(s) for repository {repository}");
 
             List<CommitModel> successful = [];
             List<CommitModel> errored = [];
 
-            try
+            foreach (CommitModel commit in commits)
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting commit {commit.Sha}");
+
+                try
                 {
-                    connection.Open();
+                    string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputCommit.sql");
+                    SqlParameter[] parameters =
+                    [
+                        new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = commit.Repository },
+                        new SqlParameter("@author", System.Data.SqlDbType.VarChar) { Value = commit.Commit.Author.Name },
+                        new SqlParameter("@committer", System.Data.SqlDbType.VarChar) { Value = commit.Commit.Committer.Name },
+                        new SqlParameter("@sha", System.Data.SqlDbType.VarChar) { Value = commit.Sha },
+                        new SqlParameter("@message", System.Data.SqlDbType.VarChar) { Value = commit.Commit.Message }
+                    ];
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
-
-                    foreach (CommitModel commit in commits)
+                    (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting commit {commit.Sha}");
+                        return dataReader.GetInt32(0);
+                    }, parameters).Result;
 
-                        try
-                        {
-                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\OutputCommit.sql"), connection))
-                            {
-                                int result = -1;
+                    if (ex != null)
+                    {
+                        errored.Add(commit);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output commit {commit.Sha}. Error Message: {ex.Message}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                    }
 
-                                command.Parameters.Add(new SqlParameter("@repository", commit.Repository));
-                                command.Parameters.Add(new SqlParameter("@author", commit.Commit.Author.Name));
-                                command.Parameters.Add(new SqlParameter("@committer", commit.Commit.Committer.Name));
-                                command.Parameters.Add(new SqlParameter("@sha", commit.Sha));
-                                command.Parameters.Add(new SqlParameter("@message", commit.Commit.Message));
+                    if (result == 0)
+                    {
+                        successful.Add(commit);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                                using (SqlDataReader dataReader = command.ExecuteReader())
-                                {
-                                    while (dataReader.Read())
-                                    {
-                                        result = dataReader.GetInt32(0);
-                                    }
-                                }
-
-                                if (result == 0)
-                                {
-                                    successful.Add(commit);
-                                }
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted commit {commit.Sha}");
-                            }
-                        }
-
-                        catch (Exception ex)
-                        {
-                            errored.Add(commit);
-
-                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output commit {commit.Sha}. Error Message: {ex.Message}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
-                        }
+                        _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted commit {commit.Sha}");
                     }
                 }
-            }
 
-            catch (Exception ex)
-            {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output the commit(s) for repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                catch (Exception ex)
+                {
+                    errored.Add(commit);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output commit {commit.Sha}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                }
             }
 
             if (commits.Count > 0)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / commits.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / commits.Count) * 100}%) output errored");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / commits.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / commits.Count) * 100}%) output errored");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {commits.Count} commit(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {commits.Count} commit(s) for repository {repository}");
         }
 
-        // Outputs the pull requests to the database.
-        public void OutputPullRequests(string repository, List<PullRequestModel> pullRequests)
+        /// <summary>
+        /// Outputs the pull requests to the database.
+        /// </summary>
+        public async Task OutputPullRequests(string repository, List<PullRequestModel> pullRequests)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {pullRequests.Count} pull request(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {pullRequests.Count} pull request(s) for repository {repository}");
 
             List<PullRequestModel> successful = [];
             List<PullRequestModel> errored = [];
 
-            try
+            foreach (PullRequestModel pullRequest in pullRequests)
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting pull request {pullRequest.Number}");
+
+                try
                 {
-                    connection.Open();
+                    string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputPullRequest.sql");
+                    SqlParameter[] parameters =
+                    [
+                        new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = pullRequest.Repository },
+                        new SqlParameter("@pullRequestId", System.Data.SqlDbType.BigInt) { Value = pullRequest.Id },
+                        new SqlParameter("@number", System.Data.SqlDbType.Int) { Value = pullRequest.Number },
+                        new SqlParameter("@title", System.Data.SqlDbType.VarChar) { Value = pullRequest.Title },
+                        new SqlParameter("@assignee", System.Data.SqlDbType.VarChar) { Value = pullRequest.Assignee?.Login ?? "Unassigned" },
+                        new SqlParameter("@type", System.Data.SqlDbType.VarChar) { Value = pullRequest.Type ?? "Undefined" },
+                        new SqlParameter("@status", System.Data.SqlDbType.VarChar) { Value = pullRequest.State },
+                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = pullRequest.Created_At.UtcDateTime },
+                        new SqlParameter("@dateSolved", System.Data.SqlDbType.DateTime) { Value = pullRequest.Closed_At?.UtcDateTime ?? _Clock.DefaultDate },
+                        new SqlParameter("@dateMerged", System.Data.SqlDbType.DateTime) { Value = pullRequest.Merged_At?.UtcDateTime ?? _Clock.DefaultDate }
+                    ];
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
-
-                    foreach (PullRequestModel pullRequest in pullRequests)
+                    (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting pull request {pullRequest.Number}");
+                        return dataReader.GetInt32(0);
+                    }, parameters).Result;
 
-                        try
-                        {
-                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\OutputPullRequest.sql"), connection))
-                            {
-                                int result = -1;
+                    if (ex != null)
+                    {
+                        errored.Add(pullRequest);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
-
-                                command.Parameters.Add(new SqlParameter("@repository", pullRequest.Repository));
-                                command.Parameters.Add(new SqlParameter("@pullRequestId", pullRequest.Id));
-                                command.Parameters.Add(new SqlParameter("@number", pullRequest.Number));
-                                command.Parameters.Add(new SqlParameter("@title", pullRequest.Title));
-                                command.Parameters.Add(new SqlParameter("@assignee", pullRequest.Assignee?.Login ?? "Unassigned"));
-                                command.Parameters.Add(new SqlParameter("@type", pullRequest.Type ?? "Undefined"));
-                                command.Parameters.Add(new SqlParameter("@status", pullRequest.State));
-                                command.Parameters.Add(new SqlParameter("@dateCreated", pullRequest.Created_At));
-                                command.Parameters.Add(new SqlParameter("@dateSolved", pullRequest.Closed_At ?? DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime()));
-                                command.Parameters.Add(new SqlParameter("@dateMerged", pullRequest.Merged_At ?? DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime()));
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                                using (SqlDataReader dataReader = command.ExecuteReader())
-                                {
-                                    while (dataReader.Read())
-                                    {
-                                        result = dataReader.GetInt32(0);
-                                    }
-                                }
-
-                                if (result == 0)
-                                {
-                                    successful.Add(pullRequest);
-                                }
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted pull request {pullRequest.Number}");
-                            }
-                        }
-
-                        catch (Exception ex)
-                        {
-                            errored.Add(pullRequest);
-
-                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output pull request {pullRequest.Number}. Error Message: {ex.Message}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
-                        }
+                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output pull request {pullRequest.Number}. Error Message: {ex.Message}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
                     }
-                }
-            }
 
-            catch (Exception ex)
-            {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output the pull request(s) for repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                    if (result == 0)
+                    {
+                        successful.Add(pullRequest);
+                    }
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted pull request {pullRequest.Number}");
+                }
+
+                catch (Exception ex)
+                {
+                    errored.Add(pullRequest);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output pull request {pullRequest.Number}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                }
             }
 
             if (pullRequests.Count > 0)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / pullRequests.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / pullRequests.Count) * 100}%) output errored");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / pullRequests.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / pullRequests.Count) * 100}%) output errored");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {pullRequests.Count} pull request(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {pullRequests.Count} pull request(s) for repository {repository}");
         }
 
-        // Outputs the workflow runs to the database.
-        public void OutputWorkflowRuns(string repository, WorkflowModel workflow)
+        /// <summary>
+        /// Outputs the workflow runs to the database.
+        /// </summary>
+        public async Task OutputWorkflowRuns(string repository, WorkflowModel workflow)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {workflow.WorkflowRuns.Count} workflow run(s) for {workflow.Name} workflow in repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {workflow.WorkflowRuns.Count} workflow run(s) for {workflow.Name} workflow in repository {repository}");
 
             List<WorkflowRunModel> successful = [];
             List<WorkflowRunModel> errored = [];
 
-            try
+            foreach (WorkflowRunModel workflowRun in workflow.WorkflowRuns)
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting workflow run {workflowRun.Run_Number}");
+
+                try
                 {
-                    connection.Open();
+                    string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputWorkflowRun.sql");
+                    SqlParameter[] parameters =
+                    [
+                        new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = workflowRun.RepositoryName },
+                        new SqlParameter("@workflow", System.Data.SqlDbType.VarChar) { Value = workflowRun.Name },
+                        new SqlParameter("@workflowRunId", System.Data.SqlDbType.BigInt) { Value = workflowRun.Id },
+                        new SqlParameter("@runNumber", System.Data.SqlDbType.Int) { Value = workflowRun.Run_Number },
+                        new SqlParameter("@actor", System.Data.SqlDbType.VarChar) { Value = workflowRun.Actor.Login },
+                        new SqlParameter("@displayTitle", System.Data.SqlDbType.VarChar) { Value = workflowRun.Display_Title },
+                        new SqlParameter("@event", System.Data.SqlDbType.VarChar) { Value = workflowRun.Event },
+                        new SqlParameter("@status", System.Data.SqlDbType.VarChar) { Value = workflowRun.Status },
+                        new SqlParameter("@conclusion", System.Data.SqlDbType.VarChar) { Value = workflowRun.Conclusion },
+                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = workflowRun.Created_At.UtcDateTime },
+                    ];
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
-
-                    foreach (WorkflowRunModel workflowRun in workflow.WorkflowRuns)
+                    (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting workflow run {workflowRun.Run_Number}");
+                        return dataReader.GetInt32(0);
+                    }, parameters).Result;
 
-                        try
-                        {
-                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\OutputWorkflowRun.sql"), connection))
-                            {
-                                int result = -1;
+                    if (ex != null)
+                    {
+                        errored.Add(workflowRun);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output workflow run {workflowRun.Run_Number}. Error Message: {ex.Message}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                    }
 
-                                command.Parameters.Add(new SqlParameter("@repository", workflowRun.RepositoryName));
-                                command.Parameters.Add(new SqlParameter("@workflow", workflowRun.Name));
-                                command.Parameters.Add(new SqlParameter("@workflowRunId", workflowRun.Id));
-                                command.Parameters.Add(new SqlParameter("@runNumber", workflowRun.Run_Number));
-                                command.Parameters.Add(new SqlParameter("@actor", workflowRun.Actor.Login));
-                                command.Parameters.Add(new SqlParameter("@displayTitle", workflowRun.Display_Title));
-                                command.Parameters.Add(new SqlParameter("@event", workflowRun.Event));
-                                command.Parameters.Add(new SqlParameter("@status", workflowRun.Status));
-                                command.Parameters.Add(new SqlParameter("@conclusion", workflowRun.Conclusion));
-                                command.Parameters.Add(new SqlParameter("@dateCreated", workflowRun.Created_At));
+                    if (result == 0)
+                    {
+                        successful.Add(workflowRun);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                                using (SqlDataReader dataReader = command.ExecuteReader())
-                                {
-                                    while (dataReader.Read())
-                                    {
-                                        result = dataReader.GetInt32(0);
-                                    }
-                                }
-
-                                if (result == 0)
-                                {
-                                    successful.Add(workflowRun);
-                                }
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted workflow run {workflowRun.Run_Number}");
-                            }
-                        }
-
-                        catch (Exception ex)
-                        {
-                            errored.Add(workflowRun);
-
-                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output workflow run {workflowRun.Run_Number}. Error Message: {ex.Message}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
-                        }
+                        _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted workflow run {workflowRun.Run_Number}");
                     }
                 }
-            }
 
-            catch (Exception ex)
-            {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output the workflow run(s) for {workflow.Name} workflow in repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                catch (Exception ex)
+                {
+                    errored.Add(workflowRun);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output workflow run {workflowRun.Run_Number}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                }
             }
 
             if (workflow.WorkflowRuns.Count > 0)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / workflow.WorkflowRuns.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / workflow.WorkflowRuns.Count) * 100}%) output errored");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / workflow.WorkflowRuns.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / workflow.WorkflowRuns.Count) * 100}%) output errored");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {workflow.WorkflowRuns.Count} workflow run(s) for {workflow.Name} workflow in repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {workflow.WorkflowRuns.Count} workflow run(s) for {workflow.Name} workflow in repository {repository}");
         }
 
-        // Outputs the releases to the database.
-        public void OutputReleases(string repository, List<ReleaseModel> releases)
+        /// <summary>
+        /// Outputs the releases to the database.
+        /// </summary>
+        public async Task OutputReleases(string repository, List<ReleaseModel> releases)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {releases.Count} release(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting {releases.Count} release(s) for repository {repository}");
 
             List<ReleaseModel> successful = [];
             List<ReleaseModel> errored = [];
 
-            try
+            foreach (ReleaseModel release in releases)
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting release {release.Id}");
+
+                try
                 {
-                    connection.Open();
+                    string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\OutputRelease.sql");
+                    SqlParameter[] parameters =
+                    [
+                        new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = release.Repository },
+                        new SqlParameter("@releaseId", System.Data.SqlDbType.BigInt) { Value = release.Id },
+                        new SqlParameter("@name", System.Data.SqlDbType.VarChar) { Value = release.Name },
+                        new SqlParameter("@author", System.Data.SqlDbType.VarChar) { Value = release.Author.Login },
+                        new SqlParameter("@draft", System.Data.SqlDbType.Bit) { Value = release.Draft },
+                        new SqlParameter("@assets", System.Data.SqlDbType.Int) { Value = release.Assets.Count },
+                        new SqlParameter("@body", System.Data.SqlDbType.VarChar) { Value = release.Body },
+                        new SqlParameter("@dateCreated", System.Data.SqlDbType.DateTime) { Value = release.Created_At.UtcDateTime },
+                        new SqlParameter("@datePublished", System.Data.SqlDbType.DateTime) { Value = release.Published_At?.UtcDateTime ?? _Clock.DefaultDate },
+                    ];
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
-
-                    foreach (ReleaseModel release in releases)
+                    (int result, Exception? ex) = _Database.QuerySingle(sql, dataReader =>
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputting release {release.Id}");
+                        return dataReader.GetInt32(0);
+                    }, parameters).Result;
 
-                        try
-                        {
-                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\OutputRelease.sql"), connection))
-                            {
-                                int result = -1;
+                    if (ex != null)
+                    {
+                        errored.Add(release);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output release {release.Id}. Error Message: {ex.Message}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                    }
 
-                                command.Parameters.Add(new SqlParameter("@repository", release.Repository));
-                                command.Parameters.Add(new SqlParameter("@releaseId", release.Id));
-                                command.Parameters.Add(new SqlParameter("@name", release.Name));
-                                command.Parameters.Add(new SqlParameter("@author", release.Author.Login));
-                                command.Parameters.Add(new SqlParameter("@draft", release.Draft));
-                                command.Parameters.Add(new SqlParameter("@assets", release.Assets.Count));
-                                command.Parameters.Add(new SqlParameter("@body", release.Body));
-                                command.Parameters.Add(new SqlParameter("@dateCreated", release.Created_At));
-                                command.Parameters.Add(new SqlParameter("@datePublished", release.Published_At ?? DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime()));
+                    if (result == 0)
+                    {
+                        successful.Add(release);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                                using (SqlDataReader dataReader = command.ExecuteReader())
-                                {
-                                    while (dataReader.Read())
-                                    {
-                                        result = dataReader.GetInt32(0);
-                                    }
-                                }
-
-                                if (result == 0)
-                                {
-                                    successful.Add(release);
-                                }
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted release {release.Id}");
-                            }
-                        }
-
-                        catch (Exception ex)
-                        {
-                            errored.Add(release);
-
-                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output release {release.Id}. Error Message: {ex.Message}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
-                        }
+                        _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted release {release.Id}");
                     }
                 }
-            }
 
-            catch (Exception ex)
-            {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output the release(s) for repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                catch (Exception ex)
+                {
+                    errored.Add(release);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to output release {release.Id}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                }
             }
 
             if (releases.Count > 0)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / releases.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / releases.Count) * 100}%) output errored");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / releases.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / releases.Count) * 100}%) output errored");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {releases.Count} release(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Outputted {releases.Count} release(s) for repository {repository}");
         }
 
-        // Updates or inserts the issue aggregate record in the database.
-        public void LogIssueAggregates(string repository, List<IssueAggregateModel> issueAggregates)
+        /// <summary>
+        /// Updates or inserts the issue aggregate record in the database.
+        /// </summary>
+        public async Task LogIssueAggregates(string repository, List<IssueAggregateModel> issueAggregates)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging {issueAggregates.Count} issue aggregate(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging {issueAggregates.Count} issue aggregate(s) for repository {repository}");
 
             List<IssueAggregateModel> successful = [];
             List<IssueAggregateModel> errored = [];
 
-            try
+            foreach (IssueAggregateModel issueAggregate in issueAggregates)
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}");
+
+                try
                 {
-                    connection.Open();
+                    string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\LogIssueAggregate.sql");
+                    SqlParameter[] parameters =
+                    [
+                        new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = repository },
+                        new SqlParameter("@date", System.Data.SqlDbType.DateTime) { Value = issueAggregate.Date },
+                        new SqlParameter("@created", System.Data.SqlDbType.Int) { Value = issueAggregate.Created },
+                        new SqlParameter("@solved", System.Data.SqlDbType.Int) { Value = issueAggregate.Solved }
+                    ];
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
+                    (int result, Exception? ex) = _Database.Execute(sql, parameters).Result;
 
-                    foreach (IssueAggregateModel issueAggregate in issueAggregates)
+                    if (ex != null)
                     {
-                        Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}");
+                        errored.Add(issueAggregate);
 
-                        try
-                        {
-                            using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\LogIssueAggregate.sql"), connection))
-                            {
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}. Error Message: {ex.Message}");
+                        _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                    }
 
-                                command.Parameters.Add(new SqlParameter("@repository", repository));
-                                command.Parameters.Add(new SqlParameter("@date", issueAggregate.Date));
-                                command.Parameters.Add(new SqlParameter("@created", issueAggregate.Created));
-                                command.Parameters.Add(new SqlParameter("@solved", issueAggregate.Solved));
+                    if (result == 1)
+                    {
+                        successful.Add(issueAggregate);
 
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                                Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                                int rowsAffected = command.ExecuteNonQuery();
-
-                                if (rowsAffected == 1)
-                                {
-                                    successful.Add(issueAggregate);
-                                }
-
-                                Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}");
-                            }
-                        }
-
-                        catch (Exception ex)
-                        {
-                            errored.Add(issueAggregate);
-
-                            Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}. Error Message: {ex.Message}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
-                        }
+                        _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}");
                     }
                 }
-            }
 
-            catch (Exception ex)
-            {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log the issue aggregates(s) for repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                catch (Exception ex)
+                {
+                    errored.Add(issueAggregate);
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log issue aggregate for {issueAggregate.Date:dd/MM/yyyy HH:mm:ss}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                }
             }
 
             if (issueAggregates.Count > 0)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issueAggregates.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issueAggregates.Count) * 100}%) output errored");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"{successful.Count} ({(successful.Count / issueAggregates.Count) * 100}%) output successful, {errored.Count} ({(errored.Count / issueAggregates.Count) * 100}%) output errored");
             }
 
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged {issueAggregates.Count} issue aggregate(s) for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged {issueAggregates.Count} issue aggregate(s) for repository {repository}");
         }
 
-        // Logs the run to the database.
-        public void LogRun(string repository, int issues, int commits, int pullRequests, int workflowRuns, int releases)
+        /// <summary>
+        /// Logs the run to the database.
+        /// </summary>
+        public async Task LogRun(string repository, int issues, int commits, int pullRequests, int workflowRuns, int releases)
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging run for repository {repository}");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logging run for repository {repository}");
 
             try
             {
-                using (SqlConnection connection = new(AppSettingsModel.ConnectionString))
+                string sql = await _FileSystem.ReadAllText($@"{_Options.SQLFiles}\LogRun.sql");
+                SqlParameter[] parameters =
+                [
+                    new SqlParameter("@repository", System.Data.SqlDbType.VarChar) { Value = repository },
+                    new SqlParameter("@issues", System.Data.SqlDbType.Int) { Value = issues },
+                    new SqlParameter("@commits", System.Data.SqlDbType.Int) { Value = commits },
+                    new SqlParameter("@pullRequests", System.Data.SqlDbType.Int) { Value = pullRequests },
+                    new SqlParameter("@workflowRuns", System.Data.SqlDbType.Int) { Value = workflowRuns },
+                    new SqlParameter("@releases", System.Data.SqlDbType.Int) { Value = releases }
+                ];
+
+                (int result, Exception? ex) = _Database.Execute(sql, parameters).Result;
+
+                if (ex != null)
                 {
-                    connection.Open();
+                    _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log run for repository {repository}. Error Message: {ex.Message}");
+                    _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                }
 
-                    Logger.LogMessage(StandardValues.LoggerValues.Debug, "SQL Connection Opened");
-
-                    using (SqlCommand command = new(File.ReadAllText($@"{AppSettingsModel.SQLFiles}\LogRun.sql"), connection))
-                    {
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Command Loaded");
-
-                        command.Parameters.Add(new SqlParameter("@repository", repository));
-                        command.Parameters.Add(new SqlParameter("@issues", issues));
-                        command.Parameters.Add(new SqlParameter("@commits", commits));
-                        command.Parameters.Add(new SqlParameter("@pullRequests", pullRequests));
-                        command.Parameters.Add(new SqlParameter("@workflowRuns", workflowRuns));
-                        command.Parameters.Add(new SqlParameter("@releases", releases));
-
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Parameters Set");
-                        Logger.LogMessage(StandardValues.LoggerValues.Debug, "Executing Query");
-
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        if (rowsAffected == 1)
-                        {
-                            Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged run for repository {repository}");
-                        }
-
-                        else
-                        {
-                            Logger.LogMessage(StandardValues.LoggerValues.Error, $"An unknown error occured logging run for repository {repository}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Repository: {repository}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"issues: {issues}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"commits: {commits}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"pullRequests: {pullRequests}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"workflowRuns: {workflowRuns}");
-                            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"releases: {releases}");
-                        }
-                    }
+                if (result == 1)
+                {
+                    _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Logged run for repository {repository}");
                 }
             }
 
             catch (Exception ex)
             {
-                Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log run for repository {repository}. Error Message: {ex.Message}");
-                Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Failed to log run for repository {repository}. Error Message: {ex.Message}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, $"Full Error: {ex}");
             }
         }
     }

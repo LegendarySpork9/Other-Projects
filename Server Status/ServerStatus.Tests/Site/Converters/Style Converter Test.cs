@@ -10,9 +10,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestTopBarDarkModeTrue()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetTopBarDarkMode(true);
+            string style = StyleConverter.GetTopBarDarkMode(true);
 
             Assert.AreEqual("background-color: #3E3E3E; border: 1px solid transparent;", style);
         }
@@ -20,9 +18,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestTopBarDarkModeFalse()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetTopBarDarkMode(false);
+            string style = StyleConverter.GetTopBarDarkMode(false);
 
             Assert.AreEqual(string.Empty, style);
         }
@@ -30,9 +26,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestTopNavLinkDarkModeTrue()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetTopNavLinkDarkMode(true);
+            string style = StyleConverter.GetTopNavLinkDarkMode(true);
 
             Assert.AreEqual("color: white;", style);
         }
@@ -40,9 +34,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestTopNavLinkDarkModeFalse()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetTopNavLinkDarkMode(false);
+            string style = StyleConverter.GetTopNavLinkDarkMode(false);
 
             Assert.AreEqual(string.Empty, style);
         }
@@ -50,9 +42,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestBodyDarkModeTrue()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetBodyDarkMode(true);
+            string style = StyleConverter.GetBodyDarkMode(true);
 
             Assert.AreEqual("background-color: #313131; color: #A9A9A9;", style);
         }
@@ -60,9 +50,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestBodyDarkModeFalse()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetBodyDarkMode(false);
+            string style = StyleConverter.GetBodyDarkMode(false);
 
             Assert.AreEqual(string.Empty, style);
         }
@@ -70,9 +58,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestNavMenuDarkModeTrue()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetNavMenuDarkMode(true);
+            string style = StyleConverter.GetNavMenuDarkMode(true);
 
             Assert.AreEqual("background-color: #4E4E4E; color: white;", style);
         }
@@ -80,9 +66,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestNavMenuDarkModeFalse()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetNavMenuDarkMode(false);
+            string style = StyleConverter.GetNavMenuDarkMode(false);
 
             Assert.AreEqual(string.Empty, style);
         }
@@ -90,9 +74,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestTableDarkModeTrue()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetTableDarkMode(true);
+            string style = StyleConverter.GetTableDarkMode(true);
 
             Assert.AreEqual("color: #A9A9A9;", style);
         }
@@ -100,9 +82,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestTableDarkModeFalse()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetTableDarkMode(false);
+            string style = StyleConverter.GetTableDarkMode(false);
 
             Assert.AreEqual(string.Empty, style);
         }
@@ -110,9 +90,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestFormDarkModeTrue()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetFormDarkMode(true);
+            string style = StyleConverter.GetFormDarkMode(true);
 
             Assert.AreEqual("form-dark", style);
         }
@@ -120,9 +98,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestFormDarkModeFalse()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetFormDarkMode(false);
+            string style = StyleConverter.GetFormDarkMode(false);
 
             Assert.AreEqual(string.Empty, style);
         }
@@ -130,9 +106,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestInputDarkModeTrue()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetInputDarkMode(true);
+            string style = StyleConverter.GetInputDarkMode(true);
 
             Assert.AreEqual("background-color: #3E3E3E; color: #A9A9A9; border: 1px solid deepskyblue;", style);
         }
@@ -140,9 +114,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestInputDarkModeFalse()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetInputDarkMode(false);
+            string style = StyleConverter.GetInputDarkMode(false);
 
             Assert.AreEqual(string.Empty, style);
         }
@@ -150,9 +122,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestTableRowDarkModeTrue()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetTableRowDarkMode(true);
+            string style = StyleConverter.GetTableRowDarkMode(true);
 
             Assert.AreEqual("dark-mode", style);
         }
@@ -160,9 +130,7 @@ namespace ServerSite.Tests.Site.Converters
         [TestMethod]
         public void TestTableRowDarkModeFalse()
         {
-            Mock<StyleConverter> _mockStyleConverter = new();
-
-            string style = _mockStyleConverter.Object.GetTableRowDarkMode(false);
+            string style = StyleConverter.GetTableRowDarkMode(false);
 
             Assert.AreEqual(string.Empty, style);
         }

@@ -1,6 +1,8 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
+using GoogleDriveSync.Abstractions;
 using GoogleDriveSync.Converters;
 using GoogleDriveSync.Functions;
+using GoogleDriveSync.Implementations;
 using GoogleDriveSync.Models;
 using GoogleDriveSync.Services;
 using System;
@@ -14,27 +16,23 @@ namespace GoogleDriveSync
     public partial class MainSyncPage : Form
     {
         private readonly ApplicationService AppService = new ApplicationService();
+        private readonly ILoggerService _Logger = new LoggerServiceWrapper();
+
         private List<FileModel> Files = new List<FileModel>();
+        private readonly List<DataGridViewRow> RowsToUpdate = new List<DataGridViewRow>();
         private DataGridViewRow CurrentRow;
         private bool TablePopulated = false;
-        private List<DataGridViewRow> RowsToUpdate = new List<DataGridViewRow>();
 
         public MainSyncPage()
         {
             InitializeComponent();
 
-            LoggerService _logger = new LoggerService();
-
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Google Drive Folder: {AppSettingsModel.DriveFolder}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Local Folder: {AppSettingsModel.LocalFolder}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Ignore Folder(s): {string.Join(",", AppSettingsModel.IgnoreFolders)}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Ignore File(s): {string.Join(",", AppSettingsModel.IgnoreFiles)}");
-
             AppService.ProgressChanged += ProgressChanged;
         }
 
-        // Increases the value of the pogress bar.
+        /// <summary>
+        /// Increases the value of the pogress bar.
+        /// </summary>
         private void ProgressChanged(int value)
         {
             if (PRBLoading.InvokeRequired)
@@ -48,7 +46,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Populates the file information grid.
+        /// <summary>
+        /// Populates the file information grid.
+        /// </summary>
         private async void BTNCompareClick(object sender, EventArgs e)
         {
             BTNCompare.Enabled = false;
@@ -62,9 +62,9 @@ namespace GoogleDriveSync
             PBLoading.Image = Properties.Resources.LoadingSpinner;
             bool hasErrored = false;
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                (Files, hasErrored) = AppService.CheckUpdates();
+                (Files, hasErrored) = await AppService.CheckUpdates();
             });
 
             foreach (FileModel file in Files)
@@ -131,7 +131,9 @@ namespace GoogleDriveSync
             BTNCompare.Enabled = true;
         }
 
-        // Triggers the process of syncing the chosen files.
+        /// <summary>
+        /// Triggers the process of syncing the chosen files.
+        /// </summary>
         private async void BTNSyncClick(object sender, EventArgs e)
         {
             BTNSync.Enabled = false;
@@ -159,9 +161,9 @@ namespace GoogleDriveSync
                 }
             }
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                hasErrored = AppService.SyncChanges(uploadFiles, downloadFiles);
+                hasErrored = await AppService.SyncChanges(uploadFiles, downloadFiles);
             });
 
             foreach (FileModel file in uploadFiles)
@@ -205,10 +207,15 @@ namespace GoogleDriveSync
             BTNCompare.Enabled = true;
         }
 
-        // Loads the file information into the information box.
+        /// <summary>
+        /// Loads the file information into the information box.
+        /// </summary>
         private void DGVFileInformationRowState(object sender, DataGridViewRowStateChangedEventArgs e)
         {
-            if (e.StateChanged != DataGridViewElementStates.Selected) return;
+            if (e.StateChanged != DataGridViewElementStates.Selected)
+            {
+                return;
+            }
 
             if (CurrentRow != e.Row)
             {
@@ -277,7 +284,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Checks merge type and update cells to see if a merge should be done.
+        /// <summary>
+        /// Checks merge type and update cells to see if a merge should be done.
+        /// </summary>
         private void DGVFileInformationCellValue(object sender, DataGridViewCellEventArgs e)
         {
             if (TablePopulated)
@@ -336,7 +345,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Sets all files with changes to be synced up stream.
+        /// <summary>
+        /// Sets all files with changes to be synced up stream.
+        /// </summary>
         private void SyncUp(object sender, EventArgs e)
         {
             RowsToUpdate.Clear();
@@ -353,7 +364,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Sets all files with changes to be synced down stream.
+        /// <summary>
+        /// Sets all files with changes to be synced down stream.
+        /// </summary>
         private void SyncDown(object sender, EventArgs e)
         {
             RowsToUpdate.Clear();
@@ -370,7 +383,9 @@ namespace GoogleDriveSync
             }
         }
 
-        // Starts the auto sync timer.
+        /// <summary>
+        /// Starts the auto sync timer.
+        /// </summary>
         private void CBAutoSyncChecked(object sender, EventArgs e)
         {
             if (CBAutoSync.Checked)
@@ -390,22 +405,23 @@ namespace GoogleDriveSync
             }
         }
 
-        // Performs the auto sync process.
+        /// <summary>
+        /// Performs the auto sync process.
+        /// </summary>
         private async void TMAutoSyncElapsedAsync(object sender, EventArgs e)
         {
             TMAutoSync.Stop();
             CBAutoSync.Enabled = false;
 
-            FileFunction _fileFunction = new FileFunction();
-            GoogleDriveFunction _googleDriveFunction = new GoogleDriveFunction();
+            FileFunction _fileFunction = new FileFunction(_Logger, new FileSystemWrapper(), new SystemClockProvider());
 
             PRBLoading.Value = 0;
             PBLoading.Image = Properties.Resources.LoadingSpinner;
             bool hasErrored = false;
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                (Files, hasErrored) = AppService.CheckUpdates();
+                (Files, hasErrored) = await AppService.CheckUpdates();
             });
 
             PRBLoading.Value = 0;
@@ -415,7 +431,7 @@ namespace GoogleDriveSync
 
             foreach (FileModel file in Files)
             {
-                if ((file.Id.Contains(",") && !_fileFunction.IsFileLocked(new FileInfo(_googleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right")))) || ((file.Id.Contains(":\\") && !file.Id.Contains(",")) && !_fileFunction.IsFileLocked(new FileInfo(file.Id))))
+                if ((file.Id.Contains(",") && !_fileFunction.IsFileLocked(new FileInfo(GoogleDriveFunction.RemoveStringCharacters(file.Id, new char[] { ',' }, "Right")))) || ((file.Id.Contains(":\\") && !file.Id.Contains(",")) && !_fileFunction.IsFileLocked(new FileInfo(file.Id))))
                 {
                     if (file.Changes.Count > 0)
                     {
@@ -438,9 +454,9 @@ namespace GoogleDriveSync
                 }
             }
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                hasErrored = AppService.SyncChanges(uploadFiles, downloadFiles);
+                hasErrored = await AppService.SyncChanges(uploadFiles, downloadFiles);
             });
 
             if (hasErrored)
@@ -458,12 +474,12 @@ namespace GoogleDriveSync
             TMAutoSync.Start();
         }
 
-        // Logs the closing message.
+        /// <summary>
+        /// Logs the closing message.
+        /// </summary>
         private void Exit(object sender, FormClosedEventArgs e)
         {
-            LoggerService _logger = new LoggerService();
-
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
         }
     }
 }

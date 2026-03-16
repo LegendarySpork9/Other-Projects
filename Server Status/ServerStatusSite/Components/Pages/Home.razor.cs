@@ -1,10 +1,11 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Functions;
-using ServerSiteCommon.Models;
-using ServerSiteCommon.Models.Data;
-using ServerSiteCommon.Services;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Functions;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Services;
 using ServerStatusSite.Converters;
 using System.Timers;
 using Timer = System.Timers.Timer;
@@ -14,57 +15,74 @@ namespace ServerStatusSite.Components.Pages
     public partial class Home : ComponentBase
     {
         [Inject]
-        private LoggerService Logger { get; set; }
+        private ILoggerService _Logger { get; set; } = default!;
         [Inject]
-        private APIService APIService { get; set; }
+        private IClock _Clock { get; set; } = default!;
         [Inject]
-        private SharedSettingsModel SharedSettings { get; set; }
+        private APIService APIService { get; set; } = default!;
         [Inject]
-        private UserModel User { get; set; }
+        private SharedSettingsModel SharedSettings { get; set; } = default!;
+        [Inject]
+        private UserModel User { get; set; } = default!;
+
         private List<ServerModel> Servers = [];
         private Timer RefreshTimer { get; set; } = new();
         private DateTime NextElapse;
 
-        // Configures the timer and loads the servers from the API.
-        protected override void OnInitialized()
+        /// <summary>
+        /// Configures the timer and loads the servers from the API.
+        /// </summary>
+        protected override async Task OnInitializedAsync()
         {
-            Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Home Page");
+            TimerFunction _timerFunction = new(_Clock);
+
+            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Opened Home Page");
 
             RefreshTimer = new()
             {
                 AutoReset = false
             };
-            RefreshTimer.Elapsed += (sender, e) => TimerElapsed(sender, e);
+            RefreshTimer.Elapsed += async (sender, e) => await TimerElapsed(sender, e);
 
-            Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {SharedSettings.RefreshTime} minutes");
+            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {SharedSettings.RefreshTime} minutes");
 
-            Servers = APIService.GetServers();
+            Servers = await APIService.GetServers();
 
-            DateTime currentTime = DateTime.UtcNow;
+            DateTime currentTime = _Clock.UtcNow;
             NextElapse = currentTime.AddMinutes(SharedSettings.RefreshTime).AddMilliseconds(-currentTime.Millisecond);
 
-            RefreshTimer.Interval = TimerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
+            RefreshTimer.Interval = _timerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
         }
 
-        // Returns the CSS to change the page to dark mode.
-        private string GetStyle()
+        /// <summary>
+        /// Returns the CSS to change the page to dark mode.
+        /// </summary>
+        private string GetStyle() => StyleConverter.GetTableDarkMode(User.DarkMode);
+
+        /// <summary>
+        /// Loads the servers from the API.
+        /// </summary>
+        private async Task TimerElapsed(object? sender, ElapsedEventArgs e)
         {
-            StyleConverter _styleConverter = new();
+            TimerFunction _timerFunction = new(_Clock);
 
-            return _styleConverter.GetTableDarkMode(User.DarkMode);
-        }
+            try
+            {
+                NextElapse = NextElapse.AddMinutes(SharedSettings.RefreshTime);
+                Servers = await APIService.GetServers();
 
-        // Loads the servers from the API.
-        private void TimerElapsed(object? sender, ElapsedEventArgs e)
-        {
-            NextElapse = NextElapse.AddMinutes(SharedSettings.RefreshTime);
-            Servers = APIService.GetServers();
+                await InvokeAsync(StateHasChanged);
 
-            InvokeAsync(StateHasChanged);
+                RefreshTimer.Interval = _timerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
+                RefreshTimer.Start();
+            }
 
-            RefreshTimer.Interval = TimerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
-            RefreshTimer.Start();
+            catch (Exception ex)
+            {
+                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
+                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+            }
         }
     }
 }

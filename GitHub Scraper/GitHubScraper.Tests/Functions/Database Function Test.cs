@@ -1,4 +1,5 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
+using GitHubScraper.Abstractions;
 using GitHubScraper.Functions;
 using GitHubScraper.Models;
 using Moq;
@@ -8,28 +9,46 @@ namespace GitHubScraper.Tests.Functions
     [TestClass]
     public class DatabaseFunctionTest
     {
-        // Checks whether the CreateAggregates method returns one record for an empty list.
+        #region CreateAggregates
+
+        /// <summary>
+        /// Checks whether the CreateAggregates method returns one record for an empty list.
+        /// </summary>
         [TestMethod]
         public void TestCreateAggregatesEmpty()
         {
-            Mock<DatabaseFunction> _mockDatabaseFunction = new();
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", [], []);
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+            
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
+
+            List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates("Unit-Test", [], []);
 
             Assert.AreEqual(1, issueAggregates.Count);
-            Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
+            Assert.IsTrue(issueAggregates[0].Date == date);
             Assert.IsTrue(issueAggregates[0].Created == 0);
             Assert.IsTrue(issueAggregates[0].Solved == 0);
         }
 
-        // Checks whether the CreateAggregates method returns one record for an issue created today.
+        /// <summary>
+        /// Checks whether the CreateAggregates method returns one record for an issue created today.
+        /// </summary>
         [TestMethod]
         public void TestCreateAggregatesCreated()
         {
-            Mock<DatabaseFunction> _mockDatabaseFunction = new();
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
 
-            List<IssueModel> mockIssue = new()
-            {
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
+
+            List<IssueModel> mockIssue =
+            [
                 new()
                 {
                     Repository = "Unit-Test",
@@ -42,42 +61,50 @@ namespace GitHubScraper.Tests.Functions
                     },
                     Type = "Bug",
                     State = "Open",
-                    Created_At = DateTime.UtcNow,
-                    Labels = new()
-                    {
+                    Created_At = date,
+                    Labels =
+                    [
                         new()
                         {
                             Name = "bug"
                         }
-                    }
+                    ]
                 }
-            };
+            ];
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, []);
+            List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates("Unit-Test", mockIssue, []);
 
             Assert.AreEqual(1, issueAggregates.Count);
-            Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
+            Assert.IsTrue(issueAggregates[0].Date == date);
             Assert.IsTrue(issueAggregates[0].Created == 1);
             Assert.IsTrue(issueAggregates[0].Solved == 0);
         }
 
-        // Checks whether the CreateAggregates method returns two records for an issue created yesterday and solved today.
+        /// <summary>
+        /// Checks whether the CreateAggregates method returns two records for an issue created yesterday and solved today.
+        /// </summary>
         [TestMethod]
         public void TestCreateAggregatesCreatedSolved()
         {
-            Mock<DatabaseFunction> _mockDatabaseFunction = new();
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
+
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
 
             List<IssueAggregateModel> expected =
             [
                 new()
                 {
-                    Date = DateTime.UtcNow.AddDays(-1).Date,
+                    Date = date.AddDays(-1).Date,
                     Created = 1,
                     Solved = 0
                 },
                 new()
                 {
-                    Date = DateTime.UtcNow.Date,
+                    Date = date,
                     Created = 0,
                     Solved = 1
                 }
@@ -96,19 +123,19 @@ namespace GitHubScraper.Tests.Functions
                     },
                     Type = "Bug",
                     State = "Closed",
-                    Created_At = DateTime.UtcNow.AddDays(-1),
-                    Closed_At = DateTime.UtcNow,
-                    Labels = new()
-                    {
+                    Created_At = date.AddDays(-1),
+                    Closed_At = date,
+                    Labels =
+                    [
                         new()
                         {
                             Name = "bug"
                         }
-                    }
+                    ]
                 }
             ];
 
-            List<IssueAggregateModel> actual = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, []);
+            List<IssueAggregateModel> actual = _databaseFunction.CreateAggregates("Unit-Test", mockIssue, []);
 
             Assert.AreEqual(2, actual.Count);
 
@@ -123,14 +150,22 @@ namespace GitHubScraper.Tests.Functions
             }
         }
 
-        // Checks whether the CreateAggregates method fills the gap between the issue dates and now.
+        /// <summary>
+        /// Checks whether the CreateAggregates method fills the gap between the issue dates and now.
+        /// </summary>
         [TestMethod]
         public void TestCreateAggregatesFill()
         {
-            Mock<DatabaseFunction> _mockDatabaseFunction = new();
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
 
-            List<IssueModel> mockIssue = new()
-            {
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
+
+            List<IssueModel> mockIssue =
+            [
                 new()
                 {
                     Repository = "Unit-Test",
@@ -143,31 +178,31 @@ namespace GitHubScraper.Tests.Functions
                     },
                     Type = "Bug",
                     State = "Open",
-                    Created_At = DateTime.UtcNow.AddDays(-15),
-                    Closed_At = DateTime.UtcNow.AddDays(-5),
-                    Labels = new()
-                    {
+                    Created_At = date.AddDays(-15),
+                    Closed_At = date.AddDays(-5),
+                    Labels =
+                    [
                         new()
                         {
                             Name = "bug"
                         }
-                    }
+                    ]
                 }
-            };
+            ];
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, []);
+            List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates("Unit-Test", mockIssue, []);
 
             Assert.AreEqual(16, issueAggregates.Count);
 
             foreach (IssueAggregateModel issueAggregate in issueAggregates)
             {
-                if (issueAggregate.Date == DateTime.UtcNow.AddDays(-15).Date)
+                if (issueAggregate.Date == date.AddDays(-15).Date)
                 {
                     Assert.IsTrue(issueAggregate.Created == 1);
                     Assert.IsTrue(issueAggregate.Solved == 0);
                 }
 
-                else if (issueAggregate.Date == DateTime.UtcNow.AddDays(-5).Date)
+                else if (issueAggregate.Date == date.AddDays(-5).Date)
                 {
                     Assert.IsTrue(issueAggregate.Created == 0);
                     Assert.IsTrue(issueAggregate.Solved == 1);
@@ -181,14 +216,20 @@ namespace GitHubScraper.Tests.Functions
             }
         }
 
-        // Checks whether the CreateAggregates method returns one record for an existing issue.
+        // /hecks whether the CreateAggregates method returns one record for an existing issue.
         [TestMethod]
         public void TestCreateAggregatesExcludeIssue()
         {
-            Mock<DatabaseFunction> _mockDatabaseFunction = new();
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
 
-            List<IssueModel> mockIssue = new()
-            {
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
+
+            List<IssueModel> mockIssue =
+            [
                 new()
                 {
                     Repository = "Unit-Test",
@@ -201,20 +242,19 @@ namespace GitHubScraper.Tests.Functions
                     },
                     Type = "Bug",
                     State = "Open",
-                    Created_At = DateTime.UtcNow,
-                    Closed_At = DateTime.UtcNow,
-                    Labels = new()
-                    {
+                    Created_At = date,
+                    Closed_At = date,
+                    Labels =
+                    [
                         new()
                         {
                             Name = "bug"
                         }
-                    }
+                    ]
                 }
-            };
-
-            List<IssueModel> mockExistingIssue = new()
-            {
+            ];
+            List<IssueModel> mockExistingIssue =
+            [
                 new()
                 {
                     Id = 46578346587688,
@@ -225,24 +265,32 @@ namespace GitHubScraper.Tests.Functions
                     Closed_At = mockIssue[0].Closed_At,
                     Labels = []
                 }
-            };
+            ];
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
+            List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
 
             Assert.AreEqual(1, issueAggregates.Count);
-            Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
+            Assert.IsTrue(issueAggregates[0].Date == date.Date);
             Assert.IsTrue(issueAggregates[0].Created == 0);
             Assert.IsTrue(issueAggregates[0].Solved == 0);
         }
 
-        // Checks whether the CreateAggregates method returns one record for an existing issue with no closed date.
+        /// <summary>
+        /// Checks whether the CreateAggregates method returns one record for an existing issue with no closed date.
+        /// </summary>
         [TestMethod]
         public void TestCreateAggregatesExcludeIssueClosed()
         {
-            Mock<DatabaseFunction> _mockDatabaseFunction = new();
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
 
-            List<IssueModel> mockIssue = new()
-            {
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
+
+            List<IssueModel> mockIssue =
+            [
                 new()
                 {
                     Repository = "Unit-Test",
@@ -255,20 +303,19 @@ namespace GitHubScraper.Tests.Functions
                     },
                     Type = "Bug",
                     State = "Open",
-                    Created_At = DateTime.UtcNow,
-                    Closed_At = DateTime.UtcNow,
-                    Labels = new()
-                    {
+                    Created_At = date,
+                    Closed_At = date,
+                    Labels =
+                    [
                         new()
                         {
                             Name = "bug"
                         }
-                    }
+                    ]
                 }
-            };
-
-            List<IssueModel> mockExistingIssue = new()
-            {
+            ];
+            List<IssueModel> mockExistingIssue =
+            [
                 new()
                 {
                     Id = 46578346587688,
@@ -278,24 +325,36 @@ namespace GitHubScraper.Tests.Functions
                     Created_At = mockIssue[0].Created_At,
                     Labels = []
                 }
-            };
+            ];
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
+            List<IssueAggregateModel> issueAggregates = _databaseFunction.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
 
             Assert.AreEqual(1, issueAggregates.Count);
-            Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
+            Assert.IsTrue(issueAggregates[0].Date == date.Date);
             Assert.IsTrue(issueAggregates[0].Created == 0);
             Assert.IsTrue(issueAggregates[0].Solved == 1);
         }
 
-        // Checks whether the CreateAggregates method returns one record for an existing issue with no created date.
-        [TestMethod]
-        public void TestCreateAggregatesExcludeIssueCreated()
-        {
-            Mock<DatabaseFunction> _mockDatabaseFunction = new();
+        #endregion
 
-            List<IssueModel> mockIssue = new()
-            {
+        #region FilterIssues
+
+        /// <summary>
+        /// Checks whether the FilterIssues method returns one record for no existing issues.
+        /// </summary>
+        [TestMethod]
+        public void TestFilterIssuesEmpty()
+        {
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
+
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
+
+            List<IssueModel> mockIssue =
+            [
                 new()
                 {
                     Repository = "Unit-Test",
@@ -308,38 +367,141 @@ namespace GitHubScraper.Tests.Functions
                     },
                     Type = "Bug",
                     State = "Open",
-                    Created_At = DateTime.UtcNow,
-                    Closed_At = DateTime.UtcNow,
-                    Labels = new()
-                    {
+                    Created_At = date,
+                    Closed_At = date,
+                    Labels =
+                    [
                         new()
                         {
                             Name = "bug"
                         }
-                    }
+                    ]
                 }
-            };
+            ];
+            List<IssueModel> mockExistingIssue = [];
 
-            List<IssueModel> mockExistingIssue = new()
-            {
+            List<IssueModel> filteredIssues = _databaseFunction.FilterIssues("Unit-Test", mockIssue, mockExistingIssue);
+
+            Assert.AreEqual(1, filteredIssues.Count);
+            Assert.AreEqual(mockIssue[0].Id, filteredIssues[0].Id);
+        }
+
+        /// <summary>
+        /// Checks whether the FilterIssues method returns no records for an existing issue.
+        /// </summary>
+        [TestMethod]
+        public void TestFilterIssuesExclusion()
+        {
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
+
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
+
+            List<IssueModel> mockIssue =
+            [
+                new()
+                {
+                    Repository = "Unit-Test",
+                    Id = 46578346587688,
+                    Number = 1,
+                    Title = "Test",
+                    Assignee = new()
+                    {
+                        Login = "UnitTester"
+                    },
+                    Type = "Bug",
+                    State = "Open",
+                    Created_At = date,
+                    Closed_At = date,
+                    Labels =
+                    [
+                        new()
+                        {
+                            Name = "bug"
+                        }
+                    ]
+                }
+            ];
+            List<IssueModel> mockExistingIssue =
+            [
                 new()
                 {
                     Id = 46578346587688,
                     Number = 0,
                     Title = "UnLoaded",
                     State = "UnLoaded",
-                    Created_At = DateTime.Parse("01/01/1900 00:00:00").ToUniversalTime(),
+                    Created_At = mockIssue[0].Created_At,
                     Closed_At = mockIssue[0].Closed_At,
                     Labels = []
                 }
-            };
+            ];
 
-            List<IssueAggregateModel> issueAggregates = _mockDatabaseFunction.Object.CreateAggregates("Unit-Test", mockIssue, mockExistingIssue);
+            List<IssueModel> filteredIssues = _databaseFunction.FilterIssues("Unit-Test", mockIssue, mockExistingIssue);
 
-            Assert.AreEqual(1, issueAggregates.Count);
-            Assert.IsTrue(issueAggregates[0].Date == DateTime.UtcNow.Date);
-            Assert.IsTrue(issueAggregates[0].Created == 1);
-            Assert.IsTrue(issueAggregates[0].Solved == 0);
+            Assert.AreEqual(0, filteredIssues.Count);
         }
+
+        /// <summary>
+        /// Checks whether the FilterIssues method returns one record for an existing issue with no closed date.
+        /// </summary>
+        [TestMethod]
+        public void TestFilterIssuesClosed()
+        {
+            DateTime date = new(2026, 03, 04, 00, 00, 00, DateTimeKind.Utc);
+
+            Mock<ILoggerService> _mockLogger = new();
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(date);
+
+            DatabaseFunction _databaseFunction = new(_mockLogger.Object, _mockClock.Object);
+
+            List<IssueModel> mockIssue =
+            [
+                new()
+                {
+                    Repository = "Unit-Test",
+                    Id = 46578346587688,
+                    Number = 1,
+                    Title = "Test",
+                    Assignee = new()
+                    {
+                        Login = "UnitTester"
+                    },
+                    Type = "Bug",
+                    State = "Open",
+                    Created_At = date,
+                    Closed_At = date,
+                    Labels =
+                    [
+                        new()
+                        {
+                            Name = "bug"
+                        }
+                    ]
+                }
+            ];
+            List<IssueModel> mockExistingIssue =
+            [
+                new()
+                {
+                    Id = 46578346587688,
+                    Number = 0,
+                    Title = "UnLoaded",
+                    State = "UnLoaded",
+                    Created_At = _mockClock.Object.DefaultDate,
+                    Labels = []
+                }
+            ];
+
+            List<IssueModel> filteredIssues = _databaseFunction.FilterIssues("Unit-Test", mockIssue, mockExistingIssue);
+
+            Assert.AreEqual(1, filteredIssues.Count);
+            Assert.AreEqual(mockIssue[0].Id, filteredIssues[0].Id);
+        }
+
+        #endregion
     }
 }

@@ -1,8 +1,10 @@
-// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Converters;
-using ServerSiteCommon.Models;
-using ServerSiteCommon.Models.Data;
-using ServerSiteCommon.Services;
+// Copyright ï¿½ - 05/10/2025 - Toby Hunter
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Implementations;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Services;
 using ServerStatusSite.Components;
 using ServerStatusSite.Middleware;
 
@@ -15,13 +17,13 @@ namespace ServerStatusSite
         {
             log4net.Config.XmlConfigurator.Configure(new FileInfo(Path.Combine(AppContext.BaseDirectory, "log4net.config")));
 
-            LoggerService _loggerService = new();
+            ILoggerService _logger = new LoggerServiceWrapper();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Starting Website");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Starting Website");
 
             var builder = WebApplication.CreateBuilder(args);
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Created Builder");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Created Builder");
 
             builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
@@ -29,19 +31,23 @@ namespace ServerStatusSite
 
             builder.Configuration.Bind("AppSettings", sharedSettings);
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Loaded Configuration");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Loaded Configuration");
 
             builder.Services.AddSingleton(sharedSettings);
+            builder.Services.AddSingleton<ILoggerService, LoggerServiceWrapper>();
+            builder.Services.AddSingleton<IClock, SystemClockProvider>();
+            builder.Services.AddSingleton<IFileSystem, FileSystemWrapper>();
+            builder.Services.AddSingleton<IAPIClient, APIClientWrapper>();
+            builder.Services.AddSingleton<IHTTPClient, HTTPClientWrapper>();
             builder.Services.AddSingleton<APIService>();
-            builder.Services.AddSingleton<LoggerService>();
             builder.Services.AddScoped<UserModel>();
             builder.Services.AddHttpContextAccessor();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Configured Services");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Services");
 
             var app = builder.Build();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Built Application");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Built Application");
 
             if (!app.Environment.IsDevelopment())
             {
@@ -51,24 +57,24 @@ namespace ServerStatusSite
 
             app.UseHttpsRedirection();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Configured HTTPS Redirection");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured HTTPS Redirection");
 
             app.UseStaticFiles();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Configured Static Files");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Static Files");
 
             app.UseAntiforgery();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Configured Antiforgery");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Antiforgery");
 
             app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Mapped Razor Components with Interactive Server Render Mode");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Mapped Razor Components with Interactive Server Render Mode");
 
             app.UseMiddleware<URLValidationMiddleware>();
 
-            _loggerService.LogMessage(StandardValues.LoggerValues.Debug, "Configured MIddleware");
-            _loggerService.LogMessage(StandardValues.LoggerValues.Info, "Running Website");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured MIddleware");
+            _logger.LogMessage(StandardValues.LoggerValues.Info, "Running Website");
 
             app.Run();
         }

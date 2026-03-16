@@ -1,9 +1,11 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 using GitHubScraper.Models.Related;
 
 namespace GitHubScraper.Models
 {
-    // Stores information about the release.
+    /// <summary>
+    /// Stores information about the release.
+    /// </summary>
     public class ReleaseModel
     {
         public string? Repository { get; set; }
@@ -13,9 +15,9 @@ namespace GitHubScraper.Models
         public required string Body { get; set; }
         public int NumberOfAssets { get; set; } = 0;
         public required bool Draft { get; set; }
-        public required DateTime Created_At { get; set; }
-        public required DateTime Updated_At { get; set; }
-        public DateTime? Published_At { get; set; }
+        public required DateTimeOffset Created_At { get; set; }
+        public required DateTimeOffset Updated_At { get; set; }
+        public DateTimeOffset? Published_At { get; set; }
         public required List<AssetModel> Assets { get; set; } = [];
     }
 }

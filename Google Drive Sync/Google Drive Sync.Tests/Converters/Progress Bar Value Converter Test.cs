@@ -1,21 +1,22 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
 using GoogleDriveSync.Converters;
-using Moq;
 
 namespace GoogleDriveSync.Tests.Converters
 {
     [TestClass]
     public class ProgressBarValueConverterTest
     {
-        // Checks whether the GetPBIncreaseValue method returns the expected value.
+        /// <summary>
+        /// Checks whether the GetPBIncreaseValue method returns the expected value.
+        /// </summary>
         [TestMethod]
-        public void TestPBIncreaseValue()
+        public void TestGetPBIncreaseValue()
         {
-            Mock<ProgressBarValueConverter> _mockPorgressBarValueConverter = new();
+            int expected = 20;
 
-            int increase = _mockPorgressBarValueConverter.Object.GetPBIncreaseValue(5);
+            int actual = ProgressBarValueConverter.GetPBIncreaseValue(5);
 
-            Assert.AreEqual(20, increase);
+            Assert.AreEqual(expected, actual);
         }
     }
 }

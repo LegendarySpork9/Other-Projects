@@ -1,21 +1,22 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
 using GoogleDriveSync.Converters;
-using Moq;
 
 namespace GoogleDriveSync.Tests.Converters
 {
     [TestClass]
     public class LocalDriveConverterTest
     {
-        // Checks whether the GetObjectName method returns the expected file name.
+        /// <summary>
+        /// Checks whether the GetObjectName method returns the expected file name.
+        /// </summary>
         [TestMethod]
-        public void TestObjectName()
+        public void TestGetObjectName()
         {
-            Mock<LocalDriveConverter> _mockLocalDriveConverter = new();
+            string expected = "Test.txt";
 
-            string fileName = _mockLocalDriveConverter.Object.GetObjectName("C:\\GDSTests\\Book Tests\\Test.txt");
+            string actual = LocalDriveConverter.GetObjectName(@"C:\GDSTests\Book Tests\Test.txt");
 
-            Assert.AreEqual("Test.txt", fileName);
+            Assert.AreEqual(expected, actual);
         }
     }
 }

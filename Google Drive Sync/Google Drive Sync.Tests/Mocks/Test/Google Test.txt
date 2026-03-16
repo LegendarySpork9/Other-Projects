@@ -1,7 +1,0 @@
-This is a test file for testing Google Drive
-
-TestCreate Run: 2
-TestUpdate Run: 1
-TestMove Run: 5
-TestDownload Run: 1
-TestDelete Run: 2

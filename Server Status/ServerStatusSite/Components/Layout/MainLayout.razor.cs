@@ -1,6 +1,6 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerSiteCommon.Models.Data;
+using ServerStatusCommon.Models.Data;
 using ServerStatusSite.Converters;
 
 namespace ServerStatusSite.Components.Layout
@@ -8,29 +8,33 @@ namespace ServerStatusSite.Components.Layout
     public partial class MainLayout : LayoutComponentBase, IDisposable
     {
         [Inject]
-        public UserModel User { get; set; }
+        public UserModel User { get; set; } = default!;
 
-        // Subscribes the layout to the DarkMode event.
+        /// <summary>
+        /// Subscribes the layout to the DarkMode event.
+        /// </summary>
         protected override void OnInitialized()
         {
             User.OnDarkModeChanged += StateHasChanged;
         }
 
-        // Returns the CSS to change the layout to dark mode.
+        /// <summary>
+        /// Returns the CSS to change the layout to dark mode.
+        /// </summary>
         private string GetStyle(string component)
         {
-            StyleConverter _styleConverter = new();
-
             return component switch
             {
-                "Body" => _styleConverter.GetBodyDarkMode(User.DarkMode),
-                "Bar" => _styleConverter.GetTopBarDarkMode(User.DarkMode),
-                "Link" => _styleConverter.GetTopNavLinkDarkMode(User.DarkMode),
+                "Body" => StyleConverter.GetBodyDarkMode(User.DarkMode),
+                "Bar" => StyleConverter.GetTopBarDarkMode(User.DarkMode),
+                "Link" => StyleConverter.GetTopNavLinkDarkMode(User.DarkMode),
                 _ => String.Empty
             };
         }
 
-        // Unsubscribes the layout from the DarkMode event.
+        /// <summary>
+        /// Unsubscribes the layout from the DarkMode event.
+        /// </summary>
         public void Dispose()
         {
             User.OnDarkModeChanged -= StateHasChanged;

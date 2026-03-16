@@ -1,6 +1,9 @@
 ﻿// Copyright © - 14/05/2025 - Toby Hunter
 namespace GoogleDriveSync.Models
 {
+    /// <summary>
+    /// Stores the changes made to the file.
+    /// </summary>
     public class ChangeModel
     {
         public string Field { get; set; }

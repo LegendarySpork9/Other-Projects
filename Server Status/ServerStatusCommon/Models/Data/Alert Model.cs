@@ -1,7 +1,9 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-namespace ServerSiteCommon.Models.Data
+namespace ServerStatusCommon.Models.Data
 {
-    // Stores the individual server alert data.
+    /// <summary>
+    /// Stores the individual server alert data.
+    /// </summary>
     public class AlertModel
     {
         public int Id { get; set; }

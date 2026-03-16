@@ -1,9 +1,11 @@
-﻿// Copyright © - Unpublished - Toby Hunter
+﻿// Copyright © - 16/03/2026 - Toby Hunter
 namespace GitHubScraper.Converters
 {
     internal class StandardValues
     {
-        // Standard Logger Values.
+        /// <summary>
+        /// Standard Logger Values.
+        /// </summary>
         public static class LoggerValues
         {
             public const string Debug = "Debug";

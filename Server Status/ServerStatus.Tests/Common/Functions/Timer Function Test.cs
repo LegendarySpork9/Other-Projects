@@ -1,25 +1,46 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using ServerSiteCommon.Functions;
+using Moq;
+using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Functions;
 
-namespace ServerSite.Tests.Common.Functions
+namespace ServerStatus.Tests.Common.Functions
 {
-    // Checks the GetTimerInterval method output with each option.
     [TestClass]
     public class TimerFunctionTest
     {
+        /// <summary>
+        /// Checks the GetTimerInterval method output with a given time.
+        /// </summary>
         [TestMethod]
-        public void TestTimerInterval()
+        public void TestGetTimerInterval()
         {
-            DateTime now = DateTime.UtcNow;
-            TimeSpan interval = TimerFunction.GetTimerInterval(now.AddMilliseconds(-now.Millisecond).AddMinutes(5));
+            DateTime utcNow = new(2026, 03, 12, 15, 20, 00, DateTimeKind.Utc);
+
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+
+            TimerFunction _timerFunction = new(_mockClock.Object);
+
+            DateTime now = utcNow;
+            TimeSpan interval = _timerFunction.GetTimerInterval(now.AddMilliseconds(-now.Millisecond).AddMinutes(5));
 
             Assert.IsTrue(interval > TimeSpan.Zero);
         }
 
+        /// <summary>
+        /// Checks the GetTimerInterval method output with a given time.
+        /// </summary>
         [TestMethod]
-        public void TestTimerIntervalFail()
+        public void TestGetTimerIntervalFail()
         {
-            TimeSpan interval = TimerFunction.GetTimerInterval(DateTime.UtcNow);
+            DateTime utcNow = new(2026, 03, 12, 15, 20, 00, DateTimeKind.Utc);
+
+            Mock<IClock> _mockClock = new();
+            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+
+            TimerFunction _timerFunction = new(_mockClock.Object);
+
+            TimeSpan interval = _timerFunction.GetTimerInterval(utcNow);
 
             Assert.IsTrue(interval == TimeSpan.Zero);
         }
