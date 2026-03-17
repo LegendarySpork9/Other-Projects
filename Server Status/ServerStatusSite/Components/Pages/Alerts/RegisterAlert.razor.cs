@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components;
 using ServerStatusCommon.Converters;
 using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.API;
 using ServerStatusCommon.Models.Data;
 using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Services;

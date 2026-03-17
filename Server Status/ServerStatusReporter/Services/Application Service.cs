@@ -3,7 +3,6 @@ using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
 using ServerStatusCommon.Functions;
 using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.API;
 using ServerStatusCommon.Models.Data;
 using ServerStatusCommon.Services;
 using ServerStatusReporter.Abstractions;

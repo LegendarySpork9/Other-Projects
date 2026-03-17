@@ -2,7 +2,7 @@
 using Moq;
 using RestSharp;
 using ServerStatusCommon.Abstractions;
-using ServerStatusCommon.Models.API;
+using ServerStatusCommon.Models;
 using ServerStatusCommon.Models.Data;
 using ServerStatusCommon.Services;
 

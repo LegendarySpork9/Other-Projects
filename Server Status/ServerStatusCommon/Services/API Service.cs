@@ -3,8 +3,8 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
-using ServerStatusCommon.Models.API;
-using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Models.Responses;
 
 namespace ServerStatusCommon.Services
 {

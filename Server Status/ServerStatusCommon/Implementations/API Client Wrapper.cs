@@ -1,11 +1,13 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
 using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.API;
-using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Models.Requests;
+using ServerStatusCommon.Models.Responses;
+using ServerStatusCommon.Models.Responses.Related;
 
 namespace ServerStatusCommon.Implementations
 {
@@ -15,7 +17,7 @@ namespace ServerStatusCommon.Implementations
         private readonly IFileSystem _FileSystem;
         private readonly SharedSettingsModel SharedSettings;
 
-        private string BearerToken;
+        private string? BearerToken;
 
         // Sets the class's global variables.
         public APIClientWrapper(
@@ -29,11 +31,12 @@ namespace ServerStatusCommon.Implementations
         }
 
         /// <summary>
-        /// Returns a bearer token from the API.
+        /// Returns the token expiry time from the API.
         /// </summary>
-        public async Task<DateTime?> Authorise()
+        public async Task<(DateTime?, bool)> Authorise()
         {
             DateTime? expiryTime = null;
+            bool success = false;
 
             try
             {
@@ -66,15 +69,20 @@ namespace ServerStatusCommon.Implementations
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
-                    JObject responseContent = JObject.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
-                    BearerToken = responseContent.Property("token")?.Value.ToString() ?? StandardValues.MissingValues.BearerToken;
+                    AuthenticationModel? auth = JsonConvert.DeserializeObject<AuthenticationModel>(response.Content) ?? null;
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {BearerToken}");
+                    if (auth != null)
+                    {
+                        BearerToken = auth.Token;
 
-                    JObject infoContent = JObject.Parse(responseContent.Property("info")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
-                    expiryTime = DateTime.SpecifyKind(DateTime.Parse(infoContent.Property("expires")?.Value.ToString()), DateTimeKind.Utc);
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {BearerToken}");
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Expiry Time: {expiryTime}");
+                        expiryTime = DateTime.SpecifyKind(auth.Expires, DateTimeKind.Utc);
+
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Expiry Time: {expiryTime}");
+
+                        success = true;
+                    }
                 }
             }
 
@@ -84,15 +92,16 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return expiryTime;
+            return (expiryTime, success);
         }
 
         /// <summary>
         /// Returns a list of users from the API.
         /// </summary>
-        public async Task<RestResponse?> GetUsers()
+        public async Task<(List<UserModel>, bool)> GetUsers()
         {
-            RestResponse? response = null;
+            List<UserModel> users = [];
+            bool success = false;
 
             try
             {
@@ -113,10 +122,19 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    users = JsonConvert.DeserializeObject<List<UserModel>>(response.Content) ?? [];
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Users Returned: {users.Count}");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -125,15 +143,16 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return (users, success);
         }
 
         /// <summary>
         /// Returns a list of user settings from the API for a given user.
         /// </summary>
-        public async Task<RestResponse?> GetUserSettings(int userId)
+        public async Task<(List<UserSettingsModel>, bool)> GetUserSettings(int userId)
         {
-            RestResponse? response = null;
+            List<UserSettingsModel> userSettings = [];
+            bool success = false;
 
             try
             {
@@ -154,10 +173,19 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    userSettings = JsonConvert.DeserializeObject<List<UserSettingsModel>>(response.Content) ?? [];
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Settings Returned: {userSettings.Sum(us => us.Settings.Count)}");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -166,15 +194,16 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return (userSettings, success);
         }
 
         /// <summary>
         /// Returns a list of servers from the API.
         /// </summary>
-        public async Task<RestResponse?> GetServers()
+        public async Task<(List<ServerModel>, bool)> GetServers()
         {
-            RestResponse? response = null;
+            List<ServerModel> servers = [];
+            bool success = false;
 
             try
             {
@@ -195,10 +224,19 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    servers = JsonConvert.DeserializeObject<List<ServerModel>>(response.Content) ?? [];
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Servers Returned: {servers.Count}");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -207,15 +245,16 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return (servers, success);
         }
 
         /// <summary>
         /// Returns a list of server status from the API for a given component.
         /// </summary>
-        public async Task<RestResponse?> GetServerStatuses(string component)
+        public async Task<(List<ServerEventModel>, bool)> GetServerStatuses(string component)
         {
-            RestResponse? response = null;
+            List<ServerEventModel> serverEvents = [];
+            bool success = false;
 
             try
             {
@@ -236,10 +275,19 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    serverEvents = JsonConvert.DeserializeObject<List<ServerEventModel>>(response.Content) ?? [];
+
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Events Returned: {serverEvents.Count}");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -248,15 +296,15 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return (serverEvents, success);
         }
 
         /// <summary>
         /// Updates the given user setting in the API.
         /// </summary>
-        public async Task<RestResponse?> UpdateUserSettings(int userSettingsId, string value)
+        public async Task<bool> UpdateUserSettings(int userSettingsId, string value)
         {
-            RestResponse? response = null;
+            bool success = false;
 
             try
             {
@@ -270,8 +318,10 @@ namespace ServerStatusCommon.Implementations
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
 
-                JObject body = JObject.Parse(await _FileSystem.ReadAllText($@"{SharedSettings.PayloadLocation}\UpdateUserSettings.json"));
-                body.Property("value").Value = value;
+                JObject body = new()
+                {
+                    ["value"] = value
+                };
 
                 RestRequest request = new()
                 {
@@ -283,10 +333,17 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Updated User Setting: True");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -295,19 +352,19 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return success;
         }
 
         /// <summary>
         /// Updates the given user in the API.
         /// </summary>
-        public async Task<RestResponse?> UpdateUser(UserModel user)
+        public async Task<bool> UpdateUser(UserModel user)
         {
-            RestResponse? response = null;
+            bool success = false;
 
             try
             {
-                string url = BuildURL("/user", user.UserId, null, true);
+                string url = BuildURL("/user", user.Id, null, true);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
 
@@ -317,9 +374,12 @@ namespace ServerStatusCommon.Implementations
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
 
-                JObject body = JObject.Parse(await _FileSystem.ReadAllText($@"{SharedSettings.PayloadLocation}\UpdateUser.json"));
-                body.Property("Username").Value = user.Username;
-                body.Property("Password").Value = user.Password;
+                JObject body = new()
+                {
+                    ["username"] = user.Username,
+                    ["password"] = user.Password,
+                    ["scopes"] = JArray.FromObject(user.Scopes)
+                };
 
                 RestRequest request = new()
                 {
@@ -331,10 +391,17 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Updated User: True");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -343,15 +410,16 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return success;
         }
 
         /// <summary>
         /// Returns a list of alerts from the API.
         /// </summary>
-        public async Task<RestResponse?> GetAlerts(int pageNumber)
+        public async Task<(AlertInformationModel?, bool)> GetAlerts(int pageNumber)
         {
-            RestResponse? response = null;
+            AlertInformationModel? alerts = null;
+            bool success = false;
 
             try
             {
@@ -373,10 +441,22 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    alerts = JsonConvert.DeserializeObject<AlertInformationModel>(response.Content);
+
+                    if (alerts != null)
+                    {
+                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alerts Returned: {alerts.EntryCount}");
+
+                        success = true;
+                    }
+                }
             }
 
             catch (Exception ex)
@@ -385,15 +465,16 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return (alerts, success);
         }
 
         /// <summary>
         /// Returns a given alert from the API.
         /// </summary>
-        public async Task<RestResponse?> GetAlert(int alertId)
+        public async Task<(AlertModel?, bool)> GetAlert(int alertId)
         {
-            RestResponse? response = null;
+            AlertModel? alert = null;
+            bool success = false;
 
             try
             {
@@ -414,10 +495,20 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    alert = JsonConvert.DeserializeObject<AlertModel>(response.Content);
+
+                    if (alert != null)
+                    {
+                        success = true;
+                    }
+                }
             }
 
             catch (Exception ex)
@@ -426,15 +517,15 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return (alert, success);
         }
 
         /// <summary>
         /// Updates the given alert in the API.
         /// </summary>
-        public async Task<RestResponse?> UpdateAlert(int alertId, string status)
+        public async Task<bool> UpdateAlert(int alertId, string status)
         {
-            RestResponse? response = null;
+            bool success = false;
 
             try
             {
@@ -448,8 +539,10 @@ namespace ServerStatusCommon.Implementations
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
 
-                JObject body = JObject.Parse(await _FileSystem.ReadAllText($@"{SharedSettings.PayloadLocation}\UpdateAlert.json"));
-                body.Property("status").Value = status;
+                JObject body = new()
+                {
+                    ["status"] = status
+                };
 
                 RestRequest request = new()
                 {
@@ -461,10 +554,17 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Updated Alert: True");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -473,15 +573,15 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return success;
         }
 
         /// <summary>
         /// Adds the given alert to the API.
         /// </summary>
-        public async Task<RestResponse?> RegisterAlert(APINewAlertsModel alert)
+        public async Task<bool> RegisterAlert(NewAlertModel alert)
         {
-            RestResponse? response = null;
+            bool success = false;
 
             try
             {
@@ -495,29 +595,29 @@ namespace ServerStatusCommon.Implementations
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
 
-                JObject body = JObject.Parse(await _FileSystem.ReadAllText($@"{SharedSettings.PayloadLocation}\RegisterAlert.json"));
-                body.Property("reporter").Value = alert.Reporter;
-                body.Property("component").Value = alert.Component;
-                body.Property("componentStatus").Value = alert.ComponentStatus;
-                body.Property("alertStatus").Value = alert.AlertStatus;
-                body.Property("hostName").Value = alert.HostName;
-                body.Property("game").Value = alert.Game;
-                body.Property("gameVersion").Value = alert.GameVersion;
+                string body = JsonConvert.SerializeObject(alert);
 
                 RestRequest request = new()
                 {
                     Method = Method.Post
                 };
-                request.AddParameter("application/json", body.ToString(), ParameterType.RequestBody);
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {body}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Registered Alert: True");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -526,15 +626,15 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return success;
         }
 
         /// <summary>
         /// Adds the given event to the API.
         /// </summary>
-        public async Task<RestResponse?> RegisterServerEvent(APIStatusModel status)
+        public async Task<bool> RegisterServerEvent(NewEventModel newEvent)
         {
-            RestResponse? response = null;
+            bool success = false;
 
             try
             {
@@ -548,27 +648,29 @@ namespace ServerStatusCommon.Implementations
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
 
-                JObject body = JObject.Parse(await _FileSystem.ReadAllText($@"{SharedSettings.PayloadLocation}\RegisterServerEvent.json"));
-                body.Property("component").Value = status.Component;
-                body.Property("status").Value = status.Status;
-                body.Property("hostName").Value = status.Server.HostName;
-                body.Property("game").Value = status.Server.Game;
-                body.Property("gameVersion").Value = status.Server.GameVersion;
+                string body = JsonConvert.SerializeObject(newEvent);
 
                 RestRequest request = new()
                 {
                     Method = Method.Post
                 };
-                request.AddParameter("application/json", body.ToString(), ParameterType.RequestBody);
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {body}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
 
-                response = await client.ExecuteAsync(request);
+                RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Registered Event: True");
+
+                    success = true;
+                }
             }
 
             catch (Exception ex)
@@ -577,7 +679,7 @@ namespace ServerStatusCommon.Implementations
                 _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
             }
 
-            return response;
+            return success;
         }
 
         /// <summary>

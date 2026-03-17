@@ -1,7 +1,9 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 using RestSharp;
-using ServerStatusCommon.Models.API;
-using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Models;
+using ServerStatusCommon.Models.Requests;
+using ServerStatusCommon.Models.Responses;
+using ServerStatusCommon.Models.Responses.Related;
 
 namespace ServerStatusCommon.Abstractions
 {
@@ -10,17 +12,17 @@ namespace ServerStatusCommon.Abstractions
     /// </summary>
     public interface IAPIClient
     {
-        Task<DateTime?> Authorise();
-        Task<RestResponse?> GetUsers();
-        Task<RestResponse?> GetUserSettings(int userId);
-        Task<RestResponse?> GetServers();
-        Task<RestResponse?> GetServerStatuses(string component);
-        Task<RestResponse?> UpdateUserSettings(int userSettingsId, string value);
-        Task<RestResponse?> UpdateUser(UserModel user);
-        Task<RestResponse?> GetAlerts(int pageNumber);
-        Task<RestResponse?> GetAlert(int alertId);
-        Task<RestResponse?> UpdateAlert(int alertId, string status);
-        Task<RestResponse?> RegisterAlert(APINewAlertsModel alert);
-        Task<RestResponse?> RegisterServerEvent(APIStatusModel status);
+        Task<(DateTime?, bool)> Authorise();
+        Task<(List<UserModel>, bool)> GetUsers();
+        Task<(List<UserSettingsModel>, bool)> GetUserSettings(int userId);
+        Task<(List<ServerModel>, bool)> GetServers();
+        Task<(List<ServerEventModel>, bool)> GetServerStatuses(string component);
+        Task<bool> UpdateUserSettings(int userSettingsId, string value);
+        Task<bool> UpdateUser(UserModel user);
+        Task<(AlertInformationModel?, bool)> GetAlerts(int pageNumber);
+        Task<(AlertModel?, bool)> GetAlert(int alertId);
+        Task<bool> UpdateAlert(int alertId, string status);
+        Task<bool> RegisterAlert(NewAlertModel alert);
+        Task<bool> RegisterServerEvent(NewEventModel newEvent);
     }
 }
