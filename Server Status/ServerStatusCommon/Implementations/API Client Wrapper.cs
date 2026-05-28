@@ -203,9 +203,9 @@ namespace ServerStatusCommon.Implementations
         /// <summary>
         /// Returns a list of user settings from the API for a given user.
         /// </summary>
-        public async Task<(UserSettingModel?, bool)> GetUserSettings(int userId)
+        public async Task<(List<UserSettingModel>, bool)> GetUserSettings(int userId)
         {
-            UserSettingModel? userSettings = null;
+            List<UserSettingModel> userSettings = [];
             bool success = false;
 
             try
@@ -250,11 +250,11 @@ namespace ServerStatusCommon.Implementations
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
-                    userSettings = JsonConvert.DeserializeObject<UserSettingModel?>(response.Content);
+                    userSettings = JsonConvert.DeserializeObject<List<UserSettingModel>>(response.Content) ?? [];
 
                     _Logger.LogMessage(
                         StandardValues.LoggerValues.Debug,
-                        $"User Settings Returned: {userSettings?.Settings.Count ?? 0}");
+                        $"User Settings Returned: {userSettings.Select(us => us.Settings.Count).Sum()}");
 
                     success = true;
                 }

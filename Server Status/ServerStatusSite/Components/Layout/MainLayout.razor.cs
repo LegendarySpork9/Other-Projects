@@ -1,5 +1,6 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using ServerStatusCommon.Models.Responses;
 using ServerStatusSite.Converters;
 
@@ -8,7 +9,13 @@ namespace ServerStatusSite.Components.Layout
     public partial class MainLayout : LayoutComponentBase, IDisposable
     {
         [Inject]
-        public UserModel User { get; set; } = default!;
+        private NavigationManager Navigation { get; set; } = default!;
+        [Inject]
+        private ProtectedSessionStorage SessionStorage { get; set; } = default!;
+        [Inject]
+        private UserModel User { get; set; } = default!;
+
+        private bool IsInitialised;
 
         /// <summary>
         /// Subscribes the layout to the DarkMode event.
@@ -16,6 +23,48 @@ namespace ServerStatusSite.Components.Layout
         protected override void OnInitialized()
         {
             User.OnDarkModeChanged += StateHasChanged;
+        }
+
+        /// <summary>
+        /// Checks if the user is logged in.
+        /// </summary>
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                string returnUrl = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+                string loginUrl = $"/login?returnUrl={returnUrl}";
+
+                try
+                {
+                    ProtectedBrowserStorageResult<UserModel> userResult = await SessionStorage.GetAsync<UserModel>("loggedInUser");
+
+                    if (userResult.Success && userResult.Value != null)
+                    {
+                        if (User.Id == 0)
+                        {
+                            User = userResult.Value;
+                        }
+
+                        IsInitialised = true;
+                        StateHasChanged();
+                    }
+
+                    else
+                    {
+                        Navigation.NavigateTo(
+                            loginUrl,
+                            forceLoad: true);
+                    }
+                }
+
+                catch
+                {
+                    Navigation.NavigateTo(
+                        loginUrl,
+                        forceLoad: true);
+                }
+            }
         }
 
         /// <summary>

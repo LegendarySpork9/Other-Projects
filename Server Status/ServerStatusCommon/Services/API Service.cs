@@ -207,15 +207,15 @@ namespace ServerStatusCommon.Services
 
             try
             {
-                (UserSettingModel? userSettings, bool success) = await _APIClient.GetUserSettings(user.Id);
+                (List<UserSettingModel> userSettings, bool success) = await _APIClient.GetUserSettings(user.Id);
 
                 if (success)
                 {
-                    if (userSettings != null)
+                    if (userSettings.Count > 0)
                     {
-                        user.Settings = userSettings.Settings;
+                        user.Settings = userSettings[0].Settings;
 
-                        foreach (SettingModel setting in userSettings.Settings)
+                        foreach (SettingModel setting in userSettings[0].Settings)
                         {
                             _Logger.LogMessage(
                                 StandardValues.LoggerValues.Debug,
