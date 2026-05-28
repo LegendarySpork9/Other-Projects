@@ -138,11 +138,14 @@ namespace ServerStatus.Tests.Common.Services
                     Value = "UnitTester"
                 }
             ];
-            UserSettingModel userSettings = new()
-            {
-                Application = "Server Status Site",
-                Settings = expected
-            };
+            List<UserSettingModel> userSettings =
+            [
+                new()
+                {
+                    Application = "Server Status Site",
+                    Settings = expected
+                }
+            ];
 
             Mock<IAPIClient> _mockAPIClient = new();
             _mockAPIClient.Setup(api => api.GetUserSettings(It.IsAny<int>()))
