@@ -1,10 +1,10 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using Newtonsoft.Json.Linq;
-using RestSharp;
 using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
-using ServerStatusCommon.Models;
+using ServerStatusCommon.Models.Requests.Create;
+using ServerStatusCommon.Models.Requests.Update;
 using ServerStatusCommon.Models.Responses;
+using ServerStatusCommon.Models.Responses.Related;
 
 namespace ServerStatusCommon.Services
 {
@@ -41,42 +41,69 @@ namespace ServerStatusCommon.Services
         /// </summary>
         public async Task Authorise()
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Obtaining Bearer token from API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Obtaining Bearer token from API");
 
             try
             {
-                DateTime? expiryTime = await _APIClient.Authorise();
+                AuthenticationModel? auth = await _APIClient.Authorise();
 
-                if (expiryTime.HasValue)
+                if (auth != null)
                 {
-                    ExpiryTime = expiryTime.Value;
+                    _APIClient.SetBearerToken(auth.Token);
+
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Bearer Token: {auth.Token}");
+
+                    ExpiryTime = DateTime.SpecifyKind(
+                        auth.Info.Expires,
+                        DateTimeKind.Utc);
+
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Expiry Time: {ExpiryTime}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        "Obtained Bearer Token from API");
                 }
 
-                else
+                if (auth == null)
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await _APIClient.Authorise();
                     }
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch users from API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            "Failed to fetch users from API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Obtained Bearer token from API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Obtained Bearer token from API");
         }
 
         /// <summary>
@@ -84,7 +111,9 @@ namespace ServerStatusCommon.Services
         /// </summary>
         public async Task<List<UserModel>> GetUsers()
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching users from API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Fetching users from API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
@@ -95,38 +124,42 @@ namespace ServerStatusCommon.Services
 
             try
             {
-                RestResponse? response = await _APIClient.GetUsers();
+                (users, bool success) = await _APIClient.GetUsers();
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (success)
                 {
-                    JArray responseContent = JArray.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Users Returned: {responseContent.Count}");
-
-                    foreach (JObject user in responseContent)
+                    foreach (UserModel user in users)
                     {
-                        users.Add(new UserModel()
-                        {
-                            UserId = int.Parse(user.Property("id")?.Value.ToString() ?? StandardValues.MissingValues.Integer),
-                            Username = user.Property("username")?.Value.ToString() ?? StandardValues.MissingValues.Username,
-                            Password = user.Property("password")?.Value.ToString() ?? StandardValues.MissingValues.Password
-                        });
-
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Id: {users[^1].UserId}");
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Username: {users[^1].Username}");
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Password: {users[^1].Password}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"User Id: {user.Id}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"User Username: {user.Username}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"User Password: {user.Password}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"User Scopes: {string.Join(
+                                ", ",
+                                user.Scopes)}");
                     }
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched users from API");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        "Fetched users from API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
                         users = await GetUsers();
@@ -134,16 +167,24 @@ namespace ServerStatusCommon.Services
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch users from API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            "Failed to fetch users from API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch users from API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    "Failed to fetch users from API");
             }
 
             RetryCount = 0;
@@ -155,7 +196,9 @@ namespace ServerStatusCommon.Services
         /// </summary>
         public async Task<UserModel> GetUserSettings(UserModel user)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching user settings from API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Fetching user settings from API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
@@ -164,49 +207,42 @@ namespace ServerStatusCommon.Services
 
             try
             {
-                RestResponse? response = await _APIClient.GetUserSettings(user.UserId);
+                (UserSettingModel? userSettings, bool success) = await _APIClient.GetUserSettings(user.Id);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (success)
                 {
-                    JArray responseContent = JArray.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
-                    JArray settingsContent = JArray.Parse(JObject.Parse(responseContent[0].ToString()).Property("settings")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Settings Returned: {settingsContent.Count}");
-
-                    foreach (JObject setting in settingsContent)
+                    if (userSettings != null)
                     {
-                        if (setting.Property("name")?.Value.ToString() == "DiscordName")
-                        {
-                            user.DiscordName = setting.Property("value")?.Value.ToString() ?? StandardValues.MissingValues.SettingStringValue;
+                        user.Settings = userSettings.Settings;
 
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Discord: {user.DiscordName}");
+                        foreach (SettingModel setting in userSettings.Settings)
+                        {
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Setting Id: {setting.Id}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Setting Name: {setting.Name}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Setting Value: {setting.Value}");
                         }
 
-                        if (setting.Property("name")?.Value.ToString() == "IsAdmin")
-                        {
-                            user.Admin = bool.Parse(setting.Property("value")?.Value.ToString() ?? StandardValues.MissingValues.SettingBoolValue);
-
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Admin: {user.Admin}");
-                        }
-
-                        if (setting.Property("name")?.Value.ToString() == "DarkMode")
-                        {
-                            user.DarkMode = bool.Parse(setting.Property("value")?.Value.ToString() ?? StandardValues.MissingValues.SettingBoolValue);
-
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Dark Mode: {user.DarkMode}");
-                        }
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            "Fetched user settings from API");
                     }
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched user settings from API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
                         user = await GetUserSettings(user);
@@ -214,16 +250,24 @@ namespace ServerStatusCommon.Services
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch user settings from API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            "Failed to fetch user settings from API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch user settings from API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    "Failed to fetch user settings from API");
             }
 
             RetryCount = 0;
@@ -231,79 +275,13 @@ namespace ServerStatusCommon.Services
         }
 
         /// <summary>
-        /// Gets the UserSettingID for a given user & setting.
-        /// </summary>
-        public async Task<int> GetUserSettingId(int userId, string settingName)
-        {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching user settings from API");
-
-            if (ExpiryTime < _Clock.UtcNow)
-            {
-                await Authorise();
-            }
-
-            int userSettingId = 0;
-
-            try
-            {
-                RestResponse? response = await _APIClient.GetUserSettings(userId);
-
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    JArray responseContent = JArray.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
-                    JArray settingsContent = JArray.Parse(JObject.Parse(responseContent[0].ToString()).Property("settings")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Settings Returned: {settingsContent.Count}");
-
-                    foreach (JObject setting in settingsContent)
-                    {
-                        if (setting.Property("name")?.Value.ToString() == settingName)
-                        {
-                            userSettingId = int.Parse(setting.Property("id")?.Value.ToString() ?? StandardValues.MissingValues.Integer);
-
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Setting Id: {userSettingId}");
-                        }
-                    }
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched user setting id from API");
-                }
-
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
-                {
-                    if (RetryCount != 4)
-                    {
-                        RetryCount++;
-
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
-
-                        await Authorise();
-                        userSettingId = await GetUserSettingId(userId, settingName);
-                    }
-
-                    else
-                    {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch user setting id from API");
-                    }
-                }
-            }
-
-            catch (Exception ex)
-            {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch user setting id from API");
-            }
-
-            RetryCount = 0;
-            return userSettingId;
-        }
-
-        /// <summary>
         /// Gets a list of active servers.
         /// </summary>
         public async Task<List<ServerModel>> GetServers()
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching servers from API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Fetching servers from API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
@@ -314,114 +292,101 @@ namespace ServerStatusCommon.Services
 
             try
             {
-                RestResponse? response = await _APIClient.GetServers();
+                (servers, bool success) = await _APIClient.GetServers();
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (success)
                 {
-                    if (!string.IsNullOrWhiteSpace(response.Content) && !response.Content.Contains("No data returned by given parameters."))
+                    List<EventModel> pcEvents = await GetServerEvents("PC");
+                    List<EventModel> serverEvents = await GetServerEvents("Server");
+                    List<EventModel> connectionEvents = await GetServerEvents("Connection");
+
+                    foreach (ServerModel server in servers)
                     {
-                        JArray responseContent = JArray.Parse(response.Content);
+                        EventModel? pcEvent = pcEvents.Find(pce => pce.Server.Id == server.Id);
+                        EventModel? serverEvent = serverEvents.Find(se => se.Server.Id == server.Id);
+                        EventModel? connectionEvent = connectionEvents.Find(ce => ce.Server.Id == server.Id);
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Servers Returned: {responseContent.Count}");
-
-                        List<APIStatusModel> pcStatuses = await GetServerStatuses("PC Status");
-                        List<APIStatusModel> serverStatuses = await GetServerStatuses("Server Status");
-                        List<APIStatusModel> connectionStatuses = await GetServerStatuses("Connection Status");
-
-                        foreach (JObject server in responseContent)
+                        if (pcEvent != null && serverEvent != null && connectionEvent != null)
                         {
-                            string hostName = server.Property("hostName")?.Value.ToString() ?? StandardValues.MissingValues.HostName;
-                            string game = server.Property("game")?.Value.ToString() ?? StandardValues.MissingValues.Game;
-                            string gameVersion = server.Property("gameVersion")?.Value.ToString() ?? StandardValues.MissingValues.GameVersion;
-
-                            JObject connection = JObject.Parse(server.Property("connection")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
-
-                            string ipAddress = connection.Property("ipAddress")?.Value.ToString() ?? StandardValues.MissingValues.IpAddress;
-                            int port = int.Parse(connection.Property("port")?.Value.ToString() ?? StandardValues.MissingValues.Port);
-
-                            JObject downtime = JObject.Parse(server.Property("downtime")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
-
-                            string? time = null;
-
-                            if (downtime.ToString() != StandardValues.MissingValues.RelatedContent)
-                            {
-                                time = downtime.Property("time")?.Value.ToString();
-                            }
-
-                            APIStatusModel? pcStatus = pcStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
-                            APIStatusModel? serverStatus = serverStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
-                            APIStatusModel? connectionStatus = connectionStatuses.Find(c => c.Server.HostName == hostName && c.Server.Game == game && c.Server.GameVersion == gameVersion);
-
-                            if (pcStatus != null && serverStatus != null && connectionStatus != null)
-                            {
-                                DowntimeModel? dt = null;
-
-                                if (!string.IsNullOrWhiteSpace(time))
+                            List<StatusModel> statuses =
+                            [
+                                new StatusModel()
                                 {
-                                    dt = new DowntimeModel()
-                                    {
-                                        Time = time
-                                    };
+                                    Component = "PC",
+                                    Status = pcEvent.Status,
+                                    StatusClass = APIConverter.GetStatusClass(pcEvent.Status)
+                                },
+                                new StatusModel()
+                                {
+                                    Component = "Server",
+                                    Status = serverEvent.Status,
+                                    StatusClass = APIConverter.GetStatusClass(serverEvent.Status)
+                                },
+                                new StatusModel()
+                                {
+                                    Component = "Connection",
+                                    Status = connectionEvent.Status,
+                                    StatusClass = APIConverter.GetStatusClass(connectionEvent.Status)
                                 }
+                            ];
+                            server.Statuses = statuses;
 
-                                List<StatusModel> statuses =
-                                [
-                                    new StatusModel()
-                                    {
-                                        Status = pcStatus.Status,
-                                        StatusClass = APIConverter.GetStatusClass(pcStatus.Status)
-                                    },
-                                    new StatusModel()
-                                    {
-                                        Status = serverStatus.Status,
-                                        StatusClass = APIConverter.GetStatusClass(serverStatus.Status)
-                                    },
-                                    new StatusModel()
-                                    {
-                                        Status = connectionStatus.Status,
-                                        StatusClass = APIConverter.GetStatusClass(connectionStatus.Status)
-                                    }
-                                ];
-
-                                servers.Add(new ServerModel()
-                                {
-                                    HostName = hostName,
-                                    Game = game,
-                                    GameVersion = gameVersion,
-                                    Connection = new ConnectionModel()
-                                    {
-                                        IPAddress = ipAddress,
-                                        Port = port
-                                    },
-                                    Downtime = dt,
-                                    Statuses = statuses
-                                });
-
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {hostName}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game: {game}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {gameVersion}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"IP Address: {ipAddress}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Downtime: {time}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status: {statuses[0].Status}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"PC Status Class: {statuses[0].StatusClass}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status: {statuses[1].Status}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Status Class: {statuses[1].StatusClass}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Connection Status: {statuses[2].Status}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Connection Status Class: {statuses[2].StatusClass}");
-                            }
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Server Id: {server.Id}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Server Name: {server.Name}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Host Name: {server.HostName}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Game: {server.Game}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Game Version: {server.GameVersion}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Connection: {server.Connection.IPAddress}:{server.Connection.Port}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Downtime: {server.Downtime?.Time ?? "No Downtime"}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"PC Status: {statuses[0].Status}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"PC Status Class: {statuses[0].StatusClass}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Server Status: {statuses[1].Status}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Server Status Class: {statuses[1].StatusClass}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Connection Status: {statuses[2].Status}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Connection Status Class: {statuses[2].StatusClass}");
                         }
                     }
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched servers from API");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        "Fetched servers from API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
                         servers = await GetServers();
@@ -429,16 +394,24 @@ namespace ServerStatusCommon.Services
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch servers from API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            "Failed to fetch servers from API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch servers from API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    "Failed to fetch servers from API");
             }
 
             RetryCount = 0;
@@ -448,201 +421,294 @@ namespace ServerStatusCommon.Services
         /// <summary>
         /// Gets a ist of the statuses for a given component.
         /// </summary>
-        public async Task<List<APIStatusModel>> GetServerStatuses(string component)
+        public async Task<List<EventModel>> GetServerEvents(string component)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching server statuses from API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Fetching server events from API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
                 await Authorise();
             }
 
-            List<APIStatusModel> statuses = [];
+            List<EventModel> serverEvents = [];
+
+            List<KeyValuePair<string, object>> queryParameters =
+            [
+                new("component", component)
+            ];
 
             try
             {
-                RestResponse? response = await _APIClient.GetServerStatuses(component);
+                (serverEvents, bool success) = await _APIClient.GetServerEvents(queryParameters);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (success)
                 {
-                    JArray responseContent = JArray.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Statuses Returned: {responseContent.Count}");
-
-                    foreach (JObject status in responseContent)
+                    foreach (EventModel serverEvent in serverEvents)
                     {
-                        JObject server = JObject.Parse(status.Property("server")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Converting date times to UTC for server event {serverEvent.Id}.");
 
-                        statuses.Add(new APIStatusModel()
-                        {
-                            Component = status.Property("component")?.Value.ToString() ?? StandardValues.MissingValues.Component,
-                            Status = status.Property("status")?.Value.ToString() ?? StandardValues.MissingValues.Status,
-                            DateOccured = DateTime.SpecifyKind(DateTime.Parse(status.Property("dateOccured")?.Value.ToString()), DateTimeKind.Utc),
-                            Server = new APIRelatedServerModel()
-                            {
-                                HostName = server.Property("hostName")?.Value.ToString() ?? StandardValues.MissingValues.HostName,
-                                Game = server.Property("game")?.Value.ToString() ?? StandardValues.MissingValues.Game,
-                                GameVersion = server.Property("gameVersion")?.Value.ToString() ?? StandardValues.MissingValues.GameVersion
-                            }
-                        });
+                        serverEvent.DateOccured = DateTime.SpecifyKind(
+                            serverEvent.DateOccured,
+                            DateTimeKind.Utc);
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {statuses[^1].Component}");
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Status: {statuses[^1].Status}");
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {statuses[^1].DateOccured}");
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {statuses[^1].Server.HostName}");
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game: {statuses[^1].Server.Game}");
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Game Version: {statuses[^1].Server.GameVersion}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Converted date times to UTC for server event {serverEvent.Id}.");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Event Id: {serverEvent.Id}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Component: {serverEvent.Component}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Status: {serverEvent.Status}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Occured: {serverEvent.DateOccured}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Server Id: {serverEvent.Server.Id}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Server Name: {serverEvent.Server.Name}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Host Name: {serverEvent.Server.HostName}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Game: {serverEvent.Server.Game}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Game Version: {serverEvent.Server.GameVersion}");
                     }
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched server statuses from API");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        "Fetched server statuses from API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
-                        statuses = await GetServerStatuses(component);
+                        serverEvents = await GetServerEvents(component);
                     }
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch server statuses from API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            "Failed to fetch server events from API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch server statuses from API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    "Failed to fetch server events from API");
             }
 
             RetryCount = 0;
-            return statuses;
+            return serverEvents;
         }
 
         /// <summary>
         /// Changes the value of the given user setting.
         /// </summary>
-        public async Task<bool> UpdateUserSettings(int userSettingsId, string value)
+        public async Task<(SettingModel?, ResponseModel?)> UpdateUserSettings(
+            int userSettingId,
+            UserSettingUpdateRequestModel userSetting)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Updating user setting in API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                $"Updating user setting, {userSettingId}, in API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
                 await Authorise();
             }
 
-            bool updated = false;
+            SettingModel? updatedSetting = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
-                RestResponse? response = await _APIClient.UpdateUserSettings(userSettingsId, value);
+                (updatedSetting, apiResponse) = await _APIClient.UpdateUserSettings(
+                    userSettingId,
+                    userSetting);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (updatedSetting != null)
                 {
-                    updated = true;
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Setting Updated");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Updated user setting in API");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Setting Id: {updatedSetting.Id}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Setting Name: {updatedSetting.Name}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Setting Value: {updatedSetting.Value}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Updated user setting, {userSettingId}, in API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
-                        updated = await UpdateUserSettings(userSettingsId, value);
+                        (updatedSetting, apiResponse) = await UpdateUserSettings(
+                            userSettingId,
+                            userSetting);
                     }
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to update setting in API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Failed to update setting, {userSettingId}, in API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to update setting in API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    $"Failed to update setting, {userSettingId}, in API");
             }
 
             RetryCount = 0;
-            return updated;
+            return (
+                updatedSetting,
+                apiResponse);
         }
 
         /// <summary>
         /// Changes the information of a given user.
         /// </summary>
-        public async Task<bool> UpdateUser(UserModel user)
+        public async Task<(UserModel?, ResponseModel?)> UpdateUser(
+            int userId,
+            UserUpdateRequestModel user)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Updating user details in API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                $"Updating user, {userId}, in API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
                 await Authorise();
             }
 
-            bool updated = false;
+            UserModel? updatedUser = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
-                RestResponse? response = await _APIClient.UpdateUser(user);
+                (updatedUser, apiResponse) = await _APIClient.UpdateUser(
+                    userId,
+                    user);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (updatedUser != null)
                 {
-                    updated = true;
-
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Setting Updated");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Updated user details in API");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"User Id: {updatedUser.Id}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"User Username: {updatedUser.Username}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"User Password: {updatedUser.Password}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"User Scopes: {string.Join(
+                            ", ",
+                            updatedUser.Scopes)}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Updated user, {userId}, in API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
-                        updated = await UpdateUser(user);
+                        (updatedUser, apiResponse) = await UpdateUser(
+                            userId,
+                            user);
                     }
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to update user details in API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Failed to update user, {userId}, in API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to update user details in API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    $"Failed to update user, {userId}, in API");
             }
 
             RetryCount = 0;
-            return updated;
+            return (updatedUser, apiResponse);
         }
 
         /// <summary>
         /// Gets the alerts on a given page.
         /// </summary>
-        public async Task<APIAlertsModel> GetAlerts(int pageNumber)
+        public async Task<AlertInformationModel?> GetAlerts(int pageNumber)
         {
             _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching alerts from API");
 
@@ -651,68 +717,85 @@ namespace ServerStatusCommon.Services
                 await Authorise();
             }
 
-            APIAlertsModel alerts = new();
+            AlertInformationModel? alerts = null;
+            bool success;
+
+            List<KeyValuePair<string, object>> queryParameters =
+            [
+                new("pageNumber", pageNumber)
+            ];
 
             try
             {
-                RestResponse? response = await _APIClient.GetAlerts(pageNumber);
+                (alerts, success) = await _APIClient.GetAlerts(queryParameters);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (success)
                 {
-                    if (!string.IsNullOrWhiteSpace(response.Content) && !response.Content.Contains("No data returned by given parameters."))
+                    if (alerts != null)
                     {
-                        JObject responseContent = JObject.Parse(response.Content);
-                        JArray alertsContent = JArray.Parse(responseContent.Property("entries")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
-
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alerts Returned: {alertsContent.Count}");
-
-                        if (alertsContent.Count > 0)
+                        foreach (AlertModel alert in alerts.Entries)
                         {
-                            foreach (JObject alert in alertsContent)
-                            {
-                                JObject server = JObject.Parse(alert.Property("server")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Info,
+                                $"Converting date times to UTC for alert {alert.Id}.");
 
-                                alerts.Alerts.Add(new AlertModel
-                                {
-                                    Id = int.Parse(alert.Property("alertId")?.Value.ToString() ?? StandardValues.MissingValues.Integer),
-                                    Occured = DateTime.SpecifyKind(DateTime.Parse(alert.Property("alertDate")?.Value.ToString()), DateTimeKind.Utc),
-                                    Server = $"{server.Property("game")?.Value ?? StandardValues.MissingValues.Game} ({server.Property("gameVersion")?.Value ?? StandardValues.MissingValues.GameVersion})",
-                                    Reporter = alert.Property("reporter")?.Value.ToString() ?? StandardValues.MissingValues.Reporter,
-                                    Component = alert.Property("component")?.Value.ToString() ?? StandardValues.MissingValues.Component,
-                                    ComponentStatus = alert.Property("componentStatus")?.Value.ToString() ?? StandardValues.MissingValues.Status,
-                                    AlertStatus = alert.Property("alertStatus")?.Value.ToString() ?? StandardValues.MissingValues.AlertStatus
-                                });
+                            alert.AlertDate = DateTime.SpecifyKind(
+                                alert.AlertDate,
+                                DateTimeKind.Utc);
 
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alerts.Alerts[^1].Id}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alerts.Alerts[^1].Occured}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {alerts.Alerts[^1].Server}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alerts.Alerts[^1].Reporter}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alerts.Alerts[^1].Component}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alerts.Alerts[^1].ComponentStatus}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alerts.Alerts[^1].AlertStatus}");
-                            }
-
-                            if (int.Parse(responseContent.Property("totalPageCount")?.Value.ToString() ?? StandardValues.MissingValues.Integer) > 1)
-                            {
-                                alerts.MultiplePages = true;
-                                alerts.PageCount = int.Parse(responseContent.Property("totalPageCount")?.Value.ToString() ?? StandardValues.MissingValues.Integer);
-
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Multiple Pages: {alerts.MultiplePages}");
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Page Count: {alerts.PageCount}");
-                            }
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Info,
+                                $"Converted date times to UTC for alert {alert.Id}.");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Alert Id: {alert.Id}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Reporter: {alert.Reporter}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Component: {alert.Component}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Component Status: {alert.ComponentStatus}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Alert Status: {alert.AlertStatus}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Alert Date: {alert.AlertDate}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Server Id: {alert.Server.Id}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Server Name: {alert.Server.Name}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Host Name: {alert.Server.HostName}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Game: {alert.Server.Game}");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                $"Game Version: {alert.Server.GameVersion}");
                         }
-                    }
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched alerts from API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            "Fetched alerts from API");
+                    }
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
                         alerts = await GetAlerts(pageNumber);
@@ -720,19 +803,25 @@ namespace ServerStatusCommon.Services
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch alerts from API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            "Failed to fetch alerts from API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch alerts from API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    "Failed to fetch alerts from API");
             }
-
-            alerts.APICalled = true;
 
             RetryCount = 0;
             return alerts;
@@ -741,54 +830,87 @@ namespace ServerStatusCommon.Services
         /// <summary>
         /// Gets the information of a given AlertID.
         /// </summary>
-        public async Task<AlertModel> GetAlert(int alertId)
+        public async Task<AlertModel?> GetAlert(int alertId)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetching alert from API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                $"Fetching alert, {alertId}, from API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
                 await Authorise();
             }
 
-            AlertModel alert = new();
+            AlertModel? alert = null;
+            bool success;
 
             try
             {
-                RestResponse? response = await _APIClient.GetAlert(alertId);
+                (alert, success) = await _APIClient.GetAlert(alertId);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (success)
                 {
-                    JObject responseContent = JObject.Parse(response.Content ?? StandardValues.MissingValues.ResponseContent);
-                    JObject server = JObject.Parse(responseContent.Property("server")?.Value.ToString() ?? StandardValues.MissingValues.RelatedContent);
-
-                    alert = new AlertModel
+                    if (alert != null)
                     {
-                        Id = int.Parse(responseContent.Property("alertId")?.Value.ToString() ?? StandardValues.MissingValues.Integer),
-                        Occured = DateTime.SpecifyKind(DateTime.Parse(responseContent.Property("alertDate")?.Value.ToString()), DateTimeKind.Utc),
-                        Server = $"{server.Property("game")?.Value ?? StandardValues.MissingValues.Game} ({server.Property("gameVersion")?.Value ?? StandardValues.MissingValues.GameVersion})",
-                        Reporter = responseContent.Property("reporter")?.Value.ToString() ?? StandardValues.MissingValues.Reporter,
-                        Component = responseContent.Property("component")?.Value.ToString() ?? StandardValues.MissingValues.Component,
-                        ComponentStatus = responseContent.Property("componentStatus")?.Value.ToString() ?? StandardValues.MissingValues.Status,
-                        AlertStatus = responseContent.Property("alertStatus")?.Value.ToString() ?? StandardValues.MissingValues.AlertStatus
-                    };
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Converting date times to UTC for alert {alert.Id}.");
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {alert.Id}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Occured: {alert.Occured}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server: {alert.Server}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Reporter: {alert.Reporter}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component: {alert.Component}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Component Status: {alert.ComponentStatus}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Status: {alert.AlertStatus}");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Fetched alert from API");
+                        alert.AlertDate = DateTime.SpecifyKind(
+                            alert.AlertDate,
+                            DateTimeKind.Utc);
+
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Converted date times to UTC for alert {alert.Id}.");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Alert Id: {alert.Id}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Reporter: {alert.Reporter}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Component: {alert.Component}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Component Status: {alert.ComponentStatus}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Alert Status: {alert.AlertStatus}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Alert Date: {alert.AlertDate}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Server Id: {alert.Server.Id}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Server Name: {alert.Server.Name}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Host Name: {alert.Server.HostName}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Game: {alert.Server.Game}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Game Version: {alert.Server.GameVersion}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Fetched alert, {alertId}, from API");
+                    }
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
                         alert = await GetAlert(alertId);
@@ -796,16 +918,24 @@ namespace ServerStatusCommon.Services
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch alert from API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Failed to fetch alert, {alertId}, from API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to fetch alert from API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    $"Failed to fetch alert, {alertId}, from API");
             }
 
             RetryCount = 0;
@@ -815,169 +945,343 @@ namespace ServerStatusCommon.Services
         /// <summary>
         /// Changes the status of the given alert.
         /// </summary>
-        public async Task<bool> UpdateAlert(int alertId, string status)
+        public async Task<(AlertModel?, ResponseModel?)> UpdateAlert(
+            int alertId,
+            AlertUpdateRequestModel alert)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Updating alert status in API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                $"Updating alert, {alertId}, in API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
                 await Authorise();
             }
 
-            bool updated = false;
+            AlertModel? updatedAlert = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
-                RestResponse? response = await _APIClient.UpdateAlert(alertId, status);
+                (updatedAlert, apiResponse) = await _APIClient.UpdateAlert(
+                    alertId,
+                    alert);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (updatedAlert != null)
                 {
-                    updated = true;
+                    _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Converting date times to UTC for alert {updatedAlert.Id}.");
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Status Updated");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Updated alert status in API");
+                    updatedAlert.AlertDate = DateTime.SpecifyKind(
+                        updatedAlert.AlertDate,
+                        DateTimeKind.Utc);
+
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Converted date times to UTC for alert {updatedAlert.Id}.");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Alert Id: {updatedAlert.Id}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Reporter: {updatedAlert.Reporter}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Component: {updatedAlert.Component}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Component Status: {updatedAlert.ComponentStatus}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Alert Status: {updatedAlert.AlertStatus}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Alert Date: {updatedAlert.AlertDate}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Server Id: {updatedAlert.Server.Id}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Server Name: {updatedAlert.Server.Name}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Host Name: {updatedAlert.Server.HostName}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Game: {updatedAlert.Server.Game}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Game Version: {updatedAlert.Server.GameVersion}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Updated alert, {alertId}, in API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
-                        updated = await UpdateAlert(alertId, status);
+                        (updatedAlert, apiResponse) = await UpdateAlert(
+                            alertId,
+                            alert);
                     }
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to update alert status in API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Failed to update alert, {alertId}, in API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to update alert status in API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    $"Failed to update alert, {alertId}, in API");
             }
 
             RetryCount = 0;
-            return updated;
+            return (
+                updatedAlert,
+                apiResponse);
         }
 
         /// <summary>
         /// Adds a new alert to the API.
         /// </summary>
-        public async Task<bool> RegisterAlert(APINewAlertsModel alert)
+        public async Task<(AlertModel?, ResponseModel?)> RegisterAlert(AlertRequestModel alert)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Registering alert in API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                $"Registering alert, {alert.Component} ({alert.ComponentStatus}), in API");
 
             if (ExpiryTime < _Clock.UtcNow)
             {
                 await Authorise();
             }
 
-            bool registered = false;
+            AlertModel? createdAlert = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
-                RestResponse? response = await _APIClient.RegisterAlert(alert);
+                (createdAlert, apiResponse) = await _APIClient.RegisterAlert(alert);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.Created)
+                if (createdAlert != null)
                 {
-                    registered = true;
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Converting date times to UTC for alert {createdAlert.Id}.");
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Register Successful");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Registered alert in API");
+                    createdAlert.AlertDate = DateTime.SpecifyKind(
+                        createdAlert.AlertDate,
+                        DateTimeKind.Utc);
+
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Converted date times to UTC for alert {createdAlert.Id}.");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Alert Id: {createdAlert.Id}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Reporter: {createdAlert.Reporter}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Component: {createdAlert.Component}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Component Status: {createdAlert.ComponentStatus}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Alert Status: {createdAlert.AlertStatus}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Alert Date: {createdAlert.AlertDate}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Server Id: {createdAlert.Server.Id}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Server Name: {createdAlert.Server.Name}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Host Name: {createdAlert.Server.HostName}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Game: {createdAlert.Server.Game}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Game Version: {createdAlert.Server.GameVersion}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Registered alert, {alert.Component} ({alert.ComponentStatus}), in API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
-                        registered = await RegisterAlert(alert);
+                        (createdAlert, apiResponse) = await RegisterAlert(alert);
                     }
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to register server alert in API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Failed to register alert, {alert.Component} ({alert.ComponentStatus}), in API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to register alert in API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    $"Failed to register alert, {alert.Component} ({alert.ComponentStatus}), in API");
             }
 
             RetryCount = 0;
-            return registered;
+            return (
+                createdAlert,
+                apiResponse);
         }
 
         /// <summary>
         /// Adds a new event to the API.
         /// </summary>
-        public async Task<bool> RegisterServerEvent(APIStatusModel status)
+        public async Task<(EventModel?, ResponseModel?)> RegisterServerEvent(EventRequestModel serverEvent)
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Registering server event in API");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                $"Registering event, {serverEvent.Component} ({serverEvent.Status}), in API");
 
             if (ExpiryTime <= _Clock.UtcNow)
             {
                 await Authorise();
             }
 
-            bool registered = false;
+            EventModel? createdEvent = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
-                RestResponse? response = await _APIClient.RegisterServerEvent(status);
+                (createdEvent, apiResponse) = await _APIClient.RegisterServerEvent(serverEvent);
 
-                if (response != null && response.StatusCode == System.Net.HttpStatusCode.Created)
+                if (createdEvent != null)
                 {
-                    registered = true;
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Converting date times to UTC for server event {createdEvent.Id}.");
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Register Successful");
-                    _Logger.LogMessage(StandardValues.LoggerValues.Info, "Registered server event in API");
+                    createdEvent.DateOccured = DateTime.SpecifyKind(
+                        createdEvent.DateOccured,
+                        DateTimeKind.Utc);
+
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Converted date times to UTC for server event {createdEvent.Id}.");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Event Id: {createdEvent.Id}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Component: {createdEvent.Component}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Status: {createdEvent.Status}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Occured: {createdEvent.DateOccured}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Server Id: {createdEvent.Server.Id}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Server Name: {createdEvent.Server.Name}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Host Name: {createdEvent.Server.HostName}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Game: {createdEvent.Server.Game}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Game Version: {createdEvent.Server.GameVersion}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Info,
+                        $"Registered event, {serverEvent.Component} ({serverEvent.Status}), in API");
                 }
 
-                else if (response == null || response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == 0)
+                else
                 {
                     if (RetryCount != 4)
                     {
                         RetryCount++;
 
-                        _Logger.LogMessage(StandardValues.LoggerValues.Warning, $"Retry {RetryCount} of 4");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Warning,
+                            $"Retry {RetryCount} of 4");
 
                         await Authorise();
-                        registered = await RegisterServerEvent(status);
+                        (createdEvent, apiResponse) = await RegisterServerEvent(serverEvent);
                     }
 
                     else
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to register server event in API");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Info,
+                            $"Failed to register event, {serverEvent.Component} ({serverEvent.Status}), in API");
                     }
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, "Failed to register server event in API");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    $"Failed to register event, {serverEvent.Component} ({serverEvent.Status}), in API");
             }
 
             RetryCount = 0;
-            return registered;
+            return (
+                createdEvent,
+                apiResponse);
         }
     }
 }

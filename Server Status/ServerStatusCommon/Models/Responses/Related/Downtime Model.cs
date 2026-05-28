@@ -7,5 +7,6 @@ namespace ServerStatusCommon.Models.Responses.Related
     public class DowntimeModel
     {
         public required string Time { get; set; }
+        public required int Duration { get; set; }
     }
 }

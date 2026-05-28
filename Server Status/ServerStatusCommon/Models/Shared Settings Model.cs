@@ -13,7 +13,7 @@ namespace ServerStatusCommon.Models
         public bool SendAlerts { get; set; }
         public string BaseURL { get; set; }
         public string Credentials { get; set; }
-        public string PayloadLocation { get; set; }
+        public string AuthPayloadLocation { get; set; }
         public int RefreshTime { get; set; }
     }
 }

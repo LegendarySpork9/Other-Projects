@@ -17,12 +17,14 @@ namespace ServerStatus.Tests.Common.Functions
             DateTime utcNow = new(2026, 03, 12, 15, 20, 00, DateTimeKind.Utc);
 
             Mock<IClock> _mockClock = new();
-            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+            _mockClock.Setup(c => c.UtcNow)
+                .Returns(utcNow);
 
             TimerFunction _timerFunction = new(_mockClock.Object);
 
             DateTime now = utcNow;
-            TimeSpan interval = _timerFunction.GetTimerInterval(now.AddMilliseconds(-now.Millisecond).AddMinutes(5));
+            TimeSpan interval = _timerFunction.GetTimerInterval(now.AddMilliseconds(-now.Millisecond)
+                .AddMinutes(5));
 
             Assert.IsTrue(interval > TimeSpan.Zero);
         }
@@ -36,7 +38,8 @@ namespace ServerStatus.Tests.Common.Functions
             DateTime utcNow = new(2026, 03, 12, 15, 20, 00, DateTimeKind.Utc);
 
             Mock<IClock> _mockClock = new();
-            _mockClock.Setup(c => c.UtcNow).Returns(utcNow);
+            _mockClock.Setup(c => c.UtcNow)
+                .Returns(utcNow);
 
             TimerFunction _timerFunction = new(_mockClock.Object);
 

@@ -1,12 +1,14 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
-namespace ServerStatusCommon.Models.Responses.Related
+using ServerStatusCommon.Models.Responses.Related;
+
+namespace ServerStatusCommon.Models.Responses
 {
     /// <summary>
     /// Stores the alert data.
     /// </summary>
     public class AlertModel
     {
-        public required int AlertId { get; set; }
+        public required int Id { get; set; }
         public required string Reporter { get; set; }
         public required string Component { get; set; }
         public required string ComponentStatus { get; set; }

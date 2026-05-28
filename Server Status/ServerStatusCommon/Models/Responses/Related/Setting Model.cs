@@ -2,9 +2,9 @@
 namespace ServerStatusCommon.Models.Responses.Related
 {
     /// <summary>
-    /// Stores the settings data.
+    /// Stores the setting data.
     /// </summary>
-    public class SettingsModel
+    public class SettingModel
     {
         public required int Id { get; set; }
         public required string Name { get; set; }

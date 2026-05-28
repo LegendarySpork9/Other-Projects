@@ -1,11 +1,11 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
 using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.Requests;
+using ServerStatusCommon.Models.Requests.Create;
+using ServerStatusCommon.Models.Requests.Update;
 using ServerStatusCommon.Models.Responses;
 using ServerStatusCommon.Models.Responses.Related;
 
@@ -31,68 +31,94 @@ namespace ServerStatusCommon.Implementations
         }
 
         /// <summary>
-        /// Returns the token expiry time from the API.
+        /// Sets the bearer token to the given value.
         /// </summary>
-        public async Task<(DateTime?, bool)> Authorise()
+        public void SetBearerToken(string bearerToken) => BearerToken = bearerToken;
+
+        /// <summary>
+        /// Returns the authentication from the API.
+        /// </summary>
+        public async Task<AuthenticationModel?> Authorise()
         {
-            DateTime? expiryTime = null;
-            bool success = false;
+            AuthenticationModel? auth = null;
 
             try
             {
                 string url = BuildURL("/auth/token");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
-                client.AddDefaultHeader("Accept", "application/json");
+                client.AddDefaultHeader(
+                    "Authorization",
+                    SharedSettings.Credentials);
+                client.AddDefaultHeader(
+                    "Accept",
+                    "application/json");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
-                string body = await _FileSystem.ReadAllText($@"{SharedSettings.PayloadLocation}\Authorise.json");
+                string body = await _FileSystem.ReadAllText(SharedSettings.AuthPayloadLocation);
 
                 RestRequest request = new()
                 {
                     Method = Method.Post
                 };
-                request.AddParameter("application/json", body, ParameterType.RequestBody);
+                request.AddParameter(
+                    "application/json",
+                    body,
+                    ParameterType.RequestBody);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {body}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Request Body: {body}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
-                    AuthenticationModel? auth = JsonConvert.DeserializeObject<AuthenticationModel>(response.Content) ?? null;
+                    auth = JsonConvert.DeserializeObject<AuthenticationModel>(response.Content);
+                }
 
-                    if (auth != null)
-                    {
-                        BearerToken = auth.Token;
-
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Bearer Token: {BearerToken}");
-
-                        expiryTime = DateTime.SpecifyKind(auth.Expires, DateTimeKind.Utc);
-
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Expiry Time: {expiryTime}");
-
-                        success = true;
-                    }
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return (expiryTime, success);
+            return auth;
         }
 
         /// <summary>
@@ -105,96 +131,158 @@ namespace ServerStatusCommon.Implementations
 
             try
             {
-                string url = BuildURL("/users");
+                string url = BuildURL("/user");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
                 RestRequest request = new()
                 {
                     Method = Method.Get
                 };
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
                     users = JsonConvert.DeserializeObject<List<UserModel>>(response.Content) ?? [];
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Users Returned: {users.Count}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Users Returned: {users.Count}");
 
                     success = true;
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return (users, success);
+            return (
+                users,
+                success);
         }
 
         /// <summary>
         /// Returns a list of user settings from the API for a given user.
         /// </summary>
-        public async Task<(List<UserSettingsModel>, bool)> GetUserSettings(int userId)
+        public async Task<(UserSettingModel?, bool)> GetUserSettings(int userId)
         {
-            List<UserSettingsModel> userSettings = [];
+            UserSettingModel? userSettings = null;
             bool success = false;
 
             try
             {
-                string url = BuildURL("/usersettings", userId);
+                string url = BuildURL(
+                    "/usersettings",
+                    userId);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
                 RestRequest request = new()
                 {
                     Method = Method.Get
                 };
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
-                    userSettings = JsonConvert.DeserializeObject<List<UserSettingsModel>>(response.Content) ?? [];
+                    userSettings = JsonConvert.DeserializeObject<UserSettingModel?>(response.Content);
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"User Settings Returned: {userSettings.Sum(us => us.Settings.Count)}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"User Settings Returned: {userSettings?.Settings.Count ?? 0}");
 
                     success = true;
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return (userSettings, success);
+            return (
+                userSettings,
+                success);
         }
 
         /// <summary>
@@ -209,242 +297,417 @@ namespace ServerStatusCommon.Implementations
             {
                 string url = BuildURL("/serverstatus/serverinformation");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
                 RestRequest request = new()
                 {
                     Method = Method.Get
                 };
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
                     servers = JsonConvert.DeserializeObject<List<ServerModel>>(response.Content) ?? [];
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Servers Returned: {servers.Count}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Servers Returned: {servers.Count}");
 
                     success = true;
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return (servers, success);
+            return (
+                servers,
+                success);
         }
 
         /// <summary>
         /// Returns a list of server status from the API for a given component.
         /// </summary>
-        public async Task<(List<ServerEventModel>, bool)> GetServerStatuses(string component)
+        public async Task<(List<EventModel>, bool)> GetServerEvents(List<KeyValuePair<string, object>> queryParameters)
         {
-            List<ServerEventModel> serverEvents = [];
+            List<EventModel> serverEvents = [];
             bool success = false;
 
             try
             {
-                string url = BuildURL("/serverstatus/serverevent", null, [new("{component}", component)]);
+                string url = BuildURL(
+                    "/serverstatus/serverevent",
+                    queryParameters: queryParameters);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
                 RestRequest request = new()
                 {
                     Method = Method.Get
                 };
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
-                    serverEvents = JsonConvert.DeserializeObject<List<ServerEventModel>>(response.Content) ?? [];
+                    serverEvents = JsonConvert.DeserializeObject<List<EventModel>>(response.Content) ?? [];
 
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Server Events Returned: {serverEvents.Count}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        $"Server Events Returned: {serverEvents.Count}");
 
                     success = true;
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return (serverEvents, success);
+            return (
+                serverEvents,
+                success);
         }
 
         /// <summary>
         /// Updates the given user setting in the API.
         /// </summary>
-        public async Task<bool> UpdateUserSettings(int userSettingsId, string value)
+        public async Task<(SettingModel?, ResponseModel?)> UpdateUserSettings(
+            int userSettingId,
+            UserSettingUpdateRequestModel userSetting)
         {
-            bool success = false;
+            SettingModel? updatedSetting = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
-                string url = BuildURL("/usersettings", userSettingsId, null, true);
+                string url = BuildURL(
+                    "/usersettings",
+                    userSettingId,
+                    ignoreQuery: true);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
-                client.AddDefaultHeader("Accept", "application/json");
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
+                client.AddDefaultHeader(
+                    "Accept",
+                    "application/json");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
-                JObject body = new()
-                {
-                    ["value"] = value
-                };
+                string body = JsonConvert.SerializeObject(userSetting);
 
                 RestRequest request = new()
                 {
                     Method = Method.Patch
                 };
-                request.AddParameter("application/json", body.ToString(), ParameterType.RequestBody);
+                request.AddParameter(
+                    "application/json",
+                    body,
+                    ParameterType.RequestBody);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {body}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Request Body: {body}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Updated User Setting: True");
+                    updatedSetting = JsonConvert.DeserializeObject<SettingModel>(response.Content);
+                }
 
-                    success = true;
+                else if (response.Content != null)
+                {
+                    APIMessageModel? apiMessage = JsonConvert.DeserializeObject<APIMessageModel>(response.Content);
+                    apiResponse = new()
+                    {
+                        StatusCode = response.StatusCode,
+                        Message = apiMessage?.Error ?? apiMessage?.Information ?? "No message returned by the API."
+                    };
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return success;
+            return (
+                updatedSetting,
+                apiResponse);
         }
 
         /// <summary>
         /// Updates the given user in the API.
         /// </summary>
-        public async Task<bool> UpdateUser(UserModel user)
+        public async Task<(UserModel?, ResponseModel?)> UpdateUser(
+            int userId,
+            UserUpdateRequestModel user)
         {
-            bool success = false;
+            UserModel? updatedUser = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
-                string url = BuildURL("/user", user.Id, null, true);
+                string url = BuildURL(
+                    "/user",
+                    userId,
+                    ignoreQuery: true);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
-                client.AddDefaultHeader("Accept", "application/json");
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
+                client.AddDefaultHeader(
+                    "Accept",
+                    "application/json");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
-                JObject body = new()
-                {
-                    ["username"] = user.Username,
-                    ["password"] = user.Password,
-                    ["scopes"] = JArray.FromObject(user.Scopes)
-                };
+                string body = JsonConvert.SerializeObject(user);
 
                 RestRequest request = new()
                 {
                     Method = Method.Patch
                 };
-                request.AddParameter("application/json", body.ToString(), ParameterType.RequestBody);
+                request.AddParameter(
+                    "application/json",
+                    body,
+                    ParameterType.RequestBody);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {body}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Request Body: {body}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Updated User: True");
+                    updatedUser = JsonConvert.DeserializeObject<UserModel>(response.Content);
+                }
 
-                    success = true;
+                else if (response.Content != null)
+                {
+                    APIMessageModel? apiMessage = JsonConvert.DeserializeObject<APIMessageModel>(response.Content);
+                    apiResponse = new()
+                    {
+                        StatusCode = response.StatusCode,
+                        Message = apiMessage?.Error ?? apiMessage?.Information ?? "No message returned by the API."
+                    };
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return success;
+            return (
+                updatedUser,
+                apiResponse);
         }
 
         /// <summary>
         /// Returns a list of alerts from the API.
         /// </summary>
-        public async Task<(AlertInformationModel?, bool)> GetAlerts(int pageNumber)
+        public async Task<(AlertInformationModel?, bool)> GetAlerts(List<KeyValuePair<string, object>> queryParameters)
         {
             AlertInformationModel? alerts = null;
             bool success = false;
 
             try
             {
-                string url = BuildURL("/serverstatus/serveralert");
+                string url = BuildURL(
+                    "/serverstatus/serveralert",
+                    queryParameters: queryParameters);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
                 RestRequest request = new()
                 {
                     Method = Method.Get
                 };
-                request.AddParameter("page", pageNumber);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
@@ -452,20 +715,38 @@ namespace ServerStatusCommon.Implementations
 
                     if (alerts != null)
                     {
-                        _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alerts Returned: {alerts.EntryCount}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Alerts Returned: {alerts.EntryCount}");
 
                         success = true;
                     }
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return (alerts, success);
+            return (
+                alerts,
+                success);
         }
 
         /// <summary>
@@ -478,27 +759,43 @@ namespace ServerStatusCommon.Implementations
 
             try
             {
-                string url = BuildURL("/serverstatus/serveralert", alertId);
+                string url = BuildURL(
+                    "/serverstatus/serveralert",
+                    alertId);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
                 RestRequest request = new()
                 {
                     Method = Method.Get
                 };
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
                 {
@@ -509,91 +806,163 @@ namespace ServerStatusCommon.Implementations
                         success = true;
                     }
                 }
-            }
 
-            catch (Exception ex)
-            {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
-            }
-
-            return (alert, success);
-        }
-
-        /// <summary>
-        /// Updates the given alert in the API.
-        /// </summary>
-        public async Task<bool> UpdateAlert(int alertId, string status)
-        {
-            bool success = false;
-
-            try
-            {
-                string url = BuildURL("/serverstatus/serveralert", alertId);
-
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
-
-                RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
-                client.AddDefaultHeader("Accept", "application/json");
-
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
-
-                JObject body = new()
+                if (response.ErrorException != null)
                 {
-                    ["status"] = status
-                };
-
-                RestRequest request = new()
-                {
-                    Method = Method.Patch
-                };
-                request.AddParameter("application/json", body.ToString(), ParameterType.RequestBody);
-
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {body}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
-
-                RestResponse response = await client.ExecuteAsync(request);
-
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
-
-                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
-                {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Updated Alert: True");
-
-                    success = true;
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return success;
+            return (
+                alert,
+                success);
+        }
+
+        /// <summary>
+        /// Updates the given alert in the API.
+        /// </summary>
+        public async Task<(AlertModel?, ResponseModel?)> UpdateAlert(
+            int alertId,
+            AlertUpdateRequestModel alert)
+        {
+            AlertModel? updatedAlert = null;
+            ResponseModel? apiResponse = null;
+
+            try
+            {
+                string url = BuildURL(
+                    "/serverstatus/serveralert",
+                    alertId);
+
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
+
+                RestClient client = new(url);
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
+                client.AddDefaultHeader(
+                    "Accept",
+                    "application/json");
+
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
+
+                string body = JsonConvert.SerializeObject(alert);
+
+                RestRequest request = new()
+                {
+                    Method = Method.Patch
+                };
+                request.AddParameter(
+                    "application/json",
+                    body,
+                    ParameterType.RequestBody);
+
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Request Body: {body}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                {
+                    updatedAlert = JsonConvert.DeserializeObject<AlertModel>(response.Content);
+                }
+
+                else if (response.Content != null)
+                {
+                    APIMessageModel? apiMessage = JsonConvert.DeserializeObject<APIMessageModel>(response.Content);
+                    apiResponse = new()
+                    {
+                        StatusCode = response.StatusCode,
+                        Message = apiMessage?.Error ?? apiMessage?.Information ?? "No message returned by the API."
+                    };
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
+                }
+            }
+
+            catch (Exception ex)
+            {
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
+            }
+
+            return (
+                updatedAlert,
+                apiResponse);
         }
 
         /// <summary>
         /// Adds the given alert to the API.
         /// </summary>
-        public async Task<bool> RegisterAlert(NewAlertModel alert)
+        public async Task<(AlertModel?, ResponseModel?)> RegisterAlert(AlertRequestModel alert)
         {
-            bool success = false;
+            AlertModel? createdAlert = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
                 string url = BuildURL("/serverstatus/serveralert");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
-                client.AddDefaultHeader("Accept", "application/json");
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
+                client.AddDefaultHeader(
+                    "Accept",
+                    "application/json");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
                 string body = JsonConvert.SerializeObject(alert);
 
@@ -601,52 +970,98 @@ namespace ServerStatusCommon.Implementations
                 {
                     Method = Method.Post
                 };
-                request.AddParameter("application/json", body, ParameterType.RequestBody);
+                request.AddParameter(
+                    "application/json",
+                    body,
+                    ParameterType.RequestBody);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {body}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Request Body: {body}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
-                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                if (response.StatusCode == System.Net.HttpStatusCode.Created && response.Content != null)
                 {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Registered Alert: True");
+                    createdAlert = JsonConvert.DeserializeObject<AlertModel>(response.Content);
+                }
 
-                    success = true;
+                else if (response.Content != null)
+                {
+                    APIMessageModel? apiMessage = JsonConvert.DeserializeObject<APIMessageModel>(response.Content);
+                    apiResponse = new()
+                    {
+                        StatusCode = response.StatusCode,
+                        Message = apiMessage?.Error ?? apiMessage?.Information ?? "No message returned by the API."
+                    };
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return success;
+            return (
+                createdAlert,
+                apiResponse);
         }
 
         /// <summary>
         /// Adds the given event to the API.
         /// </summary>
-        public async Task<bool> RegisterServerEvent(NewEventModel newEvent)
+        public async Task<(EventModel?, ResponseModel?)> RegisterServerEvent(EventRequestModel newEvent)
         {
-            bool success = false;
+            EventModel? createdEvent = null;
+            ResponseModel? apiResponse = null;
 
             try
             {
                 string url = BuildURL("/serverstatus/serverevent");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"URL: {url}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"URL: {url}");
 
                 RestClient client = new(url);
-                client.AddDefaultHeader("Authorization", SharedSettings.Credentials);
-                client.AddDefaultHeader("Accept", "application/json");
+                client.AddDefaultHeader(
+                    "Authorization",
+                    $"Bearer {BearerToken}");
+                client.AddDefaultHeader(
+                    "Accept",
+                    "application/json");
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Client");
 
                 string body = JsonConvert.SerializeObject(newEvent);
 
@@ -654,38 +1069,79 @@ namespace ServerStatusCommon.Implementations
                 {
                     Method = Method.Post
                 };
-                request.AddParameter("application/json", body, ParameterType.RequestBody);
+                request.AddParameter(
+                    "application/json",
+                    body,
+                    ParameterType.RequestBody);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Request Body: {body}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Rest Request");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Request Body: {body}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Rest Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
                 RestResponse response = await client.ExecuteAsync(request);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Code: {response.StatusCode}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Response Message: {response.ErrorException?.Message ?? response.Content}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Code: {response.StatusCode}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Response Message: {response.Content ?? "No Response Content"}");
 
-                if (response.StatusCode == System.Net.HttpStatusCode.OK && response.Content != null)
+                if (response.StatusCode == System.Net.HttpStatusCode.Created && response.Content != null)
                 {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Registered Event: True");
+                    createdEvent = JsonConvert.DeserializeObject<EventModel>(response.Content);
+                }
 
-                    success = true;
+                else if (response.Content != null)
+                {
+                    APIMessageModel? apiMessage = JsonConvert.DeserializeObject<APIMessageModel>(response.Content);
+                    apiResponse = new()
+                    {
+                        StatusCode = response.StatusCode,
+                        Message = apiMessage?.Error ?? apiMessage?.Information ?? "No message returned by the API."
+                    };
+                }
+
+                if (response.ErrorException != null)
+                {
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Error: {response.ErrorException.Message}");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Warning,
+                        $"Response Stack Trace: {response.ErrorException.StackTrace}");
                 }
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
-            return success;
+            return (
+                createdEvent,
+                apiResponse);
         }
 
         /// <summary>
         /// Returns the API url.
         /// </summary>
-        private string BuildURL(string endpoint, object? entityId = null, List<KeyValuePair<string, object>>? queryParameters = null, bool ignoreQuery = false)
+        private string BuildURL(
+            string endpoint,
+            object? entityId = null,
+            List<KeyValuePair<string, object>>? queryParameters = null,
+            bool ignoreQuery = false)
         {
             string url = $"{SharedSettings.BaseURL}{endpoint}";
             string query = APIConverter.GetQuery(endpoint);
@@ -695,11 +1151,31 @@ namespace ServerStatusCommon.Implementations
                 url += $"/{entityId}";
             }
 
-            if (queryParameters != null)
+            if (queryParameters != null && queryParameters.Count > 0)
             {
-                foreach(KeyValuePair<string, object> queryParameter in queryParameters)
+                if (string.IsNullOrEmpty(query))
                 {
-                    query = query.Replace($"{queryParameter.Key}", $"{queryParameter.Value}");
+                    query = "?";
+
+                    for (int x = 0; x < queryParameters.Count; x++)
+                    {
+                        KeyValuePair<string, object> queryParameter = queryParameters[x];
+
+                        query += $"{queryParameter.Key}={queryParameter.Value}";
+
+                        if (x != (queryParameters.Count - 1))
+                        {
+                            query += "&";
+                        }
+                    }
+                }
+
+                else
+                {
+                    foreach (KeyValuePair<string, object> queryParameter in queryParameters)
+                    {
+                        query = query.Replace($"{queryParameter.Key}", $"{queryParameter.Value}");
+                    }
                 }
             }
 

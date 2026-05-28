@@ -1,6 +1,4 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
-using ServerStatusCommon.Models.Responses.Related;
-
 namespace ServerStatusCommon.Models.Responses
 {
     /// <summary>

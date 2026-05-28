@@ -3,7 +3,8 @@ using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
 using ServerStatusCommon.Functions;
 using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Models.Requests.Create;
+using ServerStatusCommon.Models.Responses;
 using ServerStatusCommon.Services;
 using System.Timers;
 using Timer = System.Timers.Timer;
@@ -41,7 +42,9 @@ namespace ServerStatusAutomation.Services
         /// </summary>
         public void Setup()
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Automation Service");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Configuring Automation Service");
 
             RefreshTimer = new()
             {
@@ -49,8 +52,12 @@ namespace ServerStatusAutomation.Services
             };
             RefreshTimer.Elapsed += async (sender, e) => await TimerElapsed(sender, e);
 
-            _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {SharedSettings.RefreshTime} minutes");
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Automation Service");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Debug,
+                $"Timer Duration: {SharedSettings.RefreshTime} minutes");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Configured Automation Service");
         }
 
         // Performs the first run and starts the timer.
@@ -61,7 +68,8 @@ namespace ServerStatusAutomation.Services
             await Run();
 
             DateTime currentTime = _Clock.UtcNow;
-            NextElapse = currentTime.AddMinutes(SharedSettings.RefreshTime).AddMilliseconds(-currentTime.Millisecond);
+            NextElapse = currentTime.AddMinutes(SharedSettings.RefreshTime)
+                .AddMilliseconds(-currentTime.Millisecond);
 
             RefreshTimer.Interval = _timerFunction.GetTimerInterval(NextElapse).TotalMilliseconds;
             RefreshTimer.Start();
@@ -74,9 +82,15 @@ namespace ServerStatusAutomation.Services
 
             try
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Timer Triggered");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Token Expiry: {_APIService.ExpiryTime}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Time: {_Clock.UtcNow}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Timer Triggered");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Token Expiry: {_APIService.ExpiryTime}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Current Time: {_Clock.UtcNow}");
 
                 NextElapse = NextElapse.AddMinutes(SharedSettings.RefreshTime);
 
@@ -88,8 +102,12 @@ namespace ServerStatusAutomation.Services
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
         }
 
@@ -98,30 +116,42 @@ namespace ServerStatusAutomation.Services
         /// </summary>
         private async Task Run()
         {
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "Running Automatic Status Checks");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Running Automatic Status Checks");
 
             List<ServerModel> servers = await _APIService.GetServers();
-            List<APIStatusModel> pcStatuses = await _APIService.GetServerStatuses("PC Status");
-            List<APIStatusModel> serverStatuses = await _APIService.GetServerStatuses("Server Status");
-            List<APIStatusModel> connectionStatuses = await _APIService.GetServerStatuses("Connection Status");
-            APIAlertsModel alerts = await _APIService.GetAlerts(1);
+            List<EventModel> pcStatuses = await _APIService.GetServerEvents("PC");
+            List<EventModel> serverStatuses = await _APIService.GetServerEvents("Server");
+            List<EventModel> connectionStatuses = await _APIService.GetServerEvents("Connection");
+            AlertInformationModel? alerts = await _APIService.GetAlerts(1);
 
             foreach (ServerModel server in servers)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Checking Status for {server.HostName} - {server.Game} ({server.GameVersion})");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Info,
+                    $"Checking Status for {server.HostName} - {server.Game} ({server.GameVersion})");
 
-                APIStatusModel? pcStatus = pcStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
-                APIStatusModel? serverStatus = serverStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
-                APIStatusModel? connectionStatus = connectionStatuses.Find(c => c.Server.HostName == server.HostName && c.Server.Game == server.Game && c.Server.GameVersion == server.GameVersion);
+                EventModel? pcStatus = pcStatuses.Find(c => c.Server.Id == server.Id);
+                EventModel? serverStatus = serverStatuses.Find(c => c.Server.Id == server.Id);
+                EventModel? connectionStatus = connectionStatuses.Find(c => c.Server.Id == server.Id);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current PC Status: {pcStatus?.Status ?? StandardValues.MissingValues.Status}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Connection Status: {connectionStatus?.Status ?? StandardValues.MissingValues.Status}");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Current Server Status: {serverStatus?.Status ?? StandardValues.MissingValues.Status}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Current PC Status: {pcStatus?.Status ?? StandardValues.MissingValues.Status}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Current Connection Status: {connectionStatus?.Status ?? StandardValues.MissingValues.Status}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Current Server Status: {serverStatus?.Status ?? StandardValues.MissingValues.Status}");
 
                 DateTime now = _Clock.UtcNow;
                 DateTime refreshPeriod = now.AddMinutes(-SharedSettings.RefreshTime);
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Period: {refreshPeriod} -> {now}");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Refresh Period: {refreshPeriod} -> {now}");
 
                 DateTime? downtime = null;
 
@@ -144,26 +174,29 @@ namespace ServerStatusAutomation.Services
 
                     if (downtime == null || (pcStatus.DateOccured < downtime || pcStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        await AlertsHandler(alerts.Alerts, server, pcStatus.Component, server.Statuses[0].Status);
+                        await AlertsHandler(alerts.Entries, server, pcStatus.Component, server.Statuses[0].Status);
                     }
 
                     if (pcStatus.DateOccured < refreshPeriod)
                     {
-                        APIStatusModel newStatus = new()
+                        EventRequestModel newEvent = new()
                         {
                             Component = pcStatus.Component,
                             Status = server.Statuses[0].Status,
-                            Server = new APIRelatedServerModel
-                            {
-                                HostName = server.HostName,
-                                Game = server.Game,
-                                GameVersion = server.GameVersion
-                            }
+                            ServerId = server.Id,
+                            Name = server.Name,
+                            HostName = server.HostName,
+                            Game = server.Game,
+                            GameVersion = server.GameVersion
                         };
 
-                        if (await _APIService.RegisterServerEvent(newStatus))
+                        (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                        if (createdEvent != null)
                         {
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                "Server Event Registered");
                         }
                     }
                 }
@@ -179,26 +212,29 @@ namespace ServerStatusAutomation.Services
 
                     if (downtime == null || (serverStatus.DateOccured < downtime || serverStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        await AlertsHandler(alerts.Alerts, server, serverStatus.Component, server.Statuses[1].Status);
+                        await AlertsHandler(alerts.Entries, server, serverStatus.Component, server.Statuses[1].Status);
                     }
 
                     if (serverStatus.DateOccured < refreshPeriod)
                     {
-                        APIStatusModel newStatus = new()
+                        EventRequestModel newEvent = new()
                         {
                             Component = serverStatus.Component,
                             Status = server.Statuses[1].Status,
-                            Server = new APIRelatedServerModel
-                            {
-                                HostName = server.HostName,
-                                Game = server.Game,
-                                GameVersion = server.GameVersion
-                            }
+                            ServerId = server.Id,
+                            Name = server.Name,
+                            HostName = server.HostName,
+                            Game = server.Game,
+                            GameVersion = server.GameVersion
                         };
 
-                        if (await _APIService.RegisterServerEvent(newStatus))
+                        (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                        if (createdEvent != null)
                         {
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                "Server Event Registered");
                         }
                     }
                 }
@@ -214,26 +250,29 @@ namespace ServerStatusAutomation.Services
 
                     if (downtime == null || (connectionStatus.DateOccured < downtime || connectionStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        await AlertsHandler(alerts.Alerts, server, connectionStatus.Component, server.Statuses[2].Status);
+                        await AlertsHandler(alerts.Entries, server, connectionStatus.Component, server.Statuses[2].Status);
                     }
 
                     if (connectionStatus.DateOccured < refreshPeriod)
                     {
-                        APIStatusModel newStatus = new()
+                        EventRequestModel newEvent = new()
                         {
                             Component = connectionStatus.Component,
                             Status = server.Statuses[2].Status,
-                            Server = new APIRelatedServerModel
-                            {
-                                HostName = server.HostName,
-                                Game = server.Game,
-                                GameVersion = server.GameVersion
-                            }
+                            ServerId = server.Id,
+                            Name = server.Name,
+                            HostName = server.HostName,
+                            Game = server.Game,
+                            GameVersion = server.GameVersion
                         };
 
-                        if (await _APIService.RegisterServerEvent(newStatus))
+                        (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                        if (createdEvent != null)
                         {
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                "Server Event Registered");
                         }
                     }
                 }
@@ -255,26 +294,32 @@ namespace ServerStatusAutomation.Services
 
             foreach (AlertModel alert in alerts)
             {
-                if (alert.Server == $"{server.Game} ({server.GameVersion})" && alert.Component == component)
+                if (alert.Server.Id == server.Id && alert.Component == component)
                 {
                     alertFound = true;
 
                     if (alert.AlertStatus == "Resolved")
                     {
-                        APINewAlertsModel newAlert = new()
+                        AlertRequestModel newAlert = new()
                         {
                             Reporter = "Automation",
                             Component = component,
                             ComponentStatus = status,
                             AlertStatus = "Reported",
+                            ServerId = server.Id,
+                            Name = server.Name,
                             HostName = server.HostName,
                             Game = server.Game,
                             GameVersion = server.GameVersion
                         };
 
-                        if (await _APIService.RegisterAlert(newAlert))
+                        (AlertModel? createdAlert, ResponseModel? apiResponse) = await _APIService.RegisterAlert(newAlert);
+
+                        if (createdAlert != null)
                         {
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                "Alert Registered");
                         }
 
                         await _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: {status}");
@@ -293,20 +338,26 @@ namespace ServerStatusAutomation.Services
             {
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, "No Alerts Found in API");
 
-                APINewAlertsModel newAlert = new()
+                AlertRequestModel newAlert = new()
                 {
                     Reporter = "Automation",
                     Component = component,
                     ComponentStatus = status,
                     AlertStatus = "Reported",
+                    ServerId = server.Id,
+                    Name = server.Name,
                     HostName = server.HostName,
                     Game = server.Game,
                     GameVersion = server.GameVersion
                 };
 
-                if (await _APIService.RegisterAlert(newAlert))
+                (AlertModel? createdAlert, ResponseModel? apiResponse) = await _APIService.RegisterAlert(newAlert);
+
+                if (createdAlert != null)
                 {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Alert Registered");
+                    _Logger.LogMessage(
+                        StandardValues.LoggerValues.Debug,
+                        "Alert Registered");
                 }
 
                 await _discordService.SendNotification(SharedSettings.RecipientId, $"Automation has reported an issue with the {server.Game} ({server.GameVersion}) server. {component}: {status}");

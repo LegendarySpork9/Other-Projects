@@ -24,28 +24,59 @@ namespace ServerStatusAutomation
 
             SharedSettingsModel sharedSettings = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig($"{Assembly.GetExecutingAssembly().Location}.config"));
 
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Started");
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Webhook URL: {sharedSettings.WebhookURL}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Recipient Id: {sharedSettings.RecipientId}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Base URL: {sharedSettings.BaseURL}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Credentials: {sharedSettings.Credentials}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Payload Location: {sharedSettings.PayloadLocation}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Time: {sharedSettings.RefreshTime}");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Logging Started");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Configuring Application");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Debug,
+                $"Webhook URL: {sharedSettings.WebhookURL}");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Debug,
+                $"Recipient Id: {sharedSettings.RecipientId}");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Debug,
+                $"API Base URL: {sharedSettings.BaseURL}");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Debug,
+                $"API Credentials: {sharedSettings.Credentials}");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Debug,
+                $"API Auth Payload Location: {sharedSettings.AuthPayloadLocation}");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Debug,
+                $"Refresh Time: {sharedSettings.RefreshTime}");
 
             IClock _clock = new SystemClockProvider();
-            APIClientWrapper _apiClient = new(_logger, new FileSystemWrapper(), sharedSettings);
-            APIService _apiService = new(_logger, _apiClient, _clock);
-            AutomationService _automationService = new(_logger, _clock, new HTTPClientWrapper(_logger), _apiService, sharedSettings);
+            APIClientWrapper _apiClient = new(
+                _logger,
+                new FileSystemWrapper(),
+                sharedSettings);
+            APIService _apiService = new(
+                _logger,
+                _apiClient,
+                _clock);
+            AutomationService _automationService = new(
+                _logger,
+                _clock,
+                new HTTPClientWrapper(_logger),
+                _apiService,
+                sharedSettings);
             _automationService.Setup();
 
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Configured Application");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Configured Application");
 
             await _automationService.Start();
 
             Console.ReadLine();
 
-            _logger.LogMessage(StandardValues.LoggerValues.Info, "Logging Stopped");
+            _logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "Logging Stopped");
         }
     }
 }

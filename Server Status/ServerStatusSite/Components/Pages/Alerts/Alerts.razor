@@ -4,11 +4,11 @@
 
 <button class="btn btn-primary" @onclick="RegisterAlert">Register Alert</button>
 
-@if (ReportedAlerts.MultiplePages)
+@if (ReportedAlerts?.TotalPageCount > 1)
 {
     if (PageNumber > 1)
     {
-        if (PageNumber != ReportedAlerts.PageCount)
+        if (PageNumber != ReportedAlerts.TotalPageCount)
         {
             <button class="btn btn-primary" style="float:right" @onclick="NextPage">Next Page</button>
             <button class="btn btn-primary" style="float:right;margin-right:5px" @onclick="PreviousPage">Previous Page</button>
@@ -26,9 +26,9 @@
     }
 }
 
-@if (ReportedAlerts.Alerts.Count == 0)
+@if (ReportedAlerts?.Entries.Count == 0)
 {
-    if (ReportedAlerts.APICalled)
+    if (ReportedAlerts == null)
     {
         <br />
         <br />
@@ -60,10 +60,10 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var alert in ReportedAlerts.Alerts)
+                @foreach (var alert in ReportedAlerts.Entries)
                 {
                     <tr class="clickable-row" @onclick="() => OpenClick(alert)">
-                        <td>@alert.Occured.ToString()</td>
+                        <td>@alert.AlertDate.ToString()</td>
                         <td>@alert.Server</td>
                         <td>@alert.Reporter</td>
                         <td>@alert.Component</td>

@@ -5,7 +5,7 @@
 <div class="container">
     <div class="@GetStyle("Form")" style="display: grid; grid-template-columns: 150px 1fr; row-gap: 1rem;">
         <label>Reporter:</label>
-        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="User.DiscordName" />
+        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="DiscordName" />
 
         <label>Server:</label>
         <select style="@GetStyle("Input");width: 201px" @bind="Server">

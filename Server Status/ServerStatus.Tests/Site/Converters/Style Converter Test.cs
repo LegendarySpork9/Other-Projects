@@ -1,5 +1,4 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
-using Moq;
 using ServerStatusSite.Converters;
 
 namespace ServerSite.Tests.Site.Converters
@@ -12,7 +11,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetTopBarDarkMode(true);
 
-            Assert.AreEqual("background-color: #3E3E3E; border: 1px solid transparent;", style);
+            Assert.AreEqual(
+                "background-color: #3E3E3E; border: 1px solid transparent;",
+                style);
         }
 
         [TestMethod]
@@ -20,7 +21,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetTopBarDarkMode(false);
 
-            Assert.AreEqual(string.Empty, style);
+            Assert.AreEqual(
+                string.Empty,
+                style);
         }
 
         [TestMethod]
@@ -28,7 +31,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetTopNavLinkDarkMode(true);
 
-            Assert.AreEqual("color: white;", style);
+            Assert.AreEqual(
+                "color: white;",
+                style);
         }
 
         [TestMethod]
@@ -36,7 +41,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetTopNavLinkDarkMode(false);
 
-            Assert.AreEqual(string.Empty, style);
+            Assert.AreEqual(
+                string.Empty,
+                style);
         }
 
         [TestMethod]
@@ -44,7 +51,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetBodyDarkMode(true);
 
-            Assert.AreEqual("background-color: #313131; color: #A9A9A9;", style);
+            Assert.AreEqual(
+                "background-color: #313131; color: #A9A9A9;",
+                style);
         }
 
         [TestMethod]
@@ -52,7 +61,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetBodyDarkMode(false);
 
-            Assert.AreEqual(string.Empty, style);
+            Assert.AreEqual(
+                string.Empty,
+                style);
         }
 
         [TestMethod]
@@ -60,7 +71,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetNavMenuDarkMode(true);
 
-            Assert.AreEqual("background-color: #4E4E4E; color: white;", style);
+            Assert.AreEqual(
+                "background-color: #4E4E4E; color: white;",
+                style);
         }
 
         [TestMethod]
@@ -68,7 +81,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetNavMenuDarkMode(false);
 
-            Assert.AreEqual(string.Empty, style);
+            Assert.AreEqual(
+                string.Empty,
+                style);
         }
 
         [TestMethod]
@@ -76,7 +91,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetTableDarkMode(true);
 
-            Assert.AreEqual("color: #A9A9A9;", style);
+            Assert.AreEqual(
+                "color: #A9A9A9;",
+                style);
         }
 
         [TestMethod]
@@ -84,7 +101,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetTableDarkMode(false);
 
-            Assert.AreEqual(string.Empty, style);
+            Assert.AreEqual(
+                string.Empty,
+                style);
         }
 
         [TestMethod]
@@ -92,7 +111,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetFormDarkMode(true);
 
-            Assert.AreEqual("form-dark", style);
+            Assert.AreEqual(
+                "form-dark",
+                style);
         }
 
         [TestMethod]
@@ -100,7 +121,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetFormDarkMode(false);
 
-            Assert.AreEqual(string.Empty, style);
+            Assert.AreEqual(
+                string.Empty,
+                style);
         }
 
         [TestMethod]
@@ -108,7 +131,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetInputDarkMode(true);
 
-            Assert.AreEqual("background-color: #3E3E3E; color: #A9A9A9; border: 1px solid deepskyblue;", style);
+            Assert.AreEqual(
+                "background-color: #3E3E3E; color: #A9A9A9; border: 1px solid deepskyblue;",
+                style);
         }
 
         [TestMethod]
@@ -116,7 +141,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetInputDarkMode(false);
 
-            Assert.AreEqual(string.Empty, style);
+            Assert.AreEqual(
+                string.Empty,
+                style);
         }
 
         [TestMethod]
@@ -124,7 +151,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetTableRowDarkMode(true);
 
-            Assert.AreEqual("dark-mode", style);
+            Assert.AreEqual(
+                "dark-mode",
+                style);
         }
 
         [TestMethod]
@@ -132,7 +161,9 @@ namespace ServerSite.Tests.Site.Converters
         {
             string style = StyleConverter.GetTableRowDarkMode(false);
 
-            Assert.AreEqual(string.Empty, style);
+            Assert.AreEqual(
+                string.Empty,
+                style);
         }
     }
 }

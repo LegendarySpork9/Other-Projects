@@ -1,7 +1,6 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
-using RestSharp;
-using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.Requests;
+using ServerStatusCommon.Models.Requests.Create;
+using ServerStatusCommon.Models.Requests.Update;
 using ServerStatusCommon.Models.Responses;
 using ServerStatusCommon.Models.Responses.Related;
 
@@ -12,17 +11,18 @@ namespace ServerStatusCommon.Abstractions
     /// </summary>
     public interface IAPIClient
     {
-        Task<(DateTime?, bool)> Authorise();
+        void SetBearerToken(string bearerToken);
+        Task<AuthenticationModel?> Authorise();
         Task<(List<UserModel>, bool)> GetUsers();
-        Task<(List<UserSettingsModel>, bool)> GetUserSettings(int userId);
+        Task<(UserSettingModel?, bool)> GetUserSettings(int userId);
         Task<(List<ServerModel>, bool)> GetServers();
-        Task<(List<ServerEventModel>, bool)> GetServerStatuses(string component);
-        Task<bool> UpdateUserSettings(int userSettingsId, string value);
-        Task<bool> UpdateUser(UserModel user);
-        Task<(AlertInformationModel?, bool)> GetAlerts(int pageNumber);
+        Task<(List<EventModel>, bool)> GetServerEvents(List<KeyValuePair<string, object>> queryParameters);
+        Task<(SettingModel?, ResponseModel?)> UpdateUserSettings(int userSettingId, UserSettingUpdateRequestModel userSetting);
+        Task<(UserModel?, ResponseModel?)> UpdateUser(int userId, UserUpdateRequestModel user);
+        Task<(AlertInformationModel?, bool)> GetAlerts(List<KeyValuePair<string, object>> queryParameters);
         Task<(AlertModel?, bool)> GetAlert(int alertId);
-        Task<bool> UpdateAlert(int alertId, string status);
-        Task<bool> RegisterAlert(NewAlertModel alert);
-        Task<bool> RegisterServerEvent(NewEventModel newEvent);
+        Task<(AlertModel?, ResponseModel?)> UpdateAlert(int alertId, AlertUpdateRequestModel alert);
+        Task<(AlertModel?, ResponseModel?)> RegisterAlert(AlertRequestModel alert);
+        Task<(EventModel?, ResponseModel?)> RegisterServerEvent(EventRequestModel newEvent);
     }
 }

@@ -12,7 +12,6 @@ namespace ServerStatusCommon.Converters
             {
                 "/usersettings" => "?application=Server Status Site",
                 "/serverstatus/serverinformation" => "?isActive=true",
-                "/serverstatus/serverevent" => "?component={component}",
                 _ => string.Empty
             };
         }

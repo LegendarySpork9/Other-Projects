@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Components;
 using ServerStatusCommon.Converters;
 using ServerStatusCommon.Functions;
 using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.Data;
 using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Services;
 using ServerStatusSite.Converters;
 using System.Timers;
 using Timer = System.Timers.Timer;
+using ServerStatusCommon.Models.Responses;
 
 namespace ServerStatusSite.Components.Pages
 {

@@ -1,4 +1,6 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
+using ServerStatusCommon.Models.Responses.Related;
+
 namespace ServerStatusCommon.Models.Responses
 {
     /// <summary>
@@ -10,29 +12,18 @@ namespace ServerStatusCommon.Models.Responses
         public required string Username { get; set; }
         public required string Password { get; set; }
         public required List<string> Scopes { get; set; }
-        public Dictionary<string, string> Settings { get; set; } = [];
+        public List<SettingModel> Settings { get; set; } = [];
 
         public event Action? OnDarkModeChanged;
 
         public bool DarkMode
         {
-            get => Settings.TryGetValue("DarkMode", out var val) && bool.Parse(val);
+            get => bool.Parse(Settings.First(s => s.Name == "DarkMode").Value);
             set
             {
-                Settings["DarkMode"] = value.ToString();
+                Settings.First(s => s.Name == "DarkMode").Value = value.ToString();
                 OnDarkModeChanged?.Invoke();
             }
-        }
-
-        /// <summary>
-        /// Updates the user model.
-        /// </summary>
-        public void UpdateModel(UserModel user)
-        {
-            Id = user.Id;
-            Settings["DiscordName"] = user.Settings["DiscordName"];
-            Settings["Admin"] = user.Settings["Admin"];
-            Settings["DarkMode"] = user.Settings["DarkMode"];
         }
     }
 }

@@ -15,11 +15,20 @@ namespace ServerStatus.Tests.Common.Functions
         [TestMethod]
         public void TestLoadConfig()
         {
-            Configuration result = SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\Test.config"));
+            Configuration result = SharedSettingsLoader.LoadConfig(Path.Combine(
+                Directory.GetCurrentDirectory()
+                    .Replace(
+                        @"bin\Debug\net8.0",
+                        ""),
+                @"Mocks\Configs\Test.config"));
 
             Assert.IsTrue(result.AppSettings.Settings.Count == 2);
-            Assert.AreEqual("This is a test", result.AppSettings.Settings["TestSetting"].Value);
-            Assert.AreEqual("Second test incoming", result.AppSettings.Settings["TestSettingTwo"].Value);
+            Assert.AreEqual(
+                "This is a test",
+                result.AppSettings.Settings["TestSetting"].Value);
+            Assert.AreEqual(
+                "Second test incoming",
+                result.AppSettings.Settings["TestSettingTwo"].Value);
         }
 
         /// <summary>
@@ -28,7 +37,12 @@ namespace ServerStatus.Tests.Common.Functions
         [TestMethod]
         public void TestLoadConfigFail()
         {
-            Configuration result = SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\Test Two.config"));
+            Configuration result = SharedSettingsLoader.LoadConfig(Path.Combine(
+                Directory.GetCurrentDirectory()
+                    .Replace(
+                        @"bin\Debug\net8.0",
+                        ""),
+                @"Mocks\Configs\Test Two.config"));
 
             Assert.IsTrue(result.AppSettings.Settings.Count == 0);
         }
@@ -45,11 +59,16 @@ namespace ServerStatus.Tests.Common.Functions
                 RecipientId = "test",
                 BaseURL = "https://localhost/api",
                 Credentials = "Basic TestCreds",
-                PayloadLocation = "C:\\Server Status Site\\Payload",
+                AuthPayloadLocation = "C:\\Server Status Site\\Payload\\Authorise.json",
                 RefreshTime = 5
             };
 
-            SharedSettingsModel result = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\AutomationTest.config")));
+            SharedSettingsModel result = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(
+                Directory.GetCurrentDirectory()
+                    .Replace(
+                        @"bin\Debug\net8.0",
+                        ""),
+                @"Mocks\Configs\AutomationTest.config")));
 
             result.Should().BeEquivalentTo(expectedSharedSettings);
         }
@@ -64,11 +83,16 @@ namespace ServerStatus.Tests.Common.Functions
             {
                 BaseURL = "https://localhost/api",
                 Credentials = "Basic TestCreds",
-                PayloadLocation = "C:\\Server Status Site\\Payload",
+                AuthPayloadLocation = "C:\\Server Status Site\\Payload\\Authorise.json",
                 RefreshTime = 5
             };
 
-            SharedSettingsModel result = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(Directory.GetCurrentDirectory().Replace(@"bin\Debug\net8.0", ""), @"Mocks\Configs\ReporterTest.config")));
+            SharedSettingsModel result = SharedSettingsLoader.LoadSettingsFromConfig(SharedSettingsLoader.LoadConfig(Path.Combine(
+                Directory.GetCurrentDirectory()
+                    .Replace(
+                        @"bin\Debug\net8.0",
+                        ""),
+                @"Mocks\Configs\ReporterTest.config")));
 
             result.Should().BeEquivalentTo(expectedSharedSettings);
         }
