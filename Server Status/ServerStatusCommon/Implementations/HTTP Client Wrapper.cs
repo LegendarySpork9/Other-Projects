@@ -26,16 +26,24 @@ namespace ServerStatusCommon.Implementations
             {
                 HttpClient client = new();
 
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured Http Client");
-                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Sending Request");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Configured Http Client");
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    "Sending Request");
 
-                response = client.Send(request);
+                response = await client.SendAsync(request);
             }
 
             catch (Exception ex)
             {
-                _Logger.LogMessage(StandardValues.LoggerValues.Warning, ex.Message);
-                _Logger.LogMessage(StandardValues.LoggerValues.Error, ex.ToString());
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Warning,
+                    ex.Message);
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Error,
+                    ex.ToString());
             }
 
             return response;

@@ -1,6 +1,6 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Models.Responses;
 using ServerStatusSite.Converters;
 
 namespace ServerStatusSite.Components.Layout

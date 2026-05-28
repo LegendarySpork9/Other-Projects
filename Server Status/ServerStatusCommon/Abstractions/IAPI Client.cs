@@ -1,7 +1,8 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
-using RestSharp;
-using ServerStatusCommon.Models.API;
-using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Models.Requests.Create;
+using ServerStatusCommon.Models.Requests.Update;
+using ServerStatusCommon.Models.Responses;
+using ServerStatusCommon.Models.Responses.Related;
 
 namespace ServerStatusCommon.Abstractions
 {
@@ -10,17 +11,18 @@ namespace ServerStatusCommon.Abstractions
     /// </summary>
     public interface IAPIClient
     {
-        Task<DateTime?> Authorise();
-        Task<RestResponse?> GetUsers();
-        Task<RestResponse?> GetUserSettings(int userId);
-        Task<RestResponse?> GetServers();
-        Task<RestResponse?> GetServerStatuses(string component);
-        Task<RestResponse?> UpdateUserSettings(int userSettingsId, string value);
-        Task<RestResponse?> UpdateUser(UserModel user);
-        Task<RestResponse?> GetAlerts(int pageNumber);
-        Task<RestResponse?> GetAlert(int alertId);
-        Task<RestResponse?> UpdateAlert(int alertId, string status);
-        Task<RestResponse?> RegisterAlert(APINewAlertsModel alert);
-        Task<RestResponse?> RegisterServerEvent(APIStatusModel status);
+        void SetBearerToken(string bearerToken);
+        Task<AuthenticationModel?> Authorise();
+        Task<(List<UserModel>, bool)> GetUsers();
+        Task<(UserSettingModel?, bool)> GetUserSettings(int userId);
+        Task<(List<ServerModel>, bool)> GetServers();
+        Task<(List<EventModel>, bool)> GetServerEvents(List<KeyValuePair<string, object>> queryParameters);
+        Task<(SettingModel?, ResponseModel?)> UpdateUserSettings(int userSettingId, UserSettingUpdateRequestModel userSetting);
+        Task<(UserModel?, ResponseModel?)> UpdateUser(int userId, UserUpdateRequestModel user);
+        Task<(AlertInformationModel?, bool)> GetAlerts(List<KeyValuePair<string, object>> queryParameters);
+        Task<(AlertModel?, bool)> GetAlert(int alertId);
+        Task<(AlertModel?, ResponseModel?)> UpdateAlert(int alertId, AlertUpdateRequestModel alert);
+        Task<(AlertModel?, ResponseModel?)> RegisterAlert(AlertRequestModel alert);
+        Task<(EventModel?, ResponseModel?)> RegisterServerEvent(EventRequestModel newEvent);
     }
 }

@@ -1,8 +1,10 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerStatusCommon.Converters;
-using ServerStatusCommon.Models.Data;
 using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Models.Requests.Update;
+using ServerStatusCommon.Models.Responses;
+using ServerStatusCommon.Models.Responses.Related;
 using ServerStatusCommon.Services;
 using ServerStatusSite.Converters;
 
@@ -32,7 +34,7 @@ namespace ServerStatusSite.Components.Pages
 
             Username = User.Username;
             Password = User.Password;
-            DiscordName = User.DiscordName ?? User.Username;
+            DiscordName = User.Settings.Find(s => s.Name == "DiscordName")?.Value ?? User.Username;
             DarkMode = User.DarkMode;
 
             _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Username: {Username}");
@@ -64,51 +66,77 @@ namespace ServerStatusSite.Components.Pages
             Loading = true;
             StateHasChanged();
 
+            UserUpdateRequestModel userUpdate = new();
+
             if (!string.IsNullOrWhiteSpace(Username) && Username != User.Username)
             {
-                User.Username = Username;
-                
-                if (await APIService.UpdateUser(User))
-                {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Username Updated");
-                }
+                userUpdate.Username = Username;
+
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Username: {User.Username} -> {Username}");
             }
 
             if (!string.IsNullOrWhiteSpace(Password) && Password != User.Password)
             {
-                User.Password = Password;
+                userUpdate.Password = Password;
 
-                if (await APIService.UpdateUser(User))
-                {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Password Updated");
-                }
+                _Logger.LogMessage(
+                    StandardValues.LoggerValues.Debug,
+                    $"Password: {User.Password} -> {Password}");
             }
 
-            if (!string.IsNullOrWhiteSpace(DiscordName) && DiscordName != User.DiscordName)
+            (UserModel? user, ResponseModel? apiResponse) = await APIService.UpdateUser(
+                User.Id,
+                userUpdate);
+
+            if (user != null)
             {
-                User.DiscordName = DiscordName;
+                User.Username = user.Username;
+                User.Password = user.Password;
+            }
 
-                int userSettingsId = await APIService.GetUserSettingId(User.UserId, "DiscordName");
+            SettingModel discordSetting = User.Settings.First(s => s.Name == "DiscordName");
 
-                if (await APIService.UpdateUserSettings(userSettingsId, DiscordName))
+            if (!string.IsNullOrWhiteSpace(DiscordName) && DiscordName != discordSetting.Value)
+            {
+                UserSettingUpdateRequestModel settingUpdate = new()
                 {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Discord Updated");
+                    Value = DiscordName
+                };
+
+                (SettingModel? setting, apiResponse) = await APIService.UpdateUserSettings(
+                    discordSetting.Id,
+                    settingUpdate);
+
+                if (setting != null)
+                {
+                    discordSetting.Value = setting.Value;
                 }
             }
 
             if (DarkMode != User.DarkMode)
             {
-                User.DarkMode = DarkMode;
-
-                int userSettingsId = await APIService.GetUserSettingId(User.UserId, "DarkMode");
-
-                if (await APIService.UpdateUserSettings(userSettingsId, DarkMode.ToString()))
+                SettingModel darkModeSetting = User.Settings.First(s => s.Name == "DarkMode");
+                UserSettingUpdateRequestModel settingUpdate = new()
                 {
-                    _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Discord Updated");
+                    Value = DarkMode.ToString()
+                };
+
+                (SettingModel? setting, apiResponse) = await APIService.UpdateUserSettings(
+                    darkModeSetting.Id,
+                    settingUpdate);
+
+                if (setting != null)
+                {
+                    darkModeSetting.Value = setting.Value;
+                    User.DarkMode = bool.Parse(setting.Value);
                 }
             }
 
-            _Logger.LogMessage(StandardValues.LoggerValues.Info, "User Save Complete");
+            _Logger.LogMessage(
+                StandardValues.LoggerValues.Info,
+                "User Save Complete");
 
             Loading = false;
         }

@@ -28,7 +28,7 @@ namespace ServerStatusReporter
             _logger.LogMessage(StandardValues.LoggerValues.Info, "Configuring Application");
             _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Base URL: {sharedSettings.BaseURL}");
             _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Credentials: {sharedSettings.Credentials}");
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Payload Location: {sharedSettings.PayloadLocation}");
+            _logger.LogMessage(StandardValues.LoggerValues.Debug, $"API Auth Payload Location: {sharedSettings.AuthPayloadLocation}");
             _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Refresh Time: {sharedSettings.RefreshTime}");
             _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Host Name: {AppSettingsModel.HostName}");
             _logger.LogMessage(StandardValues.LoggerValues.Debug, $"Games: {string.Join(',', AppSettingsModel.Games)}");

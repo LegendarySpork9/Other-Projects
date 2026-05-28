@@ -3,12 +3,13 @@ using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
 using ServerStatusCommon.Functions;
 using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.API;
-using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Models.Requests.Create;
+using ServerStatusCommon.Models.Responses;
 using ServerStatusCommon.Services;
 using ServerStatusReporter.Abstractions;
 using ServerStatusReporter.Models;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -125,21 +126,24 @@ namespace ServerStatusReporter.Services
 
                     if (component == "PC")
                     {
-                        APIStatusModel newStatus = new()
+                        EventRequestModel newEvent = new()
                         {
-                            Component = "PC Status",
+                            Component = "PC",
                             Status = "Online",
-                            Server = new APIRelatedServerModel
-                            {
-                                HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                Game = server.Game ?? StandardValues.MissingValues.Game,
-                                GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                            }
+                            ServerId = server.Id,
+                            Name = server.Name,
+                            HostName = server.HostName,
+                            Game = server.Game,
+                            GameVersion = server.GameVersion
                         };
 
-                        if (await _APIService.RegisterServerEvent(newStatus))
+                        (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                        if (createdEvent != null)
                         {
-                            _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                            _Logger.LogMessage(
+                                StandardValues.LoggerValues.Debug,
+                                "Server Event Registered");
                         }
                     }
 
@@ -147,41 +151,47 @@ namespace ServerStatusReporter.Services
                     {
                         if (ServerRunning(AppSettingsModel.ServerPaths[i]))
                         {
-                            APIStatusModel newStatus = new()
+                            EventRequestModel newEvent = new()
                             {
-                                Component = "Server Status",
+                                Component = "Server",
                                 Status = "Online",
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                    Game = server.Game ?? StandardValues.MissingValues.Game,
-                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                                }
+                                ServerId = server.Id,
+                                Name = server.Name,
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
                             };
 
-                            if (await _APIService.RegisterServerEvent(newStatus))
+                            (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                            if (createdEvent != null)
                             {
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                                _Logger.LogMessage(
+                                    StandardValues.LoggerValues.Debug,
+                                    "Server Event Registered");
                             }
                         }
 
                         else
                         {
-                            APIStatusModel newStatus = new()
+                            EventRequestModel newEvent = new()
                             {
-                                Component = "Server Status",
+                                Component = "PC",
                                 Status = "Offline",
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                    Game = server.Game ?? StandardValues.MissingValues.Game,
-                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                                }
+                                ServerId = server.Id,
+                                Name = server.Name,
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
                             };
 
-                            if (await _APIService.RegisterServerEvent(newStatus))
+                            (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                            if (createdEvent != null)
                             {
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                                _Logger.LogMessage(
+                                    StandardValues.LoggerValues.Debug,
+                                    "Server Event Registered");
                             }
                         }
                     }
@@ -194,61 +204,70 @@ namespace ServerStatusReporter.Services
 
                         if (pingStatus == "Success")
                         {
-                            APIStatusModel newStatus = new()
+                            EventRequestModel newEvent = new()
                             {
-                                Component = "Connection Status",
+                                Component = "Connection",
                                 Status = "Online",
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                    Game = server.Game ?? StandardValues.MissingValues.Game,
-                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                                }
+                                ServerId = server.Id,
+                                Name = server.Name,
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
                             };
 
-                            if (await _APIService.RegisterServerEvent(newStatus))
+                            (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                            if (createdEvent != null)
                             {
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                                _Logger.LogMessage(
+                                    StandardValues.LoggerValues.Debug,
+                                    "Server Event Registered");
                             }
                         }
 
                         else if (pingStatus == "Failed")
                         {
-                            APIStatusModel newStatus = new()
+                            EventRequestModel newEvent = new()
                             {
-                                Component = "Connection Status",
+                                Component = "Connection",
                                 Status = "Offline",
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                    Game = server.Game ?? StandardValues.MissingValues.Game,
-                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                                }
+                                ServerId = server.Id,
+                                Name = server.Name,
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
                             };
 
-                            if (await _APIService.RegisterServerEvent(newStatus))
+                            (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                            if (createdEvent != null)
                             {
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                                _Logger.LogMessage(
+                                    StandardValues.LoggerValues.Debug,
+                                    "Server Event Registered");
                             }
                         }
 
                         else
                         {
-                            APIStatusModel newStatus = new()
+                            EventRequestModel newEvent = new()
                             {
-                                Component = "Connection Status",
+                                Component = "Connection",
                                 Status = "Unknown",
-                                Server = new APIRelatedServerModel
-                                {
-                                    HostName = server.HostName ?? StandardValues.MissingValues.HostName,
-                                    Game = server.Game ?? StandardValues.MissingValues.Game,
-                                    GameVersion = server.GameVersion ?? StandardValues.MissingValues.GameVersion
-                                }
+                                ServerId = server.Id,
+                                Name = server.Name,
+                                HostName = server.HostName,
+                                Game = server.Game,
+                                GameVersion = server.GameVersion
                             };
 
-                            if (await _APIService.RegisterServerEvent(newStatus))
+                            (EventModel? createdEvent, ResponseModel? apiResponse) = await _APIService.RegisterServerEvent(newEvent);
+
+                            if (createdEvent != null)
                             {
-                                _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Server Event Registered");
+                                _Logger.LogMessage(
+                                    StandardValues.LoggerValues.Debug,
+                                    "Server Event Registered");
                             }
                         }
                     }

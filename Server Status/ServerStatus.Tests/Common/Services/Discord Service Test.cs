@@ -29,11 +29,17 @@ namespace ServerStatus.Tests.Common.Services
 
             Mock<ILoggerService> _mockLogger = new();
             Mock<IHTTPClient> _mockHTTPClient = new();
-            _mockHTTPClient.Setup(http => http.Send(It.IsAny<HttpRequestMessage>())).ReturnsAsync(response);
+            _mockHTTPClient.Setup(http => http.Send(It.IsAny<HttpRequestMessage>()))
+                .ReturnsAsync(response);
 
-            DiscordService _discordService = new(_mockLogger.Object, _mockHTTPClient.Object, sharedSettings);
+            DiscordService _discordService = new(
+                _mockLogger.Object,
+                _mockHTTPClient.Object,
+                sharedSettings);
 
-            bool successfulSend = await _discordService.SendNotification(sharedSettings.RecipientId, "This is a message from a unit test.");
+            bool successfulSend = await _discordService.SendNotification(
+                sharedSettings.RecipientId,
+                "This is a message from a unit test.");
 
             Assert.IsTrue(successfulSend);
         }

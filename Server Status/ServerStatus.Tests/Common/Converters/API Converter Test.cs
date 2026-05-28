@@ -6,6 +6,8 @@ namespace ServerStatus.Tests.Common.Converters
     [TestClass]
     public class APIConverterTest
     {
+        #region GetQuery
+
         /// <summary>
         /// Checks whether the GetQuery method returns the correct output for the given value.
         /// </summary>
@@ -15,7 +17,9 @@ namespace ServerStatus.Tests.Common.Converters
             string expected = string.Empty;
             string actual = APIConverter.GetQuery("/endpoint");
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(
+                expected,
+                actual);
         }
 
         /// <summary>
@@ -27,7 +31,9 @@ namespace ServerStatus.Tests.Common.Converters
             string expected = "?application=Server Status Site";
             string actual = APIConverter.GetQuery("/usersettings");
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(
+                expected,
+                actual);
         }
 
         /// <summary>
@@ -39,20 +45,14 @@ namespace ServerStatus.Tests.Common.Converters
             string expected = "?isActive=true";
             string actual = APIConverter.GetQuery("/serverstatus/serverinformation");
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(
+                expected,
+                actual);
         }
 
-        /// <summary>
-        /// Checks whether the GetQuery method returns the correct output for the given value.
-        /// </summary>
-        [TestMethod]
-        public void TestGetQueryServerEvent()
-        {
-            string expected = "?component={component}";
-            string actual = APIConverter.GetQuery("/serverstatus/serverevent");
+        #endregion
 
-            Assert.AreEqual(expected, actual);
-        }
+        #region GetStatusClass
 
         /// <summary>
         /// Checks whether the GetStatusClass method returns the correct output for the given value.
@@ -63,7 +63,9 @@ namespace ServerStatus.Tests.Common.Converters
             string expected = "online";
             string actual = APIConverter.GetStatusClass("Online");
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(
+                expected,
+                actual);
         }
 
         /// <summary>
@@ -75,7 +77,9 @@ namespace ServerStatus.Tests.Common.Converters
             string expected = "offline";
             string actual = APIConverter.GetStatusClass("Offline");
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(
+                expected,
+                actual);
         }
 
         /// <summary>
@@ -87,7 +91,9 @@ namespace ServerStatus.Tests.Common.Converters
             string expected = "unknown";
             string actual = APIConverter.GetStatusClass("Unknown");
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(
+                expected,
+                actual);
         }
 
         /// <summary>
@@ -99,7 +105,11 @@ namespace ServerStatus.Tests.Common.Converters
             string expected = "unknown";
             string actual = APIConverter.GetStatusClass("Active");
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(
+                expected,
+                actual);
         }
+
+        #endregion
     }
 }

@@ -1,10 +1,10 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
 using ServerStatusCommon.Converters;
-using ServerStatusCommon.Models.Data;
 using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Services;
 using ServerStatusSite.Functions;
+using ServerStatusCommon.Models.Responses;
 
 namespace ServerStatusSite.Components.Pages
 {
@@ -71,7 +71,8 @@ namespace ServerStatusSite.Components.Pages
                 _Logger.LogMessage(StandardValues.LoggerValues.Info, $"Login Successful.");
                 _Logger.ChangeIdentifier(user.Username);
                 APIService.SetLogger(_Logger);
-                User.UpdateModel(await APIService.GetUserSettings(user));
+                user = await APIService.GetUserSettings(user);
+                User.Id = user.Id;
                 Navigation.NavigateTo(ReturnUrl);
             }
 

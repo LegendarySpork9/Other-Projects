@@ -4,8 +4,8 @@ using ServerStatusCommon.Abstractions;
 using ServerStatusCommon.Converters;
 using ServerStatusCommon.Functions;
 using ServerStatusCommon.Models;
-using ServerStatusCommon.Models.API;
-using ServerStatusCommon.Models.Data;
+using ServerStatusCommon.Models.Responses;
+using ServerStatusCommon.Models.Responses.Related;
 using ServerStatusCommon.Services;
 using ServerStatusSite.Converters;
 using System.Timers;
@@ -28,7 +28,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         [Inject]
         private UserModel User { get; set; } = default!;
 
-        private APIAlertsModel ReportedAlerts = new();
+        private AlertInformationModel? ReportedAlerts;
         private Timer RefreshTimer { get; set; } = new();
         private DateTime NextElapse;
         private int PageNumber = 1;
@@ -104,7 +104,9 @@ namespace ServerStatusSite.Components.Pages.Alerts
         /// </summary>
         private void OpenClick(AlertModel alert)
         {
-            if (User.Admin)
+            SettingModel adminSetting = User.Settings.First(s => s.Name == "IsAdmin");
+
+            if (bool.Parse(adminSetting.Value))
             {
                 Navigation.NavigateTo($"/editalert?alertId={alert.Id}");
             }
