@@ -1,10 +1,11 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
 using Microsoft.AspNetCore.Components;
-using ServerStatusCommon.Converters;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using ServerStatusCommon.Abstractions;
+using ServerStatusCommon.Converters;
+using ServerStatusCommon.Models.Responses;
 using ServerStatusCommon.Services;
 using ServerStatusSite.Functions;
-using ServerStatusCommon.Models.Responses;
 
 namespace ServerStatusSite.Components.Pages
 {
@@ -18,6 +19,8 @@ namespace ServerStatusSite.Components.Pages
         private IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
         [Inject]
         private NavigationManager Navigation { get; set; } = default!;
+        [Inject]
+        private ProtectedSessionStorage SessionStorage { get; set; } = default!;
         [Inject]
         private UserModel User { get; set; } = default!;
 
@@ -72,7 +75,17 @@ namespace ServerStatusSite.Components.Pages
                 _Logger.ChangeIdentifier(user.Username);
                 APIService.SetLogger(_Logger);
                 user = await APIService.GetUserSettings(user);
+
                 User.Id = user.Id;
+                User.Username = user.Username;
+                User.Password = user.Password;
+                User.Scopes = user.Scopes;
+                User.Settings = user.Settings;
+
+                await SessionStorage.SetAsync(
+                        "loggedInUser",
+                        User);
+
                 Navigation.NavigateTo(ReturnUrl);
             }
 

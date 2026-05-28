@@ -6,7 +6,6 @@ using ServerStatusCommon.Models;
 using ServerStatusCommon.Models.Responses;
 using ServerStatusCommon.Services;
 using ServerStatusSite.Components;
-using ServerStatusSite.Middleware;
 
 namespace ServerStatusSite
 {
@@ -70,10 +69,6 @@ namespace ServerStatusSite
             app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
             _logger.LogMessage(StandardValues.LoggerValues.Debug, "Mapped Razor Components with Interactive Server Render Mode");
-
-            app.UseMiddleware<URLValidationMiddleware>();
-
-            _logger.LogMessage(StandardValues.LoggerValues.Debug, "Configured MIddleware");
             _logger.LogMessage(StandardValues.LoggerValues.Info, "Running Website");
 
             app.Run();

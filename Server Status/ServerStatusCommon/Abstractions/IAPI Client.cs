@@ -14,7 +14,7 @@ namespace ServerStatusCommon.Abstractions
         void SetBearerToken(string bearerToken);
         Task<AuthenticationModel?> Authorise();
         Task<(List<UserModel>, bool)> GetUsers();
-        Task<(UserSettingModel?, bool)> GetUserSettings(int userId);
+        Task<(List<UserSettingModel>, bool)> GetUserSettings(int userId);
         Task<(List<ServerModel>, bool)> GetServers();
         Task<(List<EventModel>, bool)> GetServerEvents(List<KeyValuePair<string, object>> queryParameters);
         Task<(SettingModel?, ResponseModel?)> UpdateUserSettings(int userSettingId, UserSettingUpdateRequestModel userSetting);

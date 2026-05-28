@@ -1,4 +1,6 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
+using ServerStatusCommon.Models.Responses.Related;
+
 namespace ServerStatusCommon.Converters
 {
     public static class StandardValues
@@ -12,6 +14,34 @@ namespace ServerStatusCommon.Converters
             public const string Error = "Error";
             public const string Info = "Info";
             public const string Warning = "Warn";
+        }
+
+        /// <summary>
+        /// Standard Setting Values.
+        /// </summary>
+        public static class SettingValues
+        {
+            public static readonly List<SettingModel> Default =
+            [
+                new()
+                {
+                    Id = 0,
+                    Name = "DarkMode",
+                    Value = "false"
+                },
+                new()
+                {
+                    Id = 0,
+                    Name = "DiscordName",
+                    Value = string.Empty
+                },
+                new()
+                {
+                    Id = 0,
+                    Name = "IsAdmin",
+                    Value = "false"
+                }
+            ];
         }
 
         /// <summary>

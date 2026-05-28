@@ -1,4 +1,5 @@
 ﻿// Copyright © - Unpublished - Toby Hunter
+using ServerStatusCommon.Converters;
 using ServerStatusCommon.Models.Responses.Related;
 
 namespace ServerStatusCommon.Models.Responses
@@ -12,7 +13,7 @@ namespace ServerStatusCommon.Models.Responses
         public required string Username { get; set; }
         public required string Password { get; set; }
         public required List<string> Scopes { get; set; }
-        public List<SettingModel> Settings { get; set; } = [];
+        public List<SettingModel> Settings { get; set; } = StandardValues.SettingValues.Default;
 
         public event Action? OnDarkModeChanged;
 
