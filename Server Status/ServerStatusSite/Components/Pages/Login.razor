@@ -4,22 +4,17 @@
 <PageTitle>Login</PageTitle>
 
 <div class="login-page">
-    <center class="login-form">
-        <img src="/Images/favicon.png" height="75" width="75" />
-        <br />
+    <div class="login-form">
+        <img class="login-icon" src="/Images/favicon.png" />
         <h1>Login</h1>
         @if (ShowError)
         {
             <label class="login-fail">Your username or password was incorrect.</label>
         }
         <label>Username:</label>
-        <br />
         <input type="text" @bind="User.Username" />
-        <br />
         <label>Password:</label>
-        <br />
         <input type="password" @bind="User.Password" />
-        <br />
         <br />
         @if (Loading)
         {
@@ -30,5 +25,5 @@
         {
             <button class="btn btn-primary" @onclick="LoginClick">Login</button>
         }
-    </center>
+    </div>
 </div>

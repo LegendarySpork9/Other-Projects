@@ -2,6 +2,10 @@
     cursor: pointer;
 }
 
+.table-responsive {
+    overflow-x: auto;
+}
+
 /* Light Mode CSS*/
 
 table {

@@ -26,7 +26,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         [Inject]
         private UserModel User { get; set; } = default!;
 
-        private AlertModel? Alert { get; set; }
+        private AlertModel Alert = StandardValues.AlertValues.DefaultAlert;
         private int AlertId { get; set; } = 0;
         private bool Loading { get; set; } = false;
 
@@ -48,7 +48,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
                 _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Alert Id: {AlertId}");
             }
 
-            Alert = await APIService.GetAlert(AlertId);
+            Alert = await APIService.GetAlert(AlertId) ?? StandardValues.AlertValues.DefaultAlert;
         }
 
         /// <summary>

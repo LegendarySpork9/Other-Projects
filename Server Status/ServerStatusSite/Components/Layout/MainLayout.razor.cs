@@ -43,7 +43,11 @@ namespace ServerStatusSite.Components.Layout
                     {
                         if (User.Id == 0)
                         {
-                            User = userResult.Value;
+                            User.Id = userResult.Value.Id;
+                            User.Username = userResult.Value.Username;
+                            User.Password = userResult.Value.Password;
+                            User.Scopes = userResult.Value.Scopes;
+                            User.Settings = userResult.Value.Settings;
                         }
 
                         IsInitialised = true;

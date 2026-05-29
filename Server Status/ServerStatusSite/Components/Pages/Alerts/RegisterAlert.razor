@@ -3,12 +3,12 @@
 <PageTitle>Register Alert</PageTitle>
 
 <div class="container">
-    <div class="@GetStyle("Form")" style="display: grid; grid-template-columns: 150px 1fr; row-gap: 1rem;">
+    <div class="@GetStyle("Form") form-grid">
         <label>Reporter:</label>
         <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="DiscordName" />
 
         <label>Server:</label>
-        <select style="@GetStyle("Input");width: 201px" @bind="Server">
+        <select style="@GetStyle("Input")" @bind="Server">
             <option value="" disabled selected>Select an option</option>
             @foreach (string server in ServersNames)
             {
@@ -17,7 +17,7 @@
         </select>
 
         <label>Component:</label>
-        <select style="@GetStyle("Input");width: 201px" @bind="Component">
+        <select style="@GetStyle("Input")" @bind="Component">
             <option value="" disabled selected>Select an option</option>
             <option value="PC Status">PC</option>
             <option value="Server Status">Server</option>
@@ -25,7 +25,7 @@
         </select>
 
         <label>Component Status:</label>
-        <select style="@GetStyle("Input");width: 201px" @bind="ComponentStatus">
+        <select style="@GetStyle("Input")" @bind="ComponentStatus">
             <option value="" disabled selected>Select an option</option>
             <option value="Offline">Offline</option>
             <option value="Unknown">Unknown</option>
@@ -33,12 +33,12 @@
 
         @if (ShowError)
         {
-            <center style="grid-column: span 2;">
+            <div class="form-full-row">
                 <label class="register-fail">There is already an alert registered for the given details.</label>
-            </center>
+            </div>
         }
 
-        <center style="grid-column: span 2;">
+        <div class="form-full-row">
             @if (Loading)
             {
                 <div class="spinner-border text-primary" role="status"></div>
@@ -48,6 +48,6 @@
             {
                 <button class="btn btn-primary" @onclick="RegisterClick">Register</button>
             }
-        </center>
+        </div>
     </div>
 </div>

@@ -1,4 +1,5 @@
 ﻿// Copyright © - 05/10/2025 - Toby Hunter
+using ServerStatusCommon.Models.Responses;
 using ServerStatusCommon.Models.Responses.Related;
 
 namespace ServerStatusCommon.Converters
@@ -42,6 +43,39 @@ namespace ServerStatusCommon.Converters
                     Value = "false"
                 }
             ];
+        }
+
+        /// <summary>
+        /// Standard Alert Values.
+        /// </summary>
+        public static class AlertValues
+        {
+            public static readonly AlertModel DefaultAlert = new()
+            {
+                Id = 0,
+                Reporter = "",
+                Component = "",
+                ComponentStatus = "Offline",
+                AlertStatus = "Reported",
+                AlertDate = DateTime.UtcNow,
+                Server = new()
+                {
+                    Id = 0,
+                    Name = "",
+                    HostName = "",
+                    Game = "",
+                    GameVersion = ""
+                }
+            };
+            public static readonly AlertInformationModel DefaultAlertInfo = new()
+            {
+                Entries = [DefaultAlert],
+                EntryCount = 1,
+                PageNumber = 1,
+                PageSize = 25,
+                TotalPageCount = 1,
+                TotalCount = 1
+            };
         }
 
         /// <summary>
