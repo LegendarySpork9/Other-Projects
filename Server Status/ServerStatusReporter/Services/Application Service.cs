@@ -9,7 +9,6 @@ using ServerStatusCommon.Services;
 using ServerStatusReporter.Abstractions;
 using ServerStatusReporter.Models;
 using System.Diagnostics;
-using System.Net.NetworkInformation;
 using System.Timers;
 using Timer = System.Timers.Timer;
 

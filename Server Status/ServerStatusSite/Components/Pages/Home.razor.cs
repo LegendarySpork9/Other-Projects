@@ -26,6 +26,10 @@ namespace ServerStatusSite.Components.Pages
         private UserModel User { get; set; } = default!;
 
         private List<ServerModel> Servers = [];
+        private List<EventModel> PCEvents = [];
+        private List<EventModel> ServerEvents = [];
+        private List<EventModel> ConnectionEvents = [];
+
         private Timer RefreshTimer { get; set; } = new();
         private DateTime NextElapse;
 
@@ -47,6 +51,9 @@ namespace ServerStatusSite.Components.Pages
             _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Timer Duration: {SharedSettings.RefreshTime} minutes");
 
             Servers = await APIService.GetServers();
+            PCEvents = await APIService.GetServerEvents("PC");
+            ServerEvents = await APIService.GetServerEvents("Server");
+            ConnectionEvents = await APIService.GetServerEvents("Connection");
 
             DateTime currentTime = _Clock.UtcNow;
             NextElapse = currentTime.AddMinutes(SharedSettings.RefreshTime).AddMilliseconds(-currentTime.Millisecond);

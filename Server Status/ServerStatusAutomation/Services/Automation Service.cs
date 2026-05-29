@@ -163,18 +163,18 @@ namespace ServerStatusAutomation.Services
                     _Logger.LogMessage(StandardValues.LoggerValues.Debug, $"Downtime Period: {downtime} -> {downtime.Value.AddMinutes(10)}");
                 }
 
-                if (pcStatus != null && (pcStatus.DateOccured < refreshPeriod || server.Statuses[0].Status != "Online"))
+                if (pcStatus != null && (pcStatus.DateOccured < refreshPeriod || pcStatus.Status != "Online"))
                 {
-                    if (server.Statuses[0].Status != "Unknown" && (server.Statuses[0].Status == "Online" || pcStatus.DateOccured < refreshPeriod))
+                    if (pcStatus.Status != "Unknown" && (pcStatus.Status == "Online" || pcStatus.DateOccured < refreshPeriod))
                     {
-                        server.Statuses[0].Status = "Unknown";
+                        pcStatus.Status = "Unknown";
 
                         _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated PC Status to Unknown");
                     }
 
                     if (downtime == null || (pcStatus.DateOccured < downtime || pcStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        await AlertsHandler(alerts.Entries, server, pcStatus.Component, server.Statuses[0].Status);
+                        await AlertsHandler(alerts.Entries, server, pcStatus.Component, pcStatus.Status);
                     }
 
                     if (pcStatus.DateOccured < refreshPeriod)
@@ -182,7 +182,7 @@ namespace ServerStatusAutomation.Services
                         EventRequestModel newEvent = new()
                         {
                             Component = pcStatus.Component,
-                            Status = server.Statuses[0].Status,
+                            Status = pcStatus.Status,
                             ServerId = server.Id,
                             Name = server.Name,
                             HostName = server.HostName,
@@ -201,18 +201,18 @@ namespace ServerStatusAutomation.Services
                     }
                 }
 
-                if (serverStatus != null && (serverStatus.DateOccured < refreshPeriod || server.Statuses[1].Status != "Online"))
+                if (serverStatus != null && (serverStatus.DateOccured < refreshPeriod || serverStatus.Status != "Online"))
                 {
-                    if (server.Statuses[1].Status != "Unknown" && (server.Statuses[1].Status == "Online" || serverStatus.DateOccured < refreshPeriod))
+                    if (serverStatus.Status != "Unknown" && (serverStatus.Status == "Online" || serverStatus.DateOccured < refreshPeriod))
                     {
-                        server.Statuses[1].Status = "Unknown";
+                        serverStatus.Status = "Unknown";
 
                         _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Server Status to Unknown");
                     }
 
                     if (downtime == null || (serverStatus.DateOccured < downtime || serverStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        await AlertsHandler(alerts.Entries, server, serverStatus.Component, server.Statuses[1].Status);
+                        await AlertsHandler(alerts.Entries, server, serverStatus.Component, serverStatus.Status);
                     }
 
                     if (serverStatus.DateOccured < refreshPeriod)
@@ -220,7 +220,7 @@ namespace ServerStatusAutomation.Services
                         EventRequestModel newEvent = new()
                         {
                             Component = serverStatus.Component,
-                            Status = server.Statuses[1].Status,
+                            Status = serverStatus.Status,
                             ServerId = server.Id,
                             Name = server.Name,
                             HostName = server.HostName,
@@ -239,18 +239,18 @@ namespace ServerStatusAutomation.Services
                     }
                 }
 
-                if (connectionStatus != null && (connectionStatus.DateOccured < refreshPeriod || server.Statuses[2].Status != "Online"))
+                if (connectionStatus != null && (connectionStatus.DateOccured < refreshPeriod || connectionStatus.Status != "Online"))
                 {
-                    if (server.Statuses[2].Status != "Unknown" && (server.Statuses[2].Status == "Online" || connectionStatus.DateOccured < refreshPeriod))
+                    if (connectionStatus.Status != "Unknown" && (connectionStatus.Status == "Online" || connectionStatus.DateOccured < refreshPeriod))
                     {
-                        server.Statuses[2].Status = "Unknown";
+                        connectionStatus.Status = "Unknown";
 
                         _Logger.LogMessage(StandardValues.LoggerValues.Debug, "Updated Connection Status to Unknown");
                     }
 
                     if (downtime == null || (connectionStatus.DateOccured < downtime || connectionStatus.DateOccured > downtime.Value.AddMinutes(10)))
                     {
-                        await AlertsHandler(alerts.Entries, server, connectionStatus.Component, server.Statuses[2].Status);
+                        await AlertsHandler(alerts.Entries, server, connectionStatus.Component, connectionStatus.Status);
                     }
 
                     if (connectionStatus.DateOccured < refreshPeriod)
@@ -258,7 +258,7 @@ namespace ServerStatusAutomation.Services
                         EventRequestModel newEvent = new()
                         {
                             Component = connectionStatus.Component,
-                            Status = server.Statuses[2].Status,
+                            Status = connectionStatus.Status,
                             ServerId = server.Id,
                             Name = server.Name,
                             HostName = server.HostName,
