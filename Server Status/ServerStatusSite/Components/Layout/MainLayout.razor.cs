@@ -48,6 +48,7 @@ namespace ServerStatusSite.Components.Layout
                             User.Password = userResult.Value.Password;
                             User.Scopes = userResult.Value.Scopes;
                             User.Settings = userResult.Value.Settings;
+                            User.DarkMode = User.DarkMode;
                         }
 
                         IsInitialised = true;

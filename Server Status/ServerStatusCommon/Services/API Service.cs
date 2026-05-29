@@ -296,81 +296,29 @@ namespace ServerStatusCommon.Services
 
                 if (success)
                 {
-                    List<EventModel> pcEvents = await GetServerEvents("PC");
-                    List<EventModel> serverEvents = await GetServerEvents("Server");
-                    List<EventModel> connectionEvents = await GetServerEvents("Connection");
-
                     foreach (ServerModel server in servers)
                     {
-                        EventModel? pcEvent = pcEvents.Find(pce => pce.Server.Id == server.Id);
-                        EventModel? serverEvent = serverEvents.Find(se => se.Server.Id == server.Id);
-                        EventModel? connectionEvent = connectionEvents.Find(ce => ce.Server.Id == server.Id);
-
-                        if (pcEvent != null && serverEvent != null && connectionEvent != null)
-                        {
-                            List<StatusModel> statuses =
-                            [
-                                new StatusModel()
-                                {
-                                    Component = "PC",
-                                    Status = pcEvent.Status,
-                                    StatusClass = APIConverter.GetStatusClass(pcEvent.Status)
-                                },
-                                new StatusModel()
-                                {
-                                    Component = "Server",
-                                    Status = serverEvent.Status,
-                                    StatusClass = APIConverter.GetStatusClass(serverEvent.Status)
-                                },
-                                new StatusModel()
-                                {
-                                    Component = "Connection",
-                                    Status = connectionEvent.Status,
-                                    StatusClass = APIConverter.GetStatusClass(connectionEvent.Status)
-                                }
-                            ];
-                            server.Statuses = statuses;
-
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Server Id: {server.Id}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Server Name: {server.Name}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Host Name: {server.HostName}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Game: {server.Game}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Game Version: {server.GameVersion}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Connection: {server.Connection.IPAddress}:{server.Connection.Port}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Downtime: {server.Downtime?.Time ?? "No Downtime"}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"PC Status: {statuses[0].Status}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"PC Status Class: {statuses[0].StatusClass}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Server Status: {statuses[1].Status}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Server Status Class: {statuses[1].StatusClass}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Connection Status: {statuses[2].Status}");
-                            _Logger.LogMessage(
-                                StandardValues.LoggerValues.Debug,
-                                $"Connection Status Class: {statuses[2].StatusClass}");
-                        }
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Server Id: {server.Id}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Server Name: {server.Name}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Host Name: {server.HostName}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Game: {server.Game}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Game Version: {server.GameVersion}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Connection: {server.Connection.IPAddress}:{server.Connection.Port}");
+                        _Logger.LogMessage(
+                            StandardValues.LoggerValues.Debug,
+                            $"Downtime: {server.Downtime?.Time ?? "No Downtime"}");
                     }
 
                     _Logger.LogMessage(

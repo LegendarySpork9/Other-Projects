@@ -1,5 +1,7 @@
 ﻿@page "/"
 @layout Layout.MainLayout
+@using ServerStatusCommon.Models.Responses
+@using ServerStatusCommon.Converters
 
 <PageTitle>Home</PageTitle>
 
@@ -18,19 +20,55 @@
                         <div class="status-image-wrapper">
                             <img src="/Images/Login Background.png" />
                         </div>
-                        <label>PC Status: <span class="@server.Statuses[0].StatusClass">@server.Statuses[0].Status</span></label>
+                        @{
+                            EventModel? pcEvent = PCEvents.Find(pc => pc.Server.Id == server.Id);
+
+                            if (pcEvent != null)
+                            {
+                                <label>PC Status: <span class="@APIConverter.GetStatusClass(pcEvent.Status)">@pcEvent.Status</span></label>
+                            }
+
+                            else
+                            {
+                                <label>PC Status: <span class="offline">Offline</span></label>
+                            }
+                        }
                     </div>
                     <div class="status-item">
                         <div class="status-image-wrapper">
                             <img src="/Images/Game Icon.png" />
                         </div>
-                        <label>Server Status: <span class="@server.Statuses[1].StatusClass">@server.Statuses[1].Status</span></label>
+                        @{
+                            EventModel? serverEvent = ServerEvents.Find(pc => pc.Server.Id == server.Id);
+
+                            if (serverEvent != null)
+                            {
+                                <label>Server Status: <span class="@APIConverter.GetStatusClass(serverEvent.Status)">@serverEvent.Status</span></label>
+                            }
+
+                            else
+                            {
+                                <label>Server Status: <span class="offline">Offline</span></label>
+                            }
+                        }
                     </div>
                     <div class="status-item">
                         <div class="status-image-wrapper">
                             <img src="/Images/Connection Icon.png" />
                         </div>
-                        <label>Connection Status: <span class="@server.Statuses[2].StatusClass">@server.Statuses[2].Status</span></label>
+                        @{
+                            EventModel? connectionEvent = ConnectionEvents.Find(pc => pc.Server.Id == server.Id);
+
+                            if (connectionEvent != null)
+                            {
+                                <label>Connection Status: <span class="@APIConverter.GetStatusClass(connectionEvent.Status)">@connectionEvent.Status</span></label>
+                            }
+
+                            else
+                            {
+                                <label>Connection Status: <span class="offline">Offline</span></label>
+                            }
+                        }
                     </div>
                 </div>
             </div>

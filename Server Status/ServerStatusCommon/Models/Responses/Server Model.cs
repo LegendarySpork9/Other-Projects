@@ -17,6 +17,5 @@ namespace ServerStatusCommon.Models.Responses
         public required DowntimeModel? Downtime { get; set; }
         public required int EventInterval { get; set; }
         public required bool IsActive { get; set; }
-        public List<StatusModel>? Statuses { get; set; }
     }
 }

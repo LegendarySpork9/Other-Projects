@@ -214,62 +214,11 @@ namespace ServerStatus.Tests.Common.Services
                     IsActive = true
                 }
             ];
-            RelatedServerModel relatedServer = new()
-            {
-                Id = 1,
-                Name = "LocalHost",
-                HostName = "LocalHost",
-                Game = "Minecraft",
-                GameVersion = "1.7.10"
-            };
-            List<EventModel> pcEvents =
-            [
-                new()
-                {
-                    Id = 1,
-                    Component = "PC",
-                    Status = "Offline",
-                    DateOccured = new(2025, 10, 03, 20, 02, 53, DateTimeKind.Utc),
-                    Server = relatedServer
-                }
-            ];
-            List<EventModel> serverEvents =
-            [
-                new()
-                {
-                    Id = 2,
-                    Component = "Server",
-                    Status = "Offline",
-                    DateOccured = new(2025, 10, 03, 20, 02, 53, DateTimeKind.Utc),
-                    Server = relatedServer
-                }
-            ];
-            List<EventModel> connectionEvents =
-            [
-                new()
-                {
-                    Id = 3,
-                    Component = "Connection",
-                    Status = "Offline",
-                    DateOccured = new(2025, 10, 03, 20, 02, 53, DateTimeKind.Utc),
-                    Server = relatedServer
-                }
-            ];
 
             Mock<IAPIClient> _mockAPIClient = new();
             _mockAPIClient.Setup(api => api.GetServers())
                 .ReturnsAsync((
                     expected,
-                    true));
-            _mockAPIClient.SetupSequence(api => api.GetServerEvents(It.IsAny<List<KeyValuePair<string, object>>>()))
-                .ReturnsAsync((
-                    pcEvents,
-                    true))
-                .ReturnsAsync((
-                    serverEvents,
-                    true))
-                .ReturnsAsync((
-                    connectionEvents,
                     true));
 
             APIService _apiService = new(
