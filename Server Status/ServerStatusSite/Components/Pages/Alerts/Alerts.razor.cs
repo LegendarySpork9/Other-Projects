@@ -28,7 +28,7 @@ namespace ServerStatusSite.Components.Pages.Alerts
         [Inject]
         private UserModel User { get; set; } = default!;
 
-        private AlertInformationModel? ReportedAlerts;
+        private AlertInformationModel ReportedAlerts = StandardValues.AlertValues.DefaultAlertInfo;
         private Timer RefreshTimer { get; set; } = new();
         private DateTime NextElapse;
         private int PageNumber = 1;

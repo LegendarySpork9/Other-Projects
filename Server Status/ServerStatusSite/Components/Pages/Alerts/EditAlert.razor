@@ -3,7 +3,7 @@
 <PageTitle>Edit Alert</PageTitle>
 
 <div class="container">
-    <div class="@GetStyle("Form")" style="display: grid; grid-template-columns: 150px 1fr; row-gap: 1rem;">
+    <div class="@GetStyle("Form") form-grid">
         <label>Reporter:</label>
         <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Reporter" />
 
@@ -11,7 +11,7 @@
         <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.AlertDate" />
 
         <label>Server:</label>
-        <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Server" />
+        <input type="text" style="@GetStyle("Input")" readonly="readonly" value="@Alert.Server.Name" />
 
         <label>Component:</label>
         <input type="text" style="@GetStyle("Input")" readonly="readonly" @bind="Alert.Component" />
@@ -25,8 +25,8 @@
             <option value="Resolved">Resolved</option>
             <option value="Investigating">Investigating</option>
         </select>
-        
-        <center style="grid-column: span 2;">
+
+        <div class="form-full-row">
             @if (Loading)
             {
                 <div class="spinner-border text-primary" role="status"></div>
@@ -36,6 +36,6 @@
             {
                 <button class="btn btn-primary" @onclick="SaveClick">Save</button>
             }
-        </center>
+        </div>
     </div>
 </div>

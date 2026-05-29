@@ -48,30 +48,32 @@
 else
 {
     <div class="@GetStyle("Data")">
-        <table class="table" style="@GetStyle()">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Server</th>
-                    <th>Reporter</th>
-                    <th>Component</th>
-                    <th>Component Status</th>
-                    <th>Alert Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var alert in ReportedAlerts.Entries)
-                {
-                    <tr class="clickable-row" @onclick="() => OpenClick(alert)">
-                        <td>@alert.AlertDate.ToString()</td>
-                        <td>@alert.Server</td>
-                        <td>@alert.Reporter</td>
-                        <td>@alert.Component</td>
-                        <td>@alert.ComponentStatus</td>
-                        <td>@alert.AlertStatus</td>
+        <div class="table-responsive">
+            <table class="table" style="@GetStyle()">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Server</th>
+                        <th>Reporter</th>
+                        <th>Component</th>
+                        <th>Component Status</th>
+                        <th>Alert Status</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var alert in ReportedAlerts.Entries)
+                    {
+                        <tr class="clickable-row" @onclick="() => OpenClick(alert)">
+                            <td>@alert.AlertDate.ToString()</td>
+                            <td>@alert.Server</td>
+                            <td>@alert.Reporter</td>
+                            <td>@alert.Component</td>
+                            <td>@alert.ComponentStatus</td>
+                            <td>@alert.AlertStatus</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 }

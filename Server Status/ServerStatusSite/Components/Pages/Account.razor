@@ -3,10 +3,10 @@
 <PageTitle>Account</PageTitle>
 
 <div class="container">
-    <div class="@GetStyle("Form")" style="display: grid; grid-template-columns: 150px 1fr; row-gap: 1rem;">
-        <center style="grid-column: span 2; margin-bottom: 1rem;">
-            <img src="/Images/Account Icon.png" height="100" width="100" />
-        </center>
+    <div class="@GetStyle("Form") form-grid">
+        <div class="form-full-row form-icon">
+            <img src="/Images/Account Icon.png" />
+        </div>
 
         <label>Username:</label>
         <input type="text" style="@GetStyle("Input")" @bind="Username" />
@@ -23,7 +23,7 @@
             <span class="slider round"></span>
         </label>
 
-        <center style="grid-column: span 2;">
+        <div class="form-full-row">
             @if (Loading)
             {
                 <div class="spinner-border text-primary" role="status"></div>
@@ -33,6 +33,6 @@
             {
                 <button class="btn btn-primary" @onclick="SaveClick">Save</button>
             }
-        </center>
+        </div>
     </div>
 </div>
