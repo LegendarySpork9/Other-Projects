@@ -5,14 +5,14 @@ Project Statuses:
 
 Book Reader: On going project. Will be continued when API is finished. Last Modified 21/12/2023
 
-GitHub Scraper: Complete. Last Modified 19/10/2025
+GitHub Scraper: Migrated to https://github.com/LegendarySpork9/GitHubScraper
 
 Github to Codecks: Complete. Last Modified 27/12/2024
 
-Google Drive Sync: Complete. Last Modified 08/07/2025
+Google Drive Sync: Migrated to https://github.com/LegendarySpork9/GoogleDriveSync
 
 NASA Image Report: Complete. Last Modified 14/08/2024
 
-Server Status: Complete. Last Modified 19/10/2025
+Server Status: Migrated to https://github.com/LegendarySpork9/ServerStatus
 
 Copyright © 2024 Toby Hunter, All rights reserved.
