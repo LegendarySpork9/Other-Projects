@@ -1,0 +1,16 @@
+<Window x:Class="LiveScreensaver.ScreensaverWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        WindowState="Maximized"
+        Topmost="True"
+        Background="Black"
+        Cursor="None">
+    <Grid>
+        <MediaElement x:Name="VideoPlayer"
+                      LoadedBehavior="Manual"
+                      UnloadedBehavior="Stop"
+                      Stretch="Uniform"
+                      MediaEnded="VideoPlayerMediaEnded" />
+    </Grid>
+</Window>
