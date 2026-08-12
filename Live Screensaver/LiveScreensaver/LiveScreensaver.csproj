@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>LiveScreensaver</AssemblyName>
+    <Title>Live Screensaver</Title>
+    <Authors>Toby Hunter</Authors>
+    <Description>A screensaver that plays all videos in a folder at random.</Description>
+    <Copyright>Copyright ©  2026</Copyright>
+    <RepositoryUrl>https://github.com/LegendarySpork9/Other-Projects</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>
