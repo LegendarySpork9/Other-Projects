@@ -84,7 +84,7 @@ namespace LiveScreensaver
         /// </summary>
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            Close();
+            Application.Current.Shutdown();
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace LiveScreensaver
         /// </summary>
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            Close();
+            Application.Current.Shutdown();
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace LiveScreensaver
 
             if (Math.Abs(delta.X) > 10 || Math.Abs(delta.Y) > 10)
             {
-                Close();
+                Application.Current.Shutdown();
             }
         }
     }
