@@ -94,12 +94,17 @@ namespace LiveScreensaver
         /// </summary>
         protected override void OnExit(ExitEventArgs e)
         {
-            if (ScriptProcess != null && !ScriptProcess.HasExited)
+            try
             {
-                ScriptProcess.Kill();
+                if (ScriptProcess != null && !ScriptProcess.HasExited)
+                {
+                    ScriptProcess.Kill();
+                }
             }
+            catch { }
 
             base.OnExit(e);
+            Environment.Exit(0);
         }
 
         /// <summary>
