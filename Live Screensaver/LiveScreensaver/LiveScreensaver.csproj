@@ -13,6 +13,9 @@
     <Copyright>Copyright ©  2026</Copyright>
     <RepositoryUrl>https://github.com/LegendarySpork9/Other-Projects</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
 </Project>
