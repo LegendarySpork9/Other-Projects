@@ -8,6 +8,8 @@ namespace LiveScreensaver
 {
     public partial class App : Application
     {
+        private Process? ScriptProcess;
+
         /// <summary>
         /// Runs the application code.
         /// </summary>
@@ -54,12 +56,12 @@ namespace LiveScreensaver
 
                 if (!string.IsNullOrEmpty(startupScript) && File.Exists(startupScript))
                 {
-                    Process.Start(new ProcessStartInfo
+                    ScriptProcess = Process.Start(new ProcessStartInfo
                     {
                         FileName = "powershell.exe",
                         Arguments = $"-ExecutionPolicy Bypass -WindowStyle Hidden -File \"{startupScript}\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
+                        UseShellExecute = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
                     });
                 }
 
@@ -85,6 +87,19 @@ namespace LiveScreensaver
             {
                 Shutdown();
             }
+        }
+
+        /// <summary>
+        /// Kills the script process when the application exits.
+        /// </summary>
+        protected override void OnExit(ExitEventArgs e)
+        {
+            if (ScriptProcess != null && !ScriptProcess.HasExited)
+            {
+                ScriptProcess.Kill();
+            }
+
+            base.OnExit(e);
         }
 
         /// <summary>
