@@ -11,7 +11,6 @@ namespace LiveScreensaver
             InitializeComponent();
 
             FolderPath.Text = App.GetVideoFolder();
-            ScriptPath.Text = App.GetScript();
         }
         
         /// <summary>
@@ -33,33 +32,13 @@ namespace LiveScreensaver
         }
 
         /// <summary>
-        /// Opens a dialog to select a script.
-        /// </summary>
-        private void BrowseScriptClick(
-            object sender,
-            RoutedEventArgs e)
-        {
-            OpenFileDialog dialog = new()
-            {
-                Title = "Select Startup Script",
-                Filter = "PowerShell Scripts (*.ps1)|*.ps1"
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                ScriptPath.Text = dialog.FileName;
-            }
-        }
-
-        /// <summary>
-        /// Triggers the saving of the settings.
+        /// Triggers the saving of the video folder.
         /// </summary>
         private void OKClick(
             object sender,
             RoutedEventArgs e)
         {
             App.SetVideoFolder(FolderPath.Text);
-            App.SetScript(ScriptPath.Text);
 
             Close();
         }

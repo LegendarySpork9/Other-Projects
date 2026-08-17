@@ -1,5 +1,4 @@
 // Copyright © - 12/08/2026 - Toby Hunter
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using Microsoft.Win32;
@@ -50,19 +49,6 @@ namespace LiveScreensaver
                     return;
                 }
 
-                string startupScript = GetScript();
-
-                if (!string.IsNullOrEmpty(startupScript) && File.Exists(startupScript))
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = "powershell.exe",
-                        Arguments = $"-ExecutionPolicy Bypass -WindowStyle Hidden -File \"{startupScript}\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    });
-                }
-
                 ScreensaverWindow window = new(files);
 
                 window.Show();
@@ -103,24 +89,6 @@ namespace LiveScreensaver
         {
             RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\LiveScreensaver");
             key.SetValue("VideoFolder", path);
-        }
-
-        /// <summary>
-        /// Returns the script path from the registry.
-        /// </summary>
-        public static string GetScript()
-        {
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\LiveScreensaver");
-            return key?.GetValue("Script") as string ?? "";
-        }
-
-        /// <summary>
-        /// Adds a registry entry to store the script path.
-        /// </summary>
-        public static void SetScript(string path)
-        {
-            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\LiveScreensaver");
-            key.SetValue("Script", path);
         }
     }
 }
