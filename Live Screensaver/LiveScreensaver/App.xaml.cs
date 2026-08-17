@@ -1,5 +1,4 @@
 // Copyright © - 12/08/2026 - Toby Hunter
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using Microsoft.Win32;
@@ -8,8 +7,6 @@ namespace LiveScreensaver
 {
     public partial class App : Application
     {
-        private Process? ScriptProcess;
-
         /// <summary>
         /// Runs the application code.
         /// </summary>
@@ -52,19 +49,6 @@ namespace LiveScreensaver
                     return;
                 }
 
-                string startupScript = GetScript();
-
-                if (!string.IsNullOrEmpty(startupScript) && File.Exists(startupScript))
-                {
-                    ScriptProcess = Process.Start(new ProcessStartInfo
-                    {
-                        FileName = "powershell.exe",
-                        Arguments = $"-ExecutionPolicy Bypass -WindowStyle Hidden -File \"{startupScript}\"",
-                        UseShellExecute = true,
-                        WindowStyle = ProcessWindowStyle.Hidden
-                    });
-                }
-
                 ScreensaverWindow window = new(files);
 
                 window.Show();
@@ -90,24 +74,6 @@ namespace LiveScreensaver
         }
 
         /// <summary>
-        /// Kills the script process when the application exits.
-        /// </summary>
-        protected override void OnExit(ExitEventArgs e)
-        {
-            try
-            {
-                if (ScriptProcess != null && !ScriptProcess.HasExited)
-                {
-                    ScriptProcess.Kill();
-                }
-            }
-            catch { }
-
-            base.OnExit(e);
-            Environment.Exit(0);
-        }
-
-        /// <summary>
         /// Returns the folder for the videos from the registry
         /// </summary>
         public static string GetVideoFolder()
@@ -123,24 +89,6 @@ namespace LiveScreensaver
         {
             RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\LiveScreensaver");
             key.SetValue("VideoFolder", path);
-        }
-
-        /// <summary>
-        /// Returns the script path from the registry.
-        /// </summary>
-        public static string GetScript()
-        {
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\LiveScreensaver");
-            return key?.GetValue("Script") as string ?? "";
-        }
-
-        /// <summary>
-        /// Adds a registry entry to store the script path.
-        /// </summary>
-        public static void SetScript(string path)
-        {
-            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\LiveScreensaver");
-            key.SetValue("Script", path);
         }
     }
 }
