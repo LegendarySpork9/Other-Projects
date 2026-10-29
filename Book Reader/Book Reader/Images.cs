@@ -18,15 +18,28 @@ namespace Book_Reader
         // Gets the image from the location.
         public static string GetNextImage(string Chapter, int PictureNumber)
         {
+            string safeChapter = Path.GetFileName(Chapter);
+
+            string filePath;
+
             if (PictureNumber == 1)
             {
-                return $@"{Text_Model.ImageLocation}\{Chapter}.png";
+                filePath = Path.Combine(Text_Model.ImageLocation, $"{safeChapter}.png");
             }
 
             else
             {
-                return $@"{Text_Model.ImageLocation}\{Chapter} {PictureNumber}.png";
+                filePath = Path.Combine(Text_Model.ImageLocation, $"{safeChapter} {PictureNumber}.png");
             }
+
+            string resolvedPath = Path.GetFullPath(filePath);
+
+            if (!resolvedPath.StartsWith(Path.GetFullPath(Text_Model.ImageLocation)))
+            {
+                return string.Empty;
+            }
+
+            return resolvedPath;
         }
     }
 }
