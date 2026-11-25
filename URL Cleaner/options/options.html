@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>URL Cleaner Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <h1>URL Cleaner Settings</h1>
+
+    <section class="card">
+      <h2>Auto Clean</h2>
+      <label class="checkbox-label">
+        <input type="checkbox" id="autoclean-enabled">
+        <span>Automatically clean URLs when sites copy them to your clipboard</span>
+      </label>
+      <p class="hint">When enabled, links copied by buttons like Twitter/X's "Copy link" are cleaned instantly. Requires a page refresh to take effect.</p>
+    </section>
+
+    <section class="card">
+      <h2>Default Mode</h2>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="mode" value="stripAll">
+          <span class="radio-text">
+            <strong>Strip All</strong>
+            <small>Remove everything after ? in the URL</small>
+          </span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="mode" value="stripSelected">
+          <span class="radio-text">
+            <strong>Strip Selected</strong>
+            <small>Remove only known tracking parameters</small>
+          </span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="mode" value="whitelist">
+          <span class="radio-text">
+            <strong>Whitelist</strong>
+            <small>Keep only specified parameters, remove everything else</small>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <section class="card" id="categories-section">
+      <h2>Tracking Parameters</h2>
+      <p class="hint">Used in Strip Selected mode. Check categories to include in removal.</p>
+      <div id="categories"></div>
+    </section>
+
+    <section class="card">
+      <h2>Custom Parameters</h2>
+      <p class="hint">Additional parameter names to strip (used in Strip Selected mode).</p>
+      <div class="add-row">
+        <input type="text" id="custom-input" placeholder="e.g. my_tracking_id" class="text-input">
+        <button id="custom-add" class="btn btn-small">Add</button>
+      </div>
+      <div id="custom-list" class="tag-list"></div>
+    </section>
+
+    <section class="card">
+      <h2>Wildcard Patterns</h2>
+      <label class="checkbox-label">
+        <input type="checkbox" id="wildcards-enabled">
+        <span>Enable wildcard matching</span>
+      </label>
+      <div class="add-row">
+        <input type="text" id="wildcard-input" placeholder="e.g. track_*" class="text-input">
+        <button id="wildcard-add" class="btn btn-small">Add</button>
+      </div>
+      <div id="wildcard-list" class="tag-list"></div>
+    </section>
+
+    <section class="card" id="whitelist-section">
+      <h2>Whitelist</h2>
+      <p class="hint">Parameters to keep when using Whitelist mode.</p>
+      <div class="add-row">
+        <input type="text" id="whitelist-input" placeholder="e.g. search" class="text-input">
+        <button id="whitelist-add" class="btn btn-small">Add</button>
+      </div>
+      <div id="whitelist-list" class="tag-list"></div>
+    </section>
+
+    <section class="card">
+      <h2>Per-Domain Rules</h2>
+      <p class="hint">Override the default mode for specific domains.</p>
+      <div class="domain-add-row">
+        <input type="text" id="domain-input" placeholder="e.g. instagram.com" class="text-input">
+        <select id="domain-mode" class="select-input">
+          <option value="stripAll">Strip All</option>
+          <option value="stripSelected">Strip Selected</option>
+          <option value="whitelist">Whitelist</option>
+        </select>
+        <button id="domain-add" class="btn btn-small">Add</button>
+      </div>
+      <div id="domain-list"></div>
+    </section>
+
+    <section class="card">
+      <h2>Test</h2>
+      <p class="hint">Paste a URL to preview how it will be cleaned with current settings.</p>
+      <input type="text" id="test-input" placeholder="https://example.com/page?utm_source=test&id=123" class="text-input full-width">
+      <div id="test-result" class="test-result"></div>
+    </section>
+
+    <section class="card actions-card">
+      <div class="actions-row">
+        <button id="reset-btn" class="btn btn-danger">Reset to Defaults</button>
+        <div class="actions-right">
+          <button id="export-btn" class="btn btn-secondary">Export</button>
+          <button id="import-btn" class="btn btn-secondary">Import</button>
+          <input type="file" id="import-file" accept=".json" hidden>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

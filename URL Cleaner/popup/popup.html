@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <h1>URL Cleaner</h1>
+    <button id="settings-btn" class="icon-btn" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="section">
+    <label class="label">Original</label>
+    <div id="original-url" class="url-display"></div>
+  </div>
+
+  <div class="section">
+    <label class="label">Cleaned</label>
+    <div id="cleaned-url" class="url-display cleaned"></div>
+  </div>
+
+  <div class="mode-bar">
+    <button id="mode-stripAll" class="mode-btn active" data-mode="stripAll">Strip All</button>
+    <button id="mode-stripSelected" class="mode-btn" data-mode="stripSelected">Strip Selected</button>
+    <button id="mode-whitelist" class="mode-btn" data-mode="whitelist">Whitelist</button>
+  </div>
+
+  <button id="copy-btn" class="copy-btn">Copy Clean URL</button>
+
+  <div id="status" class="status"></div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
